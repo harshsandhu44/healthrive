@@ -6,10 +6,10 @@ const HomePage = () => {
       <h1 className="text-4xl font-bold text-foreground">
         Welcome to Healthrive
       </h1>
-      <p className="text-lg text-muted-foreground">
+      <p className="text-lg text-muted-foreground font-medium">
         Explore our platform and start your journey to better health.
       </p>
-      <Button>Get Started</Button>
+      <Button className="font-semibold">Get Started</Button>
     </div>
   );
 };

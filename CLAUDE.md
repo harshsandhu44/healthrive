@@ -33,6 +33,7 @@ The project uses Next.js App Router with the following structure:
 - `src/components/ui/` - shadcn/ui components (auto-generated)
 - `src/components/providers/` - Application providers (theme, etc.)
 - `src/lib/` - Utility functions including shadcn/ui utils
+- `public/fonts/` - Satoshi variable font files (TTF format)
 - `public/` - Static assets (SVG icons)
 - `components.json` - shadcn/ui configuration
 
@@ -40,6 +41,7 @@ The project uses Next.js App Router with the following structure:
 
 - **Framework**: Next.js 15 with App Router
 - **Styling**: Tailwind CSS 4 with PostCSS configuration + shadcn/ui components
+- **Typography**: Satoshi variable font (100-900 weights) with fallback to system fonts
 - **UI Components**: shadcn/ui with stone base color and New York style
 - **TypeScript**: Strict mode enabled with path aliases (`@/*` maps to `./src/*`)
 - **Linting**: ESLint with Next.js core-web-vitals and TypeScript configurations
@@ -53,6 +55,8 @@ The project uses Next.js App Router with the following structure:
 - Strict TypeScript settings with noEmit for type checking only
 - shadcn/ui configured with stone color palette and CSS variables
 - Component library includes Radix UI primitives with custom styling
+- Satoshi variable font configured as default sans-serif with @font-face declarations
+- Font display swap for optimal loading performance
 
 ## Development Notes
 
