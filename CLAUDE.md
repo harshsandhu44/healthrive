@@ -27,19 +27,24 @@ Healthrive is a comprehensive health and wellness platform built with Next.js 15
 The project uses Next.js App Router with the following structure:
 
 - `src/app/` - Main application directory containing pages and layouts
+- `src/app/(auth)/` - Auth route group with sign-in/sign-up pages
+- `src/app/dashboard/` - Protected dashboard pages
 - `src/app/layout.tsx` - Root layout with metadata and HTML structure
 - `src/app/page.tsx` - Homepage component
 - `src/app/globals.css` - Global styles with Tailwind CSS imports and shadcn/ui variables
 - `src/components/ui/` - shadcn/ui components (auto-generated)
-- `src/components/providers/` - Application providers (theme, etc.)
+- `src/components/providers/` - Application providers (theme, auth, etc.)
 - `src/lib/` - Utility functions including shadcn/ui utils
+- `src/middleware.ts` - Clerk authentication middleware
 - `public/fonts/` - Satoshi variable font files (TTF format)
 - `public/` - Static assets (SVG icons)
 - `components.json` - shadcn/ui configuration
+- `.env.local` - Environment variables for Clerk keys
 
 ## Architecture Notes
 
 - **Framework**: Next.js 15 with App Router
+- **Authentication**: Clerk for user management and auth flows
 - **Styling**: Tailwind CSS 4 with PostCSS configuration + shadcn/ui components
 - **Typography**: Satoshi variable font (100-900 weights) with fallback to system fonts
 - **UI Components**: shadcn/ui with stone base color and New York style
@@ -57,6 +62,8 @@ The project uses Next.js App Router with the following structure:
 - Component library includes Radix UI primitives with custom styling
 - Satoshi variable font configured as default sans-serif with @font-face declarations
 - Font display swap for optimal loading performance
+- Clerk authentication with route protection middleware
+- Environment-based configuration for auth keys and redirect URLs
 
 ## Development Notes
 
@@ -64,7 +71,16 @@ The project uses Next.js App Router with the following structure:
 - Metadata API for SEO configuration in layout files
 - `suppressHydrationWarning` enabled in root HTML element for next-themes
 - Theme switching with next-themes (light/dark/system modes)
-- Provider pattern with RootProvider wrapping ThemeProvider
+- Provider pattern with RootProvider wrapping ClerkProvider and ThemeProvider
+- Authentication state management with Clerk's SignedIn/SignedOut components
+- Protected routes using middleware for /dashboard and /profile paths
 - Prettier and ESLint configured with pre-commit hooks via Husky
 - lint-staged runs automatic formatting and linting on commit
 - Empty README.md indicates this is a new project setup
+
+## Authentication Setup
+
+1. Copy `.env.example` to `.env.local`
+2. Add your Clerk publishable and secret keys from Clerk Dashboard
+3. Configure redirect URLs in Clerk Dashboard to match environment variables
+4. Protected routes are automatically secured via middleware
