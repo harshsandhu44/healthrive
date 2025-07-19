@@ -12,10 +12,14 @@ Healthrive is a comprehensive health and wellness platform built with Next.js 15
 - `npm run build` - Create production build
 - `npm start` - Start production server
 - `npm run lint` - Run ESLint to check code quality and TypeScript types
+- `npm run lint:fix` - Run ESLint and automatically fix issues
+- `npm run format` - Format all code with Prettier
+- `npm run format:check` - Check if code is properly formatted
 
 ## Project Structure
 
 The project uses Next.js App Router with the following structure:
+
 - `src/app/` - Main application directory containing pages and layouts
 - `src/app/layout.tsx` - Root layout with metadata and HTML structure
 - `src/app/page.tsx` - Homepage component
@@ -42,4 +46,6 @@ The project uses Next.js App Router with the following structure:
 - Uses React 19 with latest features and patterns
 - Metadata API for SEO configuration in layout files
 - `suppressHydrationWarning` enabled in root HTML element
+- Prettier and ESLint configured with pre-commit hooks via Husky
+- lint-staged runs automatic formatting and linting on commit
 - Empty README.md indicates this is a new project setup
