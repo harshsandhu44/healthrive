@@ -35,16 +35,19 @@ The project uses Next.js App Router with the following structure:
 - `src/components/ui/` - shadcn/ui components (auto-generated)
 - `src/components/providers/` - Application providers (theme, auth, etc.)
 - `src/lib/` - Utility functions including shadcn/ui utils
+- `src/lib/supabase/` - Supabase client utilities (browser, server, middleware)
 - `src/middleware.ts` - Clerk authentication middleware
+- `supabase/` - Supabase configuration and migrations
 - `public/fonts/` - Satoshi variable font files (TTF format)
 - `public/` - Static assets (SVG icons)
 - `components.json` - shadcn/ui configuration
-- `.env.local` - Environment variables for Clerk keys
+- `.env.local` - Environment variables for Clerk and Supabase keys
 
 ## Architecture Notes
 
 - **Framework**: Next.js 15 with App Router
 - **Authentication**: Clerk for user management and auth flows
+- **Database**: Supabase (PostgreSQL) with local development setup
 - **Styling**: Tailwind CSS 4 with PostCSS configuration + shadcn/ui components
 - **Typography**: Satoshi variable font (100-900 weights) with fallback to system fonts
 - **UI Components**: shadcn/ui with stone base color and New York style
@@ -63,7 +66,8 @@ The project uses Next.js App Router with the following structure:
 - Satoshi variable font configured as default sans-serif with @font-face declarations
 - Font display swap for optimal loading performance
 - Clerk authentication with route protection middleware
-- Environment-based configuration for auth keys and redirect URLs
+- Supabase SSR integration with client/server utilities
+- Environment-based configuration for auth and database keys
 
 ## Development Notes
 
@@ -71,8 +75,9 @@ The project uses Next.js App Router with the following structure:
 - Metadata API for SEO configuration in layout files
 - `suppressHydrationWarning` enabled in root HTML element for next-themes
 - Theme switching with next-themes (light/dark/system modes)
-- Provider pattern with RootProvider wrapping ClerkProvider and ThemeProvider
+- Provider pattern with RootProvider wrapping ClerkProvider, SupabaseProvider, and ThemeProvider
 - Authentication state management with Clerk's SignedIn/SignedOut components
+- Database integration with Supabase client context and utilities
 - Protected routes using middleware for /dashboard and /profile paths
 - Prettier and ESLint configured with pre-commit hooks via Husky
 - lint-staged runs automatic formatting and linting on commit
@@ -84,3 +89,12 @@ The project uses Next.js App Router with the following structure:
 2. Add your Clerk publishable and secret keys from Clerk Dashboard
 3. Configure redirect URLs in Clerk Dashboard to match environment variables
 4. Protected routes are automatically secured via middleware
+
+## Database Setup (Local Development)
+
+1. Install Docker Desktop and start it
+2. Run `npx supabase start` to start local Supabase instance
+3. Access Supabase Studio at http://127.0.0.1:54323
+4. Database URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+5. Use `npx supabase stop` to stop the local instance
+6. Tables and migrations can be created in the `supabase/` directory
