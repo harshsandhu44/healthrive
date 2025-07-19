@@ -1,8 +1,15 @@
+import { Button } from "@/components/ui/button";
+
 const HomePage = () => {
   return (
-    <div>
-      <h1>Welcome to Healthrive</h1>
-      <p>Explore our platform and start your journey to better health.</p>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
+      <h1 className="text-4xl font-bold text-foreground">
+        Welcome to Healthrive
+      </h1>
+      <p className="text-lg text-muted-foreground">
+        Explore our platform and start your journey to better health.
+      </p>
+      <Button>Get Started</Button>
     </div>
   );
 };
