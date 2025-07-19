@@ -31,6 +31,7 @@ The project uses Next.js App Router with the following structure:
 - `src/app/page.tsx` - Homepage component
 - `src/app/globals.css` - Global styles with Tailwind CSS imports and shadcn/ui variables
 - `src/components/ui/` - shadcn/ui components (auto-generated)
+- `src/components/providers/` - Application providers (theme, etc.)
 - `src/lib/` - Utility functions including shadcn/ui utils
 - `public/` - Static assets (SVG icons)
 - `components.json` - shadcn/ui configuration
@@ -57,7 +58,9 @@ The project uses Next.js App Router with the following structure:
 
 - Uses React 19 with latest features and patterns
 - Metadata API for SEO configuration in layout files
-- `suppressHydrationWarning` enabled in root HTML element
+- `suppressHydrationWarning` enabled in root HTML element for next-themes
+- Theme switching with next-themes (light/dark/system modes)
+- Provider pattern with RootProvider wrapping ThemeProvider
 - Prettier and ESLint configured with pre-commit hooks via Husky
 - lint-staged runs automatic formatting and linting on commit
 - Empty README.md indicates this is a new project setup
