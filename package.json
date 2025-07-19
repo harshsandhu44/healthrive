@@ -10,12 +10,7 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky",
-    "docker:dev": "docker-compose up healthrive-dev ngrok",
-    "docker:build": "docker build -t healthrive:latest .",
-    "docker:prod": "docker-compose --profile production up healthrive-prod",
-    "docker:stop": "docker-compose down",
-    "docker:clean": "docker-compose down -v --remove-orphans && docker system prune -f"
+    "prepare": "husky"
   },
   "dependencies": {
     "next": "15.4.2",
