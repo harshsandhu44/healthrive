@@ -8,10 +8,10 @@ import { ThemeProvider } from './theme-provider';
 
 export const RootProvider = ({ children }: PropsWithChildren) => {
   return (
-    <ClerkProvider>
-      <SupabaseProvider>
-        <ThemeProvider>{children}</ThemeProvider>
-      </SupabaseProvider>
-    </ClerkProvider>
+    <SupabaseProvider>
+      <ThemeProvider>
+        <ClerkProvider>{children}</ClerkProvider>
+      </ThemeProvider>
+    </SupabaseProvider>
   );
 };
