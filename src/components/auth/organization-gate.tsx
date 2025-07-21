@@ -1,8 +1,6 @@
 'use client';
 
 import { useOrganization, useOrganizationList, useUser } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 import { CreateOrganization } from './create-organization';
 import { OrganizationSelector } from './organization-selector';
@@ -11,7 +9,6 @@ export function OrganizationGate({ children }: { children: React.ReactNode }) {
   const { user, isLoaded: userLoaded } = useUser();
   const { organization, isLoaded: orgLoaded } = useOrganization();
   const { organizationList, isLoaded: orgListLoaded } = useOrganizationList();
-  const router = useRouter();
 
   const isLoaded = userLoaded && orgLoaded && orgListLoaded;
 
@@ -27,20 +24,7 @@ export function OrganizationGate({ children }: { children: React.ReactNode }) {
     organizationName: organization?.name,
   });
 
-  useEffect(() => {
-    console.info('🔄 OrganizationGate: useEffect triggered', {
-      isLoaded,
-      hasUser: !!user,
-      hasOrganization: !!organization,
-    });
-    if (isLoaded && user && organization) {
-      console.info('🧭 OrganizationGate: Redirecting to dashboard', {
-        organizationId: organization.id,
-        organizationName: organization.name,
-      });
-      router.push('/dashboard');
-    }
-  }, [isLoaded, user, organization, router]);
+  // Remove redirect logic since OrganizationGate is used in dashboard layout
 
   if (!isLoaded || !user) {
     console.info('⏳ OrganizationGate: Loading state');
