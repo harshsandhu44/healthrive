@@ -1,5 +1,6 @@
 'use client';
 
+import { useOrganization } from '@clerk/nextjs';
 import { Building2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export function CreateOrganization() {
+  const { setActive } = useOrganization();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
@@ -59,7 +61,12 @@ export function CreateOrganization() {
         throw new Error('Failed to create organization');
       }
 
-      // Redirect to dashboard after creation
+      const result = await response.json();
+
+      // Set the newly created organization as active
+      await setActive({ organization: result.organization.id });
+
+      // Redirect to dashboard after setting active organization
       router.push('/dashboard');
     } catch (err) {
       setError('Failed to create organization. Please try again.');
