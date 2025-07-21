@@ -5,7 +5,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   createContext,
   useContext,
-  useEffect,
   useState,
   type PropsWithChildren,
 } from "react";
@@ -18,17 +17,6 @@ const Context = createContext<SupabaseContext | undefined>(undefined);
 
 export function SupabaseProvider({ children }: PropsWithChildren) {
   const [supabase] = useState(() => createClient());
-
-  useEffect(() => {
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      // Handle auth state changes if needed
-      console.log("Supabase auth state changed:", event, session?.user?.email);
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
 
   return <Context.Provider value={{ supabase }}>{children}</Context.Provider>;
 }

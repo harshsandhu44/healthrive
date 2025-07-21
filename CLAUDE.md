@@ -47,7 +47,7 @@ The project uses Next.js App Router with the following structure:
 
 - **Framework**: Next.js 15 with App Router
 - **Authentication**: Clerk for user management and auth flows
-- **Database**: Supabase (PostgreSQL) with local development setup
+- **Database**: Supabase (PostgreSQL) with local development setup - used only for data storage
 - **Styling**: Tailwind CSS 4 with PostCSS configuration + shadcn/ui components
 - **Typography**: Satoshi variable font (100-900 weights) with fallback to system fonts
 - **UI Components**: shadcn/ui with stone base color and New York style
@@ -77,7 +77,7 @@ The project uses Next.js App Router with the following structure:
 - Theme switching with next-themes (light/dark/system modes)
 - Provider pattern with RootProvider wrapping ClerkProvider, SupabaseProvider, and ThemeProvider
 - Authentication state management with Clerk's SignedIn/SignedOut components
-- Database integration with Supabase client context and utilities
+- Database integration with Supabase client context (data only, auth handled by Clerk)
 - Protected routes using middleware for /dashboard and /profile paths
 - Prettier and ESLint configured with pre-commit hooks via Husky
 - lint-staged runs automatic formatting and linting on commit
@@ -98,3 +98,4 @@ The project uses Next.js App Router with the following structure:
 4. Database URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
 5. Use `npx supabase stop` to stop the local instance
 6. Tables and migrations can be created in the `supabase/` directory
+7. **Note**: Supabase is used only for data storage - authentication is handled by Clerk
