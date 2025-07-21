@@ -48,7 +48,7 @@ export function OrganizationGate({ children }: { children: React.ReactNode }) {
       organizationCount: organizationList.length,
       organizations: organizationList,
     });
-    return <OrganizationSelector organizations={organizationList} />;
+    return <OrganizationSelector />;
   }
 
   // User has no organizations
@@ -58,6 +58,8 @@ export function OrganizationGate({ children }: { children: React.ReactNode }) {
       organizationListUndefined: organizationList === undefined,
       organizationListLength: organizationList?.length,
       organizationListEmpty: organizationList?.length === 0,
+      userMembershipsData: userMemberships.data,
+      userMembershipsCount: userMemberships.count,
     });
     return <CreateOrganization />;
   }
