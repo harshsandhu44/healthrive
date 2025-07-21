@@ -19,6 +19,9 @@ export function OrganizationGate({ children }: { children: React.ReactNode }) {
     isLoaded,
     hasUser: !!user,
     hasOrganization: !!organization,
+    organizationList: organizationList,
+    organizationListType: typeof organizationList,
+    organizationListLength: organizationList?.length,
     organizationCount: organizationList?.length || 0,
     organizationId: organization?.id,
     organizationName: organization?.name,
@@ -39,13 +42,19 @@ export function OrganizationGate({ children }: { children: React.ReactNode }) {
   if (organizationList && organizationList.length > 0 && !organization) {
     console.info('📋 OrganizationGate: Showing organization selector', {
       organizationCount: organizationList.length,
+      organizations: organizationList,
     });
     return <OrganizationSelector organizations={organizationList} />;
   }
 
   // User has no organizations
   if (!organizationList || organizationList.length === 0) {
-    console.info('➕ OrganizationGate: Showing create organization');
+    console.info('➕ OrganizationGate: Showing create organization', {
+      organizationListNull: organizationList === null,
+      organizationListUndefined: organizationList === undefined,
+      organizationListLength: organizationList?.length,
+      organizationListEmpty: organizationList?.length === 0,
+    });
     return <CreateOrganization />;
   }
 
