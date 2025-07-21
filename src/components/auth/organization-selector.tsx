@@ -1,6 +1,6 @@
 'use client';
 
-import { useOrganization } from '@clerk/nextjs';
+import { useOrganizationList } from '@clerk/nextjs';
 import { Building2, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -22,7 +22,7 @@ interface OrganizationSelectorProps {
 export function OrganizationSelector({
   organizations,
 }: OrganizationSelectorProps) {
-  const { setActive } = useOrganization();
+  const { setActive } = useOrganizationList();
   const router = useRouter();
 
   const handleSelectOrganization = async (orgId: string) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useOrganization } from '@clerk/nextjs';
+import { useOrganizationList } from '@clerk/nextjs';
 import { Building2, Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export function CreateOrganization() {
-  const { setActive } = useOrganization();
+  const { setActive } = useOrganizationList();
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: '',
