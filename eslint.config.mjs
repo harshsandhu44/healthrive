@@ -1,6 +1,7 @@
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { FlatCompat } from '@eslint/eslintrc';
+import prettierPlugin from 'eslint-plugin-prettier';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -15,10 +16,27 @@ const eslintConfig = [
     files: ['**/*.{js,jsx,ts,tsx,mjs}'],
     ignores: ['eslint.config.mjs'],
     plugins: {
-      prettier: (await import('eslint-plugin-prettier')).default,
+      prettier: prettierPlugin,
     },
     rules: {
-      'prettier/prettier': 'error',
+      'prettier/prettier': [
+        'error',
+        {
+          semi: true,
+          trailingComma: 'es5',
+          singleQuote: true,
+          printWidth: 80,
+          tabWidth: 2,
+          useTabs: false,
+          bracketSpacing: true,
+          bracketSameLine: false,
+          arrowParens: 'avoid',
+          endOfLine: 'lf',
+          quoteProps: 'as-needed',
+          jsxSingleQuote: true,
+          proseWrap: 'preserve',
+        },
+      ],
       '@typescript-eslint/no-unused-vars': [
         'error',
         {
@@ -37,8 +55,6 @@ const eslintConfig = [
         { props: 'never', children: 'never' },
       ],
       'react/self-closing-comp': 'error',
-      'quotes': ['error', 'single', { avoidEscape: true }],
-      'jsx-quotes': ['error', 'prefer-single'],
     },
   },
 ];
