@@ -1,8 +1,8 @@
 import { SignedIn, SignedOut } from '@clerk/nextjs';
 import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Button } from '@/components/ui/button';
 import { UserButton } from '@/components/user-button';
 
 const HomePage = () => {

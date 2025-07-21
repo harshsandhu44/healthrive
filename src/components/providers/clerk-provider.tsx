@@ -1,8 +1,18 @@
 'use client';
 
 import { ClerkProvider as NextClerkProvider } from '@clerk/nextjs';
-import type { PropsWithChildren } from 'react';
+import { dark } from '@clerk/themes';
+import { useTheme } from 'next-themes';
+import { type PropsWithChildren } from 'react';
 
 export function ClerkProvider({ children }: PropsWithChildren) {
-  return <NextClerkProvider>{children}</NextClerkProvider>;
+  const { theme } = useTheme();
+
+  return (
+    <NextClerkProvider
+      appearance={{ baseTheme: theme === 'dark' ? dark : undefined }}
+    >
+      {children}
+    </NextClerkProvider>
+  );
 }

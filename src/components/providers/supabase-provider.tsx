@@ -1,6 +1,5 @@
 'use client';
 
-import { createClient } from '@/lib/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import {
   createContext,
@@ -8,6 +7,8 @@ import {
   useState,
   type PropsWithChildren,
 } from 'react';
+
+import { createClient } from '@/lib/supabase/client';
 
 type SupabaseContext = {
   supabase: SupabaseClient;

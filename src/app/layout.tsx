@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import type { PropsWithChildren } from 'react';
+
 import { RootProvider } from '@/components/providers';
+import { ThemeToggle } from '@/components/theme-toggle';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -13,7 +15,10 @@ export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang='en' suppressHydrationWarning>
       <body>
-        <RootProvider>{children}</RootProvider>
+        <RootProvider>
+          {children}
+          <ThemeToggle />
+        </RootProvider>
       </body>
     </html>
   );
