@@ -37,42 +37,75 @@ export function CreateOrganization() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.info('🚀 CreateOrganization: Form submitted', { formData });
 
     if (!formData.name.trim()) {
+      console.warn('⚠️ CreateOrganization: Empty organization name');
       setError('Organization name is required');
       return;
     }
 
     setIsLoading(true);
+    console.info(
+      '📡 CreateOrganization: Starting organization creation request'
+    );
+
     try {
       // Create organization using Clerk
+      const requestBody = {
+        name: formData.name.trim(),
+        slug: formData.slug.trim() || undefined,
+      };
+      console.info('📤 CreateOrganization: Sending API request', requestBody);
+
       const response = await fetch('/api/organizations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          slug: formData.slug.trim() || undefined,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
+      console.info(
+        '📥 CreateOrganization: API response status',
+        response.status
+      );
+
       if (!response.ok) {
+        const errorData = await response.text();
+        console.error('❌ CreateOrganization: API request failed', {
+          status: response.status,
+          error: errorData,
+        });
         throw new Error('Failed to create organization');
       }
 
       const result = await response.json();
+      console.info(
+        '✅ CreateOrganization: Organization created successfully',
+        result
+      );
 
       // Set the newly created organization as active
+      console.info(
+        '🔄 CreateOrganization: Setting organization as active',
+        result.organization.id
+      );
       await setActive({ organization: result.organization.id });
+      console.info('✅ CreateOrganization: Organization set as active');
 
       // Redirect to dashboard after setting active organization
+      console.info('🧭 CreateOrganization: Redirecting to dashboard');
       router.push('/dashboard');
     } catch (err) {
+      console.error(
+        '❌ CreateOrganization: Error during creation process',
+        err
+      );
       setError('Failed to create organization. Please try again.');
-      console.error('Organization creation error:', err);
     } finally {
       setIsLoading(false);
+      console.info('🏁 CreateOrganization: Process completed');
     }
   };
 
