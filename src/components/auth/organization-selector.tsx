@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 interface Organization {
   id: string;
   name: string;
-  slug: string;
+  slug: string | null;
   imageUrl?: string;
 }
 
@@ -27,8 +27,12 @@ export function OrganizationSelector({
 
   const handleSelectOrganization = async (orgId: string) => {
     try {
-      await setActive({ organization: orgId });
-      router.push('/dashboard');
+      if (setActive) {
+        await setActive({ organization: orgId });
+        router.push('/dashboard');
+      } else {
+        console.warn('⚠️ OrganizationSelector: setActive is undefined');
+      }
     } catch (error) {
       console.error('Failed to set active organization:', error);
     }
@@ -73,7 +77,9 @@ export function OrganizationSelector({
                     )}
                     <div className='text-left'>
                       <p className='font-medium text-gray-900'>{org.name}</p>
-                      <p className='text-sm text-gray-500'>@{org.slug}</p>
+                      <p className='text-sm text-gray-500'>
+                        @{org.slug || 'no-slug'}
+                      </p>
                     </div>
                   </div>
                   <ChevronRight className='h-5 w-5 text-gray-400' />

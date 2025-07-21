@@ -91,8 +91,12 @@ export function CreateOrganization() {
         '🔄 CreateOrganization: Setting organization as active',
         result.organization.id
       );
-      await setActive({ organization: result.organization.id });
-      console.info('✅ CreateOrganization: Organization set as active');
+      if (setActive) {
+        await setActive({ organization: result.organization.id });
+        console.info('✅ CreateOrganization: Organization set as active');
+      } else {
+        console.warn('⚠️ CreateOrganization: setActive is undefined');
+      }
 
       // Redirect to dashboard after setting active organization
       console.info('🧭 CreateOrganization: Redirecting to dashboard');

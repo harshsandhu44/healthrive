@@ -8,9 +8,12 @@ import { OrganizationSelector } from './organization-selector';
 export function OrganizationGate({ children }: { children: React.ReactNode }) {
   const { user, isLoaded: userLoaded } = useUser();
   const { organization, isLoaded: orgLoaded } = useOrganization();
-  const { organizationList, isLoaded: orgListLoaded } = useOrganizationList();
+  const { userMemberships, isLoaded: orgListLoaded } = useOrganizationList();
 
   const isLoaded = userLoaded && orgLoaded && orgListLoaded;
+
+  const organizationList =
+    userMemberships.data?.map(membership => membership.organization) || [];
 
   console.info('🛡️ OrganizationGate: State check', {
     userLoaded,
@@ -19,6 +22,7 @@ export function OrganizationGate({ children }: { children: React.ReactNode }) {
     isLoaded,
     hasUser: !!user,
     hasOrganization: !!organization,
+    userMemberships: userMemberships,
     organizationList: organizationList,
     organizationListType: typeof organizationList,
     organizationListLength: organizationList?.length,
