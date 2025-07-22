@@ -8,33 +8,23 @@ import { OrganizationSelector } from './organization-selector';
 export function OrganizationGate({ children }: { children: React.ReactNode }) {
   const { user, isLoaded: userLoaded } = useUser();
   const { organization, isLoaded: orgLoaded } = useOrganization();
-  const { userMemberships, isLoaded: orgListLoaded } = useOrganizationList();
+  const { userMemberships, isLoaded: orgListLoaded } = useOrganizationList({
+    userMemberships: true, // This is required to fetch the organizations
+  });
 
   const isLoaded = userLoaded && orgLoaded && orgListLoaded;
 
-  const organizationList =
-    userMemberships.data?.map(membership => membership.organization) || [];
-
-  console.info('🛡️ OrganizationGate: State check', {
-    userLoaded,
-    orgLoaded,
-    orgListLoaded,
+  console.info('🛡️ OrganizationGate: Simplified state check', {
     isLoaded,
     hasUser: !!user,
-    hasOrganization: !!organization,
-    userMemberships: userMemberships,
-    organizationList: organizationList,
-    organizationListType: typeof organizationList,
-    organizationListLength: organizationList?.length,
-    organizationCount: organizationList?.length || 0,
+    hasActiveOrganization: !!organization,
     organizationId: organization?.id,
     organizationName: organization?.name,
+    userMembershipsCount: userMemberships.count,
   });
 
-  // Remove redirect logic since OrganizationGate is used in dashboard layout
-
+  // Loading state
   if (!isLoaded || !user) {
-    console.info('⏳ OrganizationGate: Loading state');
     return (
       <div className='flex h-screen items-center justify-center'>
         <div className='h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-gray-900' />
@@ -42,31 +32,21 @@ export function OrganizationGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // User has organization(s) but none selected
-  if (organizationList && organizationList.length > 0 && !organization) {
-    console.info('📋 OrganizationGate: Showing organization selector', {
-      organizationCount: organizationList.length,
-      organizations: organizationList,
-    });
+  // Has active organization - show dashboard
+  if (organization) {
+    console.info(
+      '✅ OrganizationGate: Active organization found, showing dashboard'
+    );
+    return <>{children}</>;
+  }
+
+  // Has organizations but none active - show selector
+  if (userMemberships.count > 0) {
+    console.info('📋 OrganizationGate: Organizations found, showing selector');
     return <OrganizationSelector />;
   }
 
-  // User has no organizations
-  if (!organizationList || organizationList.length === 0) {
-    console.info('➕ OrganizationGate: Showing create organization', {
-      organizationListNull: organizationList === null,
-      organizationListUndefined: organizationList === undefined,
-      organizationListLength: organizationList?.length,
-      organizationListEmpty: organizationList?.length === 0,
-      userMembershipsData: userMemberships.data,
-      userMembershipsCount: userMemberships.count,
-    });
-    return <CreateOrganization />;
-  }
-
-  // User has organization selected, show children (dashboard)
-  console.info('✅ OrganizationGate: Showing dashboard', {
-    organizationId: organization?.id,
-  });
-  return <>{children}</>;
+  // No organizations - show create
+  console.info('➕ OrganizationGate: No organizations, showing create');
+  return <CreateOrganization />;
 }
