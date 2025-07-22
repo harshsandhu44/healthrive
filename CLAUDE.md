@@ -99,3 +99,136 @@ The project uses Next.js App Router with the following structure:
 5. Use `npx supabase stop` to stop the local instance
 6. Tables and migrations can be created in the `supabase/` directory
 7. **Note**: Supabase is used only for data storage - authentication is handled by Clerk
+
+## Sentry Configuration
+
+### Exception Catching
+
+- Use `Sentry.captureException(error)` to capture an exception and log the error in Sentry
+- Apply this in try-catch blocks or areas where exceptions are expected
+
+### Tracing Examples
+
+- Create spans for meaningful actions like button clicks, API calls, and function calls
+- Use `Sentry.startSpan` function to create spans
+- Child spans can exist within a parent span
+
+### Custom Span Instrumentation
+
+#### In Component Actions
+
+- Set `name` and `op` properties meaningfully for the specific activity
+- Attach attributes based on relevant information and metrics from the request
+
+Example:
+
+```javascript
+function TestComponent() {
+  const handleTestButtonClick = () => {
+    Sentry.startSpan(
+      {
+        op: 'ui.click',
+        name: 'Test Button Click',
+      },
+      span => {
+        const value = 'some config';
+        const metric = 'some metric';
+
+        span.setAttribute('config', value);
+        span.setAttribute('metric', metric);
+
+        doSomething();
+      }
+    );
+  };
+
+  return (
+    <button type='button' onClick={handleTestButtonClick}>
+      Test Sentry
+    </button>
+  );
+}
+```
+
+#### In API Calls
+
+- Set `name` and `op` properties meaningfully for the API call
+- Attach attributes based on request information and metrics
+
+Example:
+
+```javascript
+async function fetchUserData(userId) {
+  return Sentry.startSpan(
+    {
+      op: 'http.client',
+      name: `GET /api/users/${userId}`,
+    },
+    async () => {
+      const response = await fetch(`/api/users/${userId}`);
+      const data = await response.json();
+      return data;
+    }
+  );
+}
+```
+
+### Logs
+
+- Import Sentry using `import * as Sentry from "@sentry/nextjs"`
+- Enable logging with `Sentry.init({ _experiments: { enableLogs: true } })`
+- Reference logger using `const { logger } = Sentry`
+- Use `consoleLoggingIntegration` to log specific console error types automatically
+
+### Configuration Files
+
+- Client-side initialization: `instrumentation-client.ts`
+- Server initialization: `sentry.edge.config.ts`
+- Edge initialization: `sentry.server.config.ts`
+- Use `import * as Sentry from "@sentry/nextjs"` to reference Sentry functionality
+
+### Baseline Configuration
+
+```javascript
+import * as Sentry from '@sentry/nextjs';
+
+Sentry.init({
+  dsn: 'https://205133460ba8357bb001cbed78ae1763@o4509711169552384.ingest.de.sentry.io/4509711178072144',
+  _experiments: {
+    enableLogs: true,
+  },
+});
+```
+
+### Logger Integration Configuration
+
+```javascript
+Sentry.init({
+  dsn: 'https://205133460ba8357bb001cbed78ae1763@o4509711169552384.ingest.de.sentry.io/4509711178072144',
+  integrations: [
+    Sentry.consoleLoggingIntegration({ levels: ['log', 'error', 'warn'] }),
+  ],
+});
+```
+
+### Logger Examples
+
+- Use `logger.fmt` for template literal logging with variables
+
+```javascript
+logger.trace('Starting database connection', { database: 'users' });
+logger.debug(logger.fmt`Cache miss for user: ${userId}`);
+logger.info('Updated profile', { profileId: 345 });
+logger.warn('Rate limit reached for endpoint', {
+  endpoint: '/api/results/',
+  isEnterprise: false,
+});
+logger.error('Failed to process payment', {
+  orderId: 'order_123',
+  amount: 99.99,
+});
+logger.fatal('Database connection pool exhausted', {
+  database: 'users',
+  activeConnections: 100,
+});
+```

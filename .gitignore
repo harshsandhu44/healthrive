@@ -48,3 +48,6 @@ supabase/.branches
 supabase/.temp
 supabase/logs
 
+
+# Sentry Config File
+.env.sentry-build-plugin
