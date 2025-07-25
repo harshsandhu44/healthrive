@@ -1,12 +1,11 @@
 import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
+import { PAID_PLANS } from '@/lib/constants';
+
 interface BillingGateProps {
   children: React.ReactNode;
 }
-
-// Define valid paid plans (should match client-side)
-const PAID_PLANS = ['individual_practitioner'] as const;
 
 export async function BillingGate({ children }: BillingGateProps) {
   const { has } = await auth();

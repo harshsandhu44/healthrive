@@ -4,17 +4,10 @@ import { useOrganization } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
+import { isPaidPlan } from '@/lib/constants';
+
 interface ClientBillingGateProps {
   children: React.ReactNode;
-}
-
-// Define valid paid plans
-const PAID_PLANS = ['individual_practitioner'] as const;
-
-type PaidPlan = (typeof PAID_PLANS)[number];
-
-function hasPaidPlan(plan: string | undefined): plan is PaidPlan {
-  return plan ? PAID_PLANS.includes(plan as PaidPlan) : false;
 }
 
 export function ClientBillingGate({ children }: ClientBillingGateProps) {
@@ -25,7 +18,7 @@ export function ClientBillingGate({ children }: ClientBillingGateProps) {
     if (isLoaded && organization) {
       const currentPlan = organization.publicMetadata?.plan as string;
 
-      if (!hasPaidPlan(currentPlan)) {
+      if (!isPaidPlan(currentPlan)) {
         // Pass current plan (or lack thereof) to billing page via URL params
         const billingUrl = currentPlan
           ? `/billing?current=${encodeURIComponent(currentPlan)}`
@@ -53,7 +46,7 @@ export function ClientBillingGate({ children }: ClientBillingGateProps) {
   // Check plan in metadata (fallback for client-side)
   const currentPlan = organization.publicMetadata?.plan as string;
 
-  if (!hasPaidPlan(currentPlan)) {
+  if (!isPaidPlan(currentPlan)) {
     // Will redirect via useEffect, show loading
     return (
       <div className='flex h-screen items-center justify-center'>

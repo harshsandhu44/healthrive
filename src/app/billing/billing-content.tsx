@@ -4,15 +4,7 @@ import { PricingTable, useOrganization } from '@clerk/nextjs';
 import { useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-
-// Plan display names for better UX
-const PLAN_DISPLAY_NAMES: Record<string, string> = {
-  individual_practitioner: 'Individual Practitioner',
-  small_practice: 'Small Practice',
-  enterprise: 'Enterprise',
-  premium: 'Premium',
-  free: 'Free Plan',
-} as const;
+import { PAID_PLANS, getPlanDisplayName, PaidPlan } from '@/lib/constants';
 
 export function BillingContent() {
   const { organization } = useOrganization();
@@ -20,8 +12,7 @@ export function BillingContent() {
   const currentPlan = searchParams.get('current');
 
   const getCurrentPlanDisplay = () => {
-    if (!currentPlan) return null;
-    return PLAN_DISPLAY_NAMES[currentPlan] || currentPlan;
+    return getPlanDisplayName(currentPlan);
   };
 
   const getPageTitle = () => {
@@ -42,7 +33,7 @@ export function BillingContent() {
 
   const getBackButtonText = () => {
     const organizationPlan = organization?.publicMetadata?.plan as string;
-    if (organizationPlan && PLAN_DISPLAY_NAMES[organizationPlan]) {
+    if (getPlanDisplayName(organizationPlan)) {
       return '← Continue with Current Plan';
     }
     return '← Back to Dashboard';
@@ -51,14 +42,8 @@ export function BillingContent() {
   const handleBackNavigation = () => {
     // If user has a valid plan, go to dashboard, otherwise stay on billing
     const organizationPlan = organization?.publicMetadata?.plan as string;
-    const validPlans = [
-      'individual_practitioner',
-      'small_practice',
-      'enterprise',
-      'premium',
-    ];
 
-    if (validPlans.includes(organizationPlan)) {
+    if (PAID_PLANS.includes(organizationPlan as PaidPlan)) {
       window.location.href = '/dashboard';
     } else {
       // Could redirect to a different page or show a message
