@@ -8,19 +8,29 @@ interface ClientBillingGateProps {
   children: React.ReactNode;
 }
 
+// Define valid paid plans
+const PAID_PLANS = ['individual_practitioner'] as const;
+
+type PaidPlan = (typeof PAID_PLANS)[number];
+
+function hasPaidPlan(plan: string | undefined): plan is PaidPlan {
+  return plan ? PAID_PLANS.includes(plan as PaidPlan) : false;
+}
+
 export function ClientBillingGate({ children }: ClientBillingGateProps) {
   const { organization, isLoaded } = useOrganization();
   const router = useRouter();
 
   useEffect(() => {
     if (isLoaded && organization) {
-      // Check if organization has the required plan
-      // This is a client-side check - the real validation should happen server-side
-      const hasPaidPlan =
-        organization.publicMetadata?.plan === 'individual_practitioner';
+      const currentPlan = organization.publicMetadata?.plan as string;
 
-      if (!hasPaidPlan) {
-        router.push('/billing');
+      if (!hasPaidPlan(currentPlan)) {
+        // Pass current plan (or lack thereof) to billing page via URL params
+        const billingUrl = currentPlan
+          ? `/billing?current=${encodeURIComponent(currentPlan)}`
+          : '/billing';
+        router.push(billingUrl);
         return;
       }
     }
@@ -41,10 +51,9 @@ export function ClientBillingGate({ children }: ClientBillingGateProps) {
   }
 
   // Check plan in metadata (fallback for client-side)
-  const hasPaidPlan =
-    organization.publicMetadata?.plan === 'individual_practitioner';
+  const currentPlan = organization.publicMetadata?.plan as string;
 
-  if (!hasPaidPlan) {
+  if (!hasPaidPlan(currentPlan)) {
     // Will redirect via useEffect, show loading
     return (
       <div className='flex h-screen items-center justify-center'>
