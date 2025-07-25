@@ -10,6 +10,13 @@ export const PLAN_DISPLAY_NAMES: Record<string, string> = {
 
 // Plan Validation Helper
 export function isPaidPlan(plan: string | undefined): plan is PaidPlan {
+  console.info('🔍 isPaidPlan check:', {
+    plan,
+    planType: typeof plan,
+    PAID_PLANS,
+    includes: plan ? PAID_PLANS.includes(plan as PaidPlan) : false,
+  });
+
   if (!plan) return false;
   return PAID_PLANS.includes(plan as PaidPlan);
 }

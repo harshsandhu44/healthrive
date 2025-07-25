@@ -18,7 +18,18 @@ export function ClientBillingGate({ children }: ClientBillingGateProps) {
     if (isLoaded && organization) {
       const currentPlan = organization.publicMetadata?.plan as string;
 
+      console.info('🔍 ClientBillingGate: Plan check debug', {
+        organizationId: organization.id,
+        organizationName: organization.name,
+        publicMetadata: organization.publicMetadata,
+        currentPlan,
+        isPaidPlanResult: isPaidPlan(currentPlan),
+      });
+
       if (!isPaidPlan(currentPlan)) {
+        console.info(
+          '❌ ClientBillingGate: No valid paid plan, redirecting to billing'
+        );
         // Pass current plan (or lack thereof) to billing page via URL params
         const billingUrl = currentPlan
           ? `/billing?current=${encodeURIComponent(currentPlan)}`
@@ -26,6 +37,10 @@ export function ClientBillingGate({ children }: ClientBillingGateProps) {
         router.push(billingUrl);
         return;
       }
+
+      console.info(
+        '✅ ClientBillingGate: Valid paid plan found, allowing access'
+      );
     }
   }, [isLoaded, organization, router]);
 
