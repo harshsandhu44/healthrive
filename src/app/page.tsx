@@ -1,17 +1,11 @@
 import { SignedIn, SignedOut } from '@clerk/nextjs';
 import Link from 'next/link';
 
-import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
-import { UserButton } from '@/components/user-button';
 
 const HomePage = () => {
   return (
     <div className='flex min-h-screen flex-col items-center justify-center gap-4 p-8'>
-      <div className='absolute top-4 right-4 flex items-center gap-2'>
-        <UserButton />
-        <ThemeToggle />
-      </div>
       <h1 className='text-4xl font-bold text-foreground'>
         Welcome to Healthrive
       </h1>
