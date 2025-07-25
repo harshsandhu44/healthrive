@@ -15,8 +15,10 @@ export function UserButton() {
     <>
       <SignedIn>
         <ClerkUserButton
+          showName
           appearance={{
             elements: {
+              userButtonBox: 'clerk-userButtonBox',
               avatarBox: 'w-8 h-8',
             },
           }}

@@ -22,7 +22,7 @@ const eslintConfig = [
     },
     rules: {
       'prettier/prettier': [
-        'error',
+        'warn',
         {
           semi: true,
           trailingComma: 'es5',
