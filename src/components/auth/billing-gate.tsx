@@ -5,8 +5,8 @@ interface BillingGateProps {
   children: React.ReactNode;
 }
 
-export function BillingGate({ children }: BillingGateProps) {
-  const { has } = auth();
+export async function BillingGate({ children }: BillingGateProps) {
+  const { has } = await auth();
 
   const hasPaidPlan = has({ plan: 'individual_practitioner' });
 
