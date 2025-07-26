@@ -1,10 +1,11 @@
 import { OrganizationSwitcher } from '@clerk/nextjs';
 import {
-  BellIcon,
   BuildingIcon,
+  CalendarIcon,
   ChartAreaIcon,
   LayoutDashboardIcon,
   StethoscopeIcon,
+  UsersIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
@@ -32,6 +33,11 @@ export function ProtectedSidebar({
       icon: LayoutDashboardIcon,
     },
     {
+      label: 'Patients',
+      href: '/patients',
+      icon: UsersIcon,
+    },
+    {
       label: 'Doctors',
       href: '/doctors',
       icon: StethoscopeIcon,
@@ -44,7 +50,7 @@ export function ProtectedSidebar({
     {
       label: 'Appointments',
       href: '/appointments',
-      icon: BellIcon,
+      icon: CalendarIcon,
     },
     {
       label: 'Analytics',
