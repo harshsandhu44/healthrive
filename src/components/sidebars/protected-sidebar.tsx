@@ -1,6 +1,7 @@
 import { OrganizationSwitcher } from '@clerk/nextjs';
 import {
   BellIcon,
+  BuildingIcon,
   ChartAreaIcon,
   LayoutDashboardIcon,
   StethoscopeIcon,
@@ -34,6 +35,11 @@ export function ProtectedSidebar({
       label: 'Doctors',
       href: '/doctors',
       icon: StethoscopeIcon,
+    },
+    {
+      label: 'Departments',
+      href: '/departments',
+      icon: BuildingIcon,
     },
     {
       label: 'Appointments',
