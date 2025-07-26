@@ -7,13 +7,14 @@ const nextConfig: NextConfig = {
   experimental: {
     // Optimize CSS for smaller bundles
     optimizeCss: true,
-    // Enable Turbopack for faster builds (already enabled in dev)
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
+  },
+
+  // Turbopack configuration (now stable)
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
       },
     },
   },
