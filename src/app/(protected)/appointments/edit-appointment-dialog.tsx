@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CalendarIcon, CheckIcon, ChevronsUpDownIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -86,9 +86,18 @@ export function EditAppointmentDialog({
   const [patientOpen, setPatientOpen] = useState(false);
   const [doctorOpen, setDoctorOpen] = useState(false);
 
-  const appointmentDate = new Date(appointment.datetime);
-  const hours = appointmentDate.getHours().toString().padStart(2, '0');
-  const minutes = appointmentDate.getMinutes().toString().padStart(2, '0');
+  // Memoize appointment date calculations to prevent unnecessary re-renders
+  const appointmentDate = useMemo(
+    () => new Date(appointment.datetime),
+    [appointment.datetime]
+  );
+  const { hours, minutes } = useMemo(
+    () => ({
+      hours: appointmentDate.getHours().toString().padStart(2, '0'),
+      minutes: appointmentDate.getMinutes().toString().padStart(2, '0'),
+    }),
+    [appointmentDate]
+  );
 
   const form = useForm<EditAppointmentFormData>({
     resolver: zodResolver(editAppointmentSchema),
