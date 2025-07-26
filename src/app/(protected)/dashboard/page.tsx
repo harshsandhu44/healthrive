@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const { organization } = useOrganization();
 
   return (
-    <div className='min-h-screen p-8'>
+    <div className='container'>
       <div className='flex items-center justify-between mb-8'>
         <div>
           <h1 className='text-3xl font-bold'>Dashboard</h1>

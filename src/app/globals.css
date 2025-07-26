@@ -4,7 +4,6 @@
 @font-face {
   font-family: 'Satoshi';
   src: url('/fonts/Satoshi-Variable.ttf') format('truetype');
-  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -12,7 +11,6 @@
 @font-face {
   font-family: 'Satoshi';
   src: url('/fonts/Satoshi-VariableItalic.ttf') format('truetype');
-  font-weight: 100 900;
   font-style: italic;
   font-display: swap;
 }
@@ -135,8 +133,12 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
   }
+}
+
+@utility container {
+  @apply max-w-7xl mx-auto px-4;
 }
 
 .clerk-userButtonBox {
