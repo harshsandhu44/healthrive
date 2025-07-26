@@ -107,13 +107,13 @@ export const columns: ColumnDef<Doctor>[] = [
     },
   },
   {
-    accessorKey: 'department_id',
+    accessorKey: 'department_name',
     header: 'Department',
     cell: ({ row }) => {
-      const departmentId = row.getValue('department_id') as string | null;
+      const departmentName = row.getValue('department_name') as string | null;
       return (
         <div className='text-muted-foreground'>
-          {departmentId || 'No department'}
+          {departmentName || 'No department'}
         </div>
       );
     },
