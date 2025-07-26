@@ -17,13 +17,24 @@ export interface Patient {
 
 export async function getPatients(): Promise<Patient[]> {
   try {
-    await auth();
+    const { orgId } = await auth();
+
+    if (!orgId) {
+      throw new Error('Organization not found. Please select an organization.');
+    }
 
     const supabase = createClient();
 
+    // Only show patients who have appointments with this organization
     const { data, error } = await supabase
       .from('patients')
-      .select('*')
+      .select(
+        `
+        *,
+        appointments:appointments!inner(org_id)
+      `
+      )
+      .eq('appointments.org_id', orgId)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -31,7 +42,12 @@ export async function getPatients(): Promise<Patient[]> {
       throw new Error('Failed to fetch patients');
     }
 
-    return data || [];
+    // Remove the appointments relation from the returned data for cleaner response
+    const cleanedData = (data || []).map(
+      ({ appointments: _appointments, ...patient }) => patient
+    );
+
+    return cleanedData;
   } catch (error) {
     console.error('Error in getPatients action:', error);
     throw error;
@@ -134,13 +150,24 @@ export async function deletePatient(id: string) {
 
 export async function searchPatients(query: string): Promise<Patient[]> {
   try {
-    await auth();
+    const { orgId } = await auth();
+
+    if (!orgId) {
+      throw new Error('Organization not found. Please select an organization.');
+    }
 
     const supabase = createClient();
 
+    // Only search patients who have appointments with this organization
     const { data, error } = await supabase
       .from('patients')
-      .select('*')
+      .select(
+        `
+        *,
+        appointments:appointments!inner(org_id)
+      `
+      )
+      .eq('appointments.org_id', orgId)
       .or(
         `full_name.ilike.%${query}%,phone_number.ilike.%${query}%,id.ilike.%${query}%`
       )
@@ -152,7 +179,12 @@ export async function searchPatients(query: string): Promise<Patient[]> {
       throw new Error('Failed to search patients');
     }
 
-    return data || [];
+    // Remove the appointments relation from the returned data for cleaner response
+    const cleanedData = (data || []).map(
+      ({ appointments: _appointments, ...patient }) => patient
+    );
+
+    return cleanedData;
   } catch (error) {
     console.error('Error in searchPatients action:', error);
     throw error;
