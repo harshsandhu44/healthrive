@@ -74,10 +74,14 @@ export async function getDashboardMetrics(): Promise<DashboardMetrics> {
     const startOfToday = startOfDay(today);
     const endOfToday = endOfDay(today);
 
-    // Get total patients (global)
+    // Get total patients who have appointments with this organization
     const { count: totalPatients } = await supabase
       .from('patients')
-      .select('*', { count: 'exact', head: true });
+      .select('*, appointments:appointments!inner(org_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('appointments.org_id', orgId);
 
     // Get total doctors for this org
     const { count: totalDoctors } = await supabase
@@ -304,36 +308,60 @@ export async function getDoctorPerformance(): Promise<DoctorPerformance[]> {
 
 export async function getPatientDemographics(): Promise<PatientDemographics> {
   try {
-    await auth();
+    const { orgId } = await auth();
+
+    if (!orgId) {
+      throw new Error('Organization not found');
+    }
 
     const supabase = createClient();
     const thirtyDaysAgo = subDays(new Date(), 30);
 
-    // Get total patients
+    // Get total patients who have appointments with this organization
     const { count: totalPatients } = await supabase
       .from('patients')
-      .select('*', { count: 'exact', head: true });
+      .select('*, appointments:appointments!inner(org_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('appointments.org_id', orgId);
 
-    // Get new patients this month
+    // Get new patients this month who have appointments with this organization
     const { count: newPatientsThisMonth } = await supabase
       .from('patients')
-      .select('*', { count: 'exact', head: true })
+      .select('*, appointments:appointments!inner(org_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('appointments.org_id', orgId)
       .gte('created_at', thirtyDaysAgo.toISOString());
 
-    // Get patients with contact info
+    // Get patients with contact info who have appointments with this organization
     const { count: patientsWithEmail } = await supabase
       .from('patients')
-      .select('*', { count: 'exact', head: true })
+      .select('*, appointments:appointments!inner(org_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('appointments.org_id', orgId)
       .not('email', 'is', null);
 
     const { count: patientsWithPhone } = await supabase
       .from('patients')
-      .select('*', { count: 'exact', head: true })
+      .select('*, appointments:appointments!inner(org_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('appointments.org_id', orgId)
       .not('phone_number', 'is', null);
 
     const { count: patientsWithMedicalRecords } = await supabase
       .from('patients')
-      .select('*', { count: 'exact', head: true })
+      .select('*, appointments:appointments!inner(org_id)', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('appointments.org_id', orgId)
       .not('medical_records', 'is', null);
 
     return {
@@ -376,10 +404,18 @@ export async function getRecentActivity(): Promise<RecentActivity[]> {
       .order('created_at', { ascending: false })
       .limit(10);
 
-    // Get recent patients (global)
+    // Get recent patients who have appointments with this organization
     const { data: recentPatients } = await supabase
       .from('patients')
-      .select('id, full_name, created_at')
+      .select(
+        `
+        id, 
+        full_name, 
+        created_at,
+        appointments:appointments!inner(org_id)
+      `
+      )
+      .eq('appointments.org_id', orgId)
       .order('created_at', { ascending: false })
       .limit(5);
 

@@ -16,7 +16,7 @@ export default async function PatientsPage() {
         <div>
           <h1 className='text-3xl font-bold tracking-tight'>Patients</h1>
           <p className='text-muted-foreground'>
-            Manage patient records across all organizations
+            Manage patients who have appointments with your organization
           </p>
         </div>
         <AddPatientDialog>

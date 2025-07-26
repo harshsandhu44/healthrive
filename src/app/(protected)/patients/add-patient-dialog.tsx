@@ -95,8 +95,8 @@ export function AddPatientDialog({ children }: AddPatientDialogProps) {
         <DialogHeader>
           <DialogTitle>Add New Patient</DialogTitle>
           <DialogDescription>
-            Add a new patient record. This patient will be accessible by all
-            organizations.
+            Add a new patient record. The patient will be visible to your
+            organization when they book an appointment.
           </DialogDescription>
         </DialogHeader>
 
