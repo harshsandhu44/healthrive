@@ -1,5 +1,10 @@
 import { OrganizationSwitcher } from '@clerk/nextjs';
-import { BellIcon, ChartAreaIcon, LayoutDashboardIcon } from 'lucide-react';
+import {
+  BellIcon,
+  ChartAreaIcon,
+  LayoutDashboardIcon,
+  StethoscopeIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -24,6 +29,11 @@ export function ProtectedSidebar({
       label: 'Dashboard',
       href: '/dashboard',
       icon: LayoutDashboardIcon,
+    },
+    {
+      label: 'Doctors',
+      href: '/doctors',
+      icon: StethoscopeIcon,
     },
     {
       label: 'Appointments',
