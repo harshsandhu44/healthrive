@@ -1,10 +1,11 @@
 import { PlusIcon, StethoscopeIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { getDoctors } from './actions';
 import { AddDoctorDialog } from './add-doctor-dialog';
+import { columns } from './columns';
+import { DataTable } from './data-table';
 
 export default async function DoctorsPage() {
   const doctors = await getDoctors();
@@ -41,34 +42,7 @@ export default async function DoctorsPage() {
           </AddDoctorDialog>
         </div>
       ) : (
-        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-          {doctors.map(doctor => (
-            <Card key={doctor.id}>
-              <CardHeader>
-                <CardTitle className='text-lg'>{doctor.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className='space-y-2'>
-                  <p className='text-sm text-muted-foreground'>
-                    <span className='font-medium'>Specialization:</span>{' '}
-                    {doctor.specialization}
-                  </p>
-                  <p className='text-sm text-muted-foreground'>
-                    <span className='font-medium'>Gender:</span>{' '}
-                    {doctor.gender.charAt(0).toUpperCase() +
-                      doctor.gender.slice(1)}
-                  </p>
-                  {doctor.department_id && (
-                    <p className='text-sm text-muted-foreground'>
-                      <span className='font-medium'>Department:</span>{' '}
-                      {doctor.department_id}
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <DataTable columns={columns} data={doctors} />
       )}
     </div>
   );

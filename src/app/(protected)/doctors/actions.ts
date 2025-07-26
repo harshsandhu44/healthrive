@@ -82,3 +82,76 @@ export async function addDoctor(formData: {
     throw error;
   }
 }
+
+export async function updateDoctor(
+  id: string,
+  formData: {
+    name: string;
+    specialization: string;
+    gender: 'male' | 'female' | 'rather not say';
+    department_id?: string;
+  }
+) {
+  try {
+    const { orgId } = await auth();
+
+    if (!orgId) {
+      throw new Error('Organization not found. Please select an organization.');
+    }
+
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from('doctors')
+      .update({
+        name: formData.name,
+        specialization: formData.specialization,
+        gender: formData.gender,
+        department_id: formData.department_id || null,
+      })
+      .eq('id', id)
+      .eq('org_id', orgId);
+
+    if (error) {
+      console.error('Error updating doctor:', error);
+      throw new Error('Failed to update doctor');
+    }
+
+    revalidatePath('/doctors');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error in updateDoctor action:', error);
+    throw error;
+  }
+}
+
+export async function deleteDoctor(id: string) {
+  try {
+    const { orgId } = await auth();
+
+    if (!orgId) {
+      throw new Error('Organization not found. Please select an organization.');
+    }
+
+    const supabase = createClient();
+
+    const { error } = await supabase
+      .from('doctors')
+      .delete()
+      .eq('id', id)
+      .eq('org_id', orgId);
+
+    if (error) {
+      console.error('Error deleting doctor:', error);
+      throw new Error('Failed to delete doctor');
+    }
+
+    revalidatePath('/doctors');
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error in deleteDoctor action:', error);
+    throw error;
+  }
+}
