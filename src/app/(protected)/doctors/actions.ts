@@ -1,5 +1,6 @@
 'use server';
 
+import { auth } from '@clerk/nextjs/server';
 import { revalidatePath } from 'next/cache';
 
 import { createClient } from '@/lib/supabase/server';
@@ -11,6 +12,12 @@ export async function addDoctor(formData: {
   department_id?: string;
 }) {
   try {
+    const { orgId } = await auth();
+
+    if (!orgId) {
+      throw new Error('Organization not found. Please select an organization.');
+    }
+
     const supabase = createClient();
 
     const { error } = await supabase.from('doctors').insert([
@@ -19,6 +26,7 @@ export async function addDoctor(formData: {
         specialization: formData.specialization,
         gender: formData.gender,
         department_id: formData.department_id || null,
+        org_id: orgId,
       },
     ]);
 
