@@ -1,9 +1,31 @@
+import { Button } from "@/components/ui/button";
+import { ArrowRightIcon } from "lucide-react";
+
 const Home = () => {
   return (
-    <div>
-      <h1>Welcome to HealthRive</h1>
-      <p>Your health, our priority.</p>
-    </div>
+    <main className="">
+      <section className="bg-primary text-primary-foreground">
+        <div className="dark container max-w-screen-lg py-24 h-screen flex flex-col items-center justify-center md:text-center space-y-4">
+          <h1 className="text-4xl/tight md:text-7xl/tight font-bold">
+            One stop solution for all healthcare services
+          </h1>
+          <p className="md:text-lg/tight max-w-prose mx-auto text-muted-foreground text-pretty">
+            We provide a wide range of healthcare services to meet your needs.
+            Our team of experienced professionals is dedicated to providing you
+            with the best possible care.
+          </p>
+          <div className="w-full mt-6 flex max-md:flex-col items-center justify-center gap-4">
+            <Button size="lg" className="max-md:w-full">
+              <ArrowRightIcon />
+              Let&apos;s get started
+            </Button>
+            <Button size="lg" variant="secondary" className="max-md:w-full">
+              Already have an account?
+            </Button>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 };
 
