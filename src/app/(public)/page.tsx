@@ -8,6 +8,7 @@ import {
   SignUpButton,
 } from "@clerk/nextjs";
 import { ArrowRightIcon, WandSparklesIcon } from "lucide-react";
+import Link from "next/link";
 
 const Home = () => {
   return (
@@ -41,8 +42,11 @@ const Home = () => {
               </SignInButton>
             </SignedOut>
             <SignedIn>
-              <Button size="lg" className="max-md:w-full">
-                Go to Dashboard
+              <Button asChild size="lg" className="max-md:w-full">
+                <Link href="/dashboard">
+                  <ArrowRightIcon />
+                  Go to Dashboard
+                </Link>
               </Button>
               <SignOutButton>
                 <Button size="lg" variant="secondary" className="max-md:w-full">
