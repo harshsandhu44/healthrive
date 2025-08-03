@@ -1,5 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignOutButton,
+  SignUpButton,
+} from "@clerk/nextjs";
 import { ArrowRightIcon, WandSparklesIcon } from "lucide-react";
 
 const Home = () => {
@@ -20,13 +27,29 @@ const Home = () => {
             with the best possible care.
           </p>
           <div className="w-full mt-8 flex max-md:flex-col items-center justify-center gap-4">
-            <Button size="lg" className="max-md:w-full">
-              <ArrowRightIcon />
-              Let&apos;s get started
-            </Button>
-            <Button size="lg" variant="secondary" className="max-md:w-full">
-              Already have an account?
-            </Button>
+            <SignedOut>
+              <SignUpButton>
+                <Button size="lg" className="max-md:w-full">
+                  <ArrowRightIcon />
+                  Let&apos;s get started
+                </Button>
+              </SignUpButton>
+              <SignInButton>
+                <Button size="lg" variant="secondary" className="max-md:w-full">
+                  Already have an account?
+                </Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              <Button size="lg" className="max-md:w-full">
+                Go to Dashboard
+              </Button>
+              <SignOutButton>
+                <Button size="lg" variant="secondary" className="max-md:w-full">
+                  Sign Out
+                </Button>
+              </SignOutButton>
+            </SignedIn>
           </div>
         </div>
       </section>
