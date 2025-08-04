@@ -102,6 +102,18 @@ export interface Patient {
   registrationDate: string;
 }
 
+export interface Doctor {
+  id: string;
+  name: string;
+  dateOfBirth: string;
+  specialization: string;
+  gender: "male" | "female";
+  contactInfo: {
+    phone: string;
+    email: string;
+  };
+}
+
 export interface DashboardMetrics {
   appointments: {
     current: number;
@@ -713,5 +725,141 @@ export const allPatients: Patient[] = [
     // System Information
     status: "active",
     registrationDate: "2023-05-10T00:00:00",
+  },
+];
+
+// Mock data for doctors
+export const allDoctors: Doctor[] = [
+  {
+    id: "DR-001",
+    name: "Dr. James Smith",
+    dateOfBirth: "1975-04-12",
+    specialization: "Internal Medicine",
+    gender: "male",
+    contactInfo: {
+      phone: "(555) 101-2001",
+      email: "james.smith@healthrive.com",
+    },
+  },
+  {
+    id: "DR-002",
+    name: "Dr. Sarah Johnson",
+    dateOfBirth: "1982-09-25",
+    specialization: "Cardiology",
+    gender: "female",
+    contactInfo: {
+      phone: "(555) 101-2002",
+      email: "sarah.johnson@healthrive.com",
+    },
+  },
+  {
+    id: "DR-003",
+    name: "Dr. Michael Wilson",
+    dateOfBirth: "1978-11-08",
+    specialization: "Dermatology",
+    gender: "male",
+    contactInfo: {
+      phone: "(555) 101-2003",
+      email: "michael.wilson@healthrive.com",
+    },
+  },
+  {
+    id: "DR-004",
+    name: "Dr. Emily Martinez",
+    dateOfBirth: "1985-02-14",
+    specialization: "Emergency Medicine",
+    gender: "female",
+    contactInfo: {
+      phone: "(555) 101-2004",
+      email: "emily.martinez@healthrive.com",
+    },
+  },
+  {
+    id: "DR-005",
+    name: "Dr. David Lee",
+    dateOfBirth: "1980-07-30",
+    specialization: "Orthopedic Surgery",
+    gender: "male",
+    contactInfo: {
+      phone: "(555) 101-2005",
+      email: "david.lee@healthrive.com",
+    },
+  },
+  {
+    id: "DR-006",
+    name: "Dr. Lisa Taylor",
+    dateOfBirth: "1973-12-03",
+    specialization: "Pediatrics",
+    gender: "female",
+    contactInfo: {
+      phone: "(555) 101-2006",
+      email: "lisa.taylor@healthrive.com",
+    },
+  },
+  {
+    id: "DR-007",
+    name: "Dr. Robert Anderson",
+    dateOfBirth: "1970-06-18",
+    specialization: "Surgery",
+    gender: "male",
+    contactInfo: {
+      phone: "(555) 101-2007",
+      email: "robert.anderson@healthrive.com",
+    },
+  },
+  {
+    id: "DR-008",
+    name: "Dr. Jennifer Brown",
+    dateOfBirth: "1987-03-22",
+    specialization: "Psychiatry",
+    gender: "female",
+    contactInfo: {
+      phone: "(555) 101-2008",
+      email: "jennifer.brown@healthrive.com",
+    },
+  },
+  {
+    id: "DR-009",
+    name: "Dr. Christopher Davis",
+    dateOfBirth: "1976-10-15",
+    specialization: "Neurology",
+    gender: "male",
+    contactInfo: {
+      phone: "(555) 101-2009",
+      email: "christopher.davis@healthrive.com",
+    },
+  },
+  {
+    id: "DR-010",
+    name: "Dr. Amanda Garcia",
+    dateOfBirth: "1984-08-07",
+    specialization: "Obstetrics & Gynecology",
+    gender: "female",
+    contactInfo: {
+      phone: "(555) 101-2010",
+      email: "amanda.garcia@healthrive.com",
+    },
+  },
+  {
+    id: "DR-011",
+    name: "Dr. Mark Thompson",
+    dateOfBirth: "1981-01-28",
+    specialization: "Radiology",
+    gender: "male",
+    contactInfo: {
+      phone: "(555) 101-2011",
+      email: "mark.thompson@healthrive.com",
+    },
+  },
+  {
+    id: "DR-012",
+    name: "Dr. Rachel White",
+    dateOfBirth: "1979-05-11",
+    specialization: "Anesthesiology",
+    gender: "female",
+    contactInfo: {
+      phone: "(555) 101-2012",
+      email: "rachel.white@healthrive.com",
+    },
   },
 ];
