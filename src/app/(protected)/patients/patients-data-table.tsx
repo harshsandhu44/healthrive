@@ -49,10 +49,11 @@ import {
   Edit,
   ChevronLeft,
   ChevronRight,
-  History,
+  Eye,
 } from "lucide-react";
 import { allPatients, type Patient } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 const statusColors = {
   active: "bg-green-500/10 text-green-700 dark:text-green-400",
@@ -67,10 +68,9 @@ const genderColors = {
 
 interface PatientActionsProps {
   patient: Patient;
-  onViewMedicalHistory: (patient: Patient) => void;
 }
 
-function PatientActions({ patient, onViewMedicalHistory }: PatientActionsProps) {
+function PatientActions({ patient }: PatientActionsProps) {
   const handleAction = (action: string) => {
     console.log(`${action} patient:`, patient.id);
     // In a real app, this would make an API call
@@ -87,14 +87,6 @@ function PatientActions({ patient, onViewMedicalHistory }: PatientActionsProps) 
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
-        <DropdownMenuItem
-          onClick={() => onViewMedicalHistory(patient)}
-          className="text-blue-600"
-        >
-          <History className="mr-2 h-4 w-4" />
-          View Medical History
-        </DropdownMenuItem>
         
         <DropdownMenuItem onClick={() => handleAction("view-profile")}>
           <User className="mr-2 h-4 w-4" />
@@ -134,10 +126,9 @@ function PatientActions({ patient, onViewMedicalHistory }: PatientActionsProps) 
 
 interface PatientsDataTableProps {
   data: Patient[];
-  onViewMedicalHistory: (patient: Patient) => void;
 }
 
-export function PatientsDataTable({ data, onViewMedicalHistory }: PatientsDataTableProps) {
+export function PatientsDataTable({ data }: PatientsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
     { id: "name", desc: false }
   ]);
@@ -281,10 +272,15 @@ export function PatientsDataTable({ data, onViewMedicalHistory }: PatientsDataTa
       cell: ({ row }) => {
         const patient = row.original;
         return (
-          <PatientActions 
-            patient={patient} 
-            onViewMedicalHistory={onViewMedicalHistory}
-          />
+          <div className="flex items-center gap-2">
+            <Link href={`/patients/${patient.id}`}>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <span className="sr-only">View patient details</span>
+                <Eye className="h-4 w-4" />
+              </Button>
+            </Link>
+            <PatientActions patient={patient} />
+          </div>
         );
       },
     },
