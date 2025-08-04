@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TrendingUp, TrendingDown, Users, Calendar } from "lucide-react";
-import { dashboardMetrics } from "./mock-data";
+import { dashboardMetrics } from "@/lib/mock-data";
 import { AppointmentsChart } from "./appointments-chart";
 import { AppointmentsTable } from "./appointments-table";
 

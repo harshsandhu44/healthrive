@@ -43,7 +43,7 @@ import {
   User,
   ArrowUpDown,
 } from "lucide-react";
-import { todaysAppointments, type Appointment } from "./mock-data";
+import { todaysAppointments, type Appointment } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 const statusColors = {
@@ -264,7 +264,7 @@ function DataTable({ data }: DataTableProps) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -283,7 +283,7 @@ function DataTable({ data }: DataTableProps) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
