@@ -5,6 +5,7 @@ import { auth } from '@clerk/nextjs/server'
 import type { PatientWithMedicalData } from '@/lib/types/database'
 import type { Patient } from '@/lib/mock-data'
 import { transformPatientWithMedicalData } from '@/lib/transforms/database'
+import type { TablesInsert, TablesUpdate } from '@/lib/types/supabase'
 
 const FALLBACK_ORG_ID = 'org_30ml1ttUdsl67pQecd3KPXnBVHT' // Development fallback
 
@@ -87,26 +88,28 @@ export async function createPatient(patientData: Omit<Patient, 'id'>): Promise<P
     const supabase = await createClient()
     
     // Create patient record
+    const insertData: TablesInsert<'patients'> = {
+      id: crypto.randomUUID(),
+      organization_id: organizationId,
+      name: patientData.name,
+      gender: patientData.gender,
+      date_of_birth: patientData.dateOfBirth,
+      phone: patientData.contactInfo.phone,
+      email: patientData.contactInfo.email,
+      emergency_contact_name: patientData.emergencyContact.name,
+      emergency_contact_phone: patientData.emergencyContact.phone,
+      emergency_contact_relationship: patientData.emergencyContact.relationship,
+      insurance_provider: patientData.insurance.provider,
+      insurance_policy_number: patientData.insurance.policyNumber,
+      allergies: patientData.allergies,
+      family_history: patientData.familyHistory,
+      smoking_status: patientData.socialHistory.smokingStatus,
+      alcohol_consumption: patientData.socialHistory.alcoholConsumption,
+    }
+
     const { data: patient, error: patientError } = await supabase
       .from('patients')
-      .insert({
-        organization_id: organizationId,
-        name: patientData.name,
-        age: patientData.age,
-        gender: patientData.gender,
-        date_of_birth: patientData.dateOfBirth,
-        contact_phone: patientData.contactInfo.phone,
-        contact_email: patientData.contactInfo.email,
-        emergency_contact_name: patientData.emergencyContact.name,
-        emergency_contact_phone: patientData.emergencyContact.phone,
-        emergency_contact_relationship: patientData.emergencyContact.relationship,
-        insurance_provider: patientData.insurance.provider,
-        insurance_policy_number: patientData.insurance.policyNumber,
-        allergies: patientData.allergies,
-        family_history: patientData.familyHistory,
-        smoking_status: patientData.socialHistory.smokingStatus,
-        alcohol_consumption: patientData.socialHistory.alcoholConsumption,
-      })
+      .insert(insertData)
       .select()
       .single()
     
@@ -129,14 +132,13 @@ export async function updatePatient(id: string, patientData: Partial<Omit<Patien
     
     const supabase = await createClient()
     
-    const updateData: any = {}
+    const updateData: TablesUpdate<'patients'> = {}
     
     if (patientData.name) updateData.name = patientData.name
-    if (patientData.age) updateData.age = patientData.age
     if (patientData.gender) updateData.gender = patientData.gender
     if (patientData.dateOfBirth) updateData.date_of_birth = patientData.dateOfBirth
-    if (patientData.contactInfo?.phone) updateData.contact_phone = patientData.contactInfo.phone
-    if (patientData.contactInfo?.email) updateData.contact_email = patientData.contactInfo.email
+    if (patientData.contactInfo?.phone) updateData.phone = patientData.contactInfo.phone
+    if (patientData.contactInfo?.email) updateData.email = patientData.contactInfo.email
     if (patientData.emergencyContact?.name) updateData.emergency_contact_name = patientData.emergencyContact.name
     if (patientData.emergencyContact?.phone) updateData.emergency_contact_phone = patientData.emergencyContact.phone
     if (patientData.emergencyContact?.relationship) updateData.emergency_contact_relationship = patientData.emergencyContact.relationship

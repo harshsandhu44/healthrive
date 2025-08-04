@@ -5,6 +5,7 @@ import { auth } from '@clerk/nextjs/server'
 import type { DoctorRow } from '@/lib/types/database'
 import type { Doctor } from '@/lib/mock-data'
 import { transformDoctorRow } from '@/lib/transforms/database'
+import type { TablesInsert, TablesUpdate } from '@/lib/types/supabase'
 
 const FALLBACK_ORG_ID = 'org_30ml1ttUdsl67pQecd3KPXnBVHT' // Development fallback
 
@@ -70,17 +71,20 @@ export async function createDoctor(doctorData: Omit<Doctor, 'id'>): Promise<Doct
     
     const supabase = await createClient()
     
+    const insertData: TablesInsert<'doctors'> = {
+      id: crypto.randomUUID(),
+      organization_id: organizationId,
+      name: doctorData.name,
+      date_of_birth: doctorData.dateOfBirth,
+      specialization: doctorData.specialization,
+      gender: doctorData.gender,
+      phone: doctorData.contactInfo.phone,
+      email: doctorData.contactInfo.email,
+    }
+    
     const { data: doctor, error } = await supabase
       .from('doctors')
-      .insert({
-        organization_id: organizationId,
-        name: doctorData.name,
-        date_of_birth: doctorData.dateOfBirth,
-        specialization: doctorData.specialization,
-        gender: doctorData.gender,
-        contact_phone: doctorData.contactInfo.phone,
-        contact_email: doctorData.contactInfo.email,
-      })
+      .insert(insertData)
       .select()
       .single()
     
@@ -103,14 +107,14 @@ export async function updateDoctor(id: string, doctorData: Partial<Omit<Doctor, 
     
     const supabase = await createClient()
     
-    const updateData: any = {}
+    const updateData: TablesUpdate<'doctors'> = {}
     
     if (doctorData.name) updateData.name = doctorData.name
     if (doctorData.dateOfBirth) updateData.date_of_birth = doctorData.dateOfBirth
     if (doctorData.specialization) updateData.specialization = doctorData.specialization
     if (doctorData.gender) updateData.gender = doctorData.gender
-    if (doctorData.contactInfo?.phone) updateData.contact_phone = doctorData.contactInfo.phone
-    if (doctorData.contactInfo?.email) updateData.contact_email = doctorData.contactInfo.email
+    if (doctorData.contactInfo?.phone) updateData.phone = doctorData.contactInfo.phone
+    if (doctorData.contactInfo?.email) updateData.email = doctorData.contactInfo.email
     
     const { data: doctor, error } = await supabase
       .from('doctors')

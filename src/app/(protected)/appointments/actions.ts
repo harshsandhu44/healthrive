@@ -5,6 +5,7 @@ import { auth } from '@clerk/nextjs/server'
 import type { AppointmentRow } from '@/lib/types/database'
 import type { Appointment } from '@/lib/mock-data'
 import { transformAppointmentRow } from '@/lib/transforms/database'
+import type { TablesInsert, TablesUpdate } from '@/lib/types/supabase'
 
 const FALLBACK_ORG_ID = 'org_30ml1ttUdsl67pQecd3KPXnBVHT' // Development fallback
 
@@ -101,19 +102,20 @@ export async function createAppointment(appointmentData: Omit<Appointment, 'id'>
     
     const supabase = await createClient()
     
+    const insertData: TablesInsert<'appointments'> = {
+      id: crypto.randomUUID(),
+      organization_id: organizationId,
+      patient_name: appointmentData.patientName,
+      doctor: appointmentData.doctorName,
+      time: appointmentData.time,
+      type: appointmentData.type,
+      status: appointmentData.status,
+      notes: `${appointmentData.reason || ''} ${appointmentData.location || ''}`.trim() || null,
+    }
+    
     const { data: appointment, error } = await supabase
       .from('appointments')
-      .insert({
-        organization_id: organizationId,
-        patient_name: appointmentData.patientName,
-        doctor_name: appointmentData.doctorName,
-        time: appointmentData.time,
-        type: appointmentData.type,
-        status: appointmentData.status,
-        duration: appointmentData.duration,
-        reason: appointmentData.reason,
-        location: appointmentData.location,
-      })
+      .insert(insertData)
       .select()
       .single()
     
@@ -136,16 +138,16 @@ export async function updateAppointment(id: string, appointmentData: Partial<Omi
     
     const supabase = await createClient()
     
-    const updateData: any = {}
+    const updateData: TablesUpdate<'appointments'> = {}
     
     if (appointmentData.patientName) updateData.patient_name = appointmentData.patientName
-    if (appointmentData.doctorName) updateData.doctor_name = appointmentData.doctorName
+    if (appointmentData.doctorName) updateData.doctor = appointmentData.doctorName
     if (appointmentData.time) updateData.time = appointmentData.time
     if (appointmentData.type) updateData.type = appointmentData.type
     if (appointmentData.status) updateData.status = appointmentData.status
-    if (appointmentData.duration) updateData.duration = appointmentData.duration
-    if (appointmentData.reason) updateData.reason = appointmentData.reason
-    if (appointmentData.location) updateData.location = appointmentData.location
+    if (appointmentData.reason || appointmentData.location) {
+      updateData.notes = `${appointmentData.reason || ''} ${appointmentData.location || ''}`.trim() || null
+    }
     
     const { data: appointment, error } = await supabase
       .from('appointments')
