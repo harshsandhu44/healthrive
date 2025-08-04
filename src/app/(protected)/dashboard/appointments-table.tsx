@@ -23,8 +23,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, CheckCircle, XCircle, Clock, User } from "lucide-react";
+import {
+  MoreHorizontal,
+  CheckCircle,
+  XCircle,
+  Clock,
+  User,
+} from "lucide-react";
 import { todaysAppointments, type Appointment } from "./mock-data";
+import { cn } from "@/lib/utils";
 
 const statusColors = {
   scheduled: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
@@ -95,7 +102,7 @@ export function AppointmentsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Today's Appointments</CardTitle>
+        <CardTitle>Today&apos;s Appointments</CardTitle>
         <CardDescription>
           Manage and track appointments scheduled for today
         </CardDescription>
@@ -130,7 +137,7 @@ export function AppointmentsTable() {
                 <TableCell>
                   <Badge
                     variant="secondary"
-                    className={typeColors[appointment.type]}
+                    className={cn(typeColors[appointment.type], "capitalize")}
                   >
                     {appointment.type}
                   </Badge>
@@ -139,7 +146,10 @@ export function AppointmentsTable() {
                 <TableCell>
                   <Badge
                     variant="secondary"
-                    className={statusColors[appointment.status]}
+                    className={cn(
+                      statusColors[appointment.status],
+                      "capitalize",
+                    )}
                   >
                     {appointment.status}
                   </Badge>
