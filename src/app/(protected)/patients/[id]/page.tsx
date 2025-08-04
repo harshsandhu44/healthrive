@@ -1,5 +1,6 @@
 "use client";
 
+import { use } from "react";
 import { notFound } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -24,9 +25,9 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 interface PatientDetailsPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const diagnosisStatusColors = {
@@ -51,7 +52,8 @@ const noteTypeColors = {
 };
 
 export default function PatientDetailsPage({ params }: PatientDetailsPageProps) {
-  const patient = allPatients.find((p) => p.id === params.id);
+  const { id } = use(params);
+  const patient = allPatients.find((p) => p.id === id);
 
   if (!patient) {
     notFound();
