@@ -6,14 +6,8 @@ import type {
 import type { 
   Patient, 
   Doctor, 
-  Appointment,
-  Diagnosis,
-  Medication,
-  Procedure,
-  LabResult,
-  VitalSigns,
-  ClinicalNote
-} from '@/lib/mock-data'
+  Appointment
+} from '@/lib/types/entities'
 
 // Helper function to calculate age from date of birth
 function calculateAge(dateOfBirth: string): number {
@@ -61,7 +55,7 @@ export function transformPatientWithMedicalData(dbPatient: PatientWithMedicalDat
       frequency: m.frequency || '',
       route: (m.route as 'oral' | 'intravenous' | 'topical' | 'injection' | 'inhalation') || 'oral',
       startDate: m.start_date || '',
-      endDate: m.end_date || undefined,
+      endDate: m.end_date || null,
       reason: m.reason || '',
     })) || [],
     
@@ -141,6 +135,6 @@ export function transformAppointmentRow(dbAppointment: AppointmentRow): Appointm
     type: (dbAppointment.type as 'consultation' | 'follow-up' | 'surgery' | 'emergency') || 'consultation',
     status: (dbAppointment.status as 'scheduled' | 'in-progress' | 'completed' | 'cancelled') || 'scheduled',
     doctor: dbAppointment.doctor || '',
-    notes: dbAppointment.notes || undefined,
+    notes: dbAppointment.notes || null,
   }
 }

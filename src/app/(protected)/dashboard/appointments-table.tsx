@@ -43,7 +43,7 @@ import {
   User,
   ArrowUpDown,
 } from "lucide-react";
-import { todaysAppointments, type Appointment } from "@/lib/mock-data";
+import { type Appointment } from "@/lib/types/entities";
 import { cn } from "@/lib/utils";
 import { getTodaysAppointments } from "../appointments/actions";
 

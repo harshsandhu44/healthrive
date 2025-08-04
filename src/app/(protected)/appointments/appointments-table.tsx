@@ -51,7 +51,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { allAppointments, type Appointment } from "@/lib/mock-data";
+import { type Appointment } from "@/lib/types/entities";
 import { cn } from "@/lib/utils";
 import { deleteAppointment } from "./actions";
 import { useTransition } from "react";

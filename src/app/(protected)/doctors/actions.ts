@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { auth } from "@clerk/nextjs/server";
 import type { DoctorRow } from "@/lib/types/database";
-import type { Doctor } from "@/lib/mock-data";
+import type { Doctor } from "@/lib/types/entities";
 import { transformDoctorRow } from "@/lib/transforms/database";
 import type { TablesInsert, TablesUpdate } from "@/lib/types/supabase";
 

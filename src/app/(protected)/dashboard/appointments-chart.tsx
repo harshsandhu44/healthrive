@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { appointmentsChartData } from "@/lib/mock-data";
+// Generate dummy chart data for now - in real app would come from database
 
 const chartConfig = {
   appointments: {
@@ -27,12 +27,23 @@ const chartConfig = {
 };
 
 export function AppointmentsChart() {
+  // Generate dummy data for the last 7 days
+  const chartData = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - i));
+    return {
+      date: date.toISOString().split('T')[0],
+      appointments: Math.floor(Math.random() * 15) + 5, // 5-20 appointments
+      patients: Math.floor(Math.random() * 8) + 2, // 2-10 new patients
+    };
+  });
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Appointments & Patients Overview</CardTitle>
         <CardDescription>
-          Daily appointments and new patients over the last 30 days
+          Daily appointments and new patients over the last 7 days
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -42,7 +53,7 @@ export function AppointmentsChart() {
         >
           <AreaChart
             accessibilityLayer
-            data={appointmentsChartData}
+            data={chartData}
             margin={{
               left: 12,
               right: 12,

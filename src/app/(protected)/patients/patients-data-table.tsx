@@ -51,7 +51,7 @@ import {
   ChevronRight,
   Eye,
 } from "lucide-react";
-import { allPatients, type Patient } from "@/lib/mock-data";
+import { type Patient } from "@/lib/types/entities";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deletePatient } from "./actions";

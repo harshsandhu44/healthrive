@@ -11,24 +11,30 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TrendingUp, TrendingDown, Users, Calendar } from "lucide-react";
-import { dashboardMetrics } from "@/lib/mock-data";
+import { getPatients } from "../patients/actions";
+import { getAppointments } from "../appointments/actions";
 import { AppointmentsChart } from "./appointments-chart";
 import { AppointmentsTable } from "./appointments-table";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [patients, appointments] = await Promise.all([
+    getPatients(),
+    getAppointments(),
+  ]);
+
   const metricsCards = [
     {
       label: "Appointments",
-      value: dashboardMetrics.appointments.current,
-      previous: dashboardMetrics.appointments.previous,
-      change: dashboardMetrics.appointments.change,
+      value: appointments.length,
+      previous: Math.floor(appointments.length * 0.8), // Simulated previous value
+      change: 25.0,
       icon: Calendar,
     },
     {
       label: "Patients",
-      value: dashboardMetrics.patients.current,
-      previous: dashboardMetrics.patients.previous,
-      change: dashboardMetrics.patients.change,
+      value: patients.length,
+      previous: Math.floor(patients.length * 0.85), // Simulated previous value
+      change: 17.6,
       icon: Users,
     },
   ];

@@ -62,7 +62,7 @@ export default async function DoctorDetailsPage({ params }: DoctorDetailsPagePro
     return age;
   };
 
-  const age = calculateAge(doctor.dateOfBirth);
+  const age = calculateAge(doctor.dateOfBirth || '');
 
   return (
     <main className="space-y-6">
@@ -114,9 +114,9 @@ export default async function DoctorDetailsPage({ params }: DoctorDetailsPagePro
                 <div className="mt-1">
                   <Badge
                     variant="secondary"
-                    className={cn(genderColors[doctor.gender], "capitalize")}
+                    className={cn(genderColors[doctor.gender as keyof typeof genderColors] || "bg-gray-500/10 text-gray-700 dark:text-gray-400", "capitalize")}
                   >
-                    {doctor.gender}
+                    {doctor.gender || 'Unknown'}
                   </Badge>
                 </div>
               </div>
@@ -125,7 +125,7 @@ export default async function DoctorDetailsPage({ params }: DoctorDetailsPagePro
                   Date of Birth
                 </label>
                 <p className="text-sm mt-1">
-                  {new Date(doctor.dateOfBirth).toLocaleDateString()}
+                  {doctor.dateOfBirth ? new Date(doctor.dateOfBirth).toLocaleDateString() : 'Not provided'}
                 </p>
               </div>
             </div>

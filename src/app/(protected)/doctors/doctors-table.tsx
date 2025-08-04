@@ -50,7 +50,7 @@ import {
   ChevronRight,
   Eye,
 } from "lucide-react";
-import { allDoctors, type Doctor } from "@/lib/mock-data";
+import { type Doctor } from "@/lib/types/entities";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { deleteDoctor } from "./actions";
@@ -297,7 +297,7 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
   });
 
   const uniqueSpecializations = Array.from(
-    new Set(data.map(doctor => doctor.specialization))
+    new Set(data.map(doctor => doctor.specialization).filter(Boolean))
   ).sort();
 
   return (
@@ -328,7 +328,7 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
           <SelectContent>
             <SelectItem value="all">All Specializations</SelectItem>
             {uniqueSpecializations.map((specialization) => (
-              <SelectItem key={specialization} value={specialization}>
+              <SelectItem key={specialization} value={specialization!}>
                 {specialization}
               </SelectItem>
             ))}
