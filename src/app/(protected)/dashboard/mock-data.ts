@@ -25,6 +25,7 @@ export interface DashboardMetrics {
 export interface ChartData {
   date: string;
   appointments: number;
+  patients: number;
 }
 
 // Mock data for dashboard metrics (current vs previous month)
@@ -41,38 +42,38 @@ export const dashboardMetrics: DashboardMetrics = {
   },
 };
 
-// Mock data for appointments chart (last 30 days)
+// Mock data for appointments and patients chart (last 30 days)
 export const appointmentsChartData: ChartData[] = [
-  { date: "2024-07-05", appointments: 3 },
-  { date: "2024-07-06", appointments: 5 },
-  { date: "2024-07-07", appointments: 2 },
-  { date: "2024-07-08", appointments: 7 },
-  { date: "2024-07-09", appointments: 4 },
-  { date: "2024-07-10", appointments: 6 },
-  { date: "2024-07-11", appointments: 8 },
-  { date: "2024-07-12", appointments: 5 },
-  { date: "2024-07-13", appointments: 3 },
-  { date: "2024-07-14", appointments: 4 },
-  { date: "2024-07-15", appointments: 9 },
-  { date: "2024-07-16", appointments: 6 },
-  { date: "2024-07-17", appointments: 7 },
-  { date: "2024-07-18", appointments: 5 },
-  { date: "2024-07-19", appointments: 8 },
-  { date: "2024-07-20", appointments: 4 },
-  { date: "2024-07-21", appointments: 6 },
-  { date: "2024-07-22", appointments: 9 },
-  { date: "2024-07-23", appointments: 7 },
-  { date: "2024-07-24", appointments: 5 },
-  { date: "2024-07-25", appointments: 8 },
-  { date: "2024-07-26", appointments: 6 },
-  { date: "2024-07-27", appointments: 4 },
-  { date: "2024-07-28", appointments: 7 },
-  { date: "2024-07-29", appointments: 9 },
-  { date: "2024-07-30", appointments: 8 },
-  { date: "2024-07-31", appointments: 6 },
-  { date: "2024-08-01", appointments: 10 },
-  { date: "2024-08-02", appointments: 7 },
-  { date: "2024-08-03", appointments: 5 },
+  { date: "2024-07-05", appointments: 3, patients: 2 },
+  { date: "2024-07-06", appointments: 5, patients: 4 },
+  { date: "2024-07-07", appointments: 2, patients: 2 },
+  { date: "2024-07-08", appointments: 7, patients: 5 },
+  { date: "2024-07-09", appointments: 4, patients: 3 },
+  { date: "2024-07-10", appointments: 6, patients: 4 },
+  { date: "2024-07-11", appointments: 8, patients: 6 },
+  { date: "2024-07-12", appointments: 5, patients: 4 },
+  { date: "2024-07-13", appointments: 3, patients: 3 },
+  { date: "2024-07-14", appointments: 4, patients: 3 },
+  { date: "2024-07-15", appointments: 9, patients: 7 },
+  { date: "2024-07-16", appointments: 6, patients: 5 },
+  { date: "2024-07-17", appointments: 7, patients: 5 },
+  { date: "2024-07-18", appointments: 5, patients: 4 },
+  { date: "2024-07-19", appointments: 8, patients: 6 },
+  { date: "2024-07-20", appointments: 4, patients: 3 },
+  { date: "2024-07-21", appointments: 6, patients: 5 },
+  { date: "2024-07-22", appointments: 9, patients: 7 },
+  { date: "2024-07-23", appointments: 7, patients: 5 },
+  { date: "2024-07-24", appointments: 5, patients: 4 },
+  { date: "2024-07-25", appointments: 8, patients: 6 },
+  { date: "2024-07-26", appointments: 6, patients: 5 },
+  { date: "2024-07-27", appointments: 4, patients: 4 },
+  { date: "2024-07-28", appointments: 7, patients: 5 },
+  { date: "2024-07-29", appointments: 9, patients: 7 },
+  { date: "2024-07-30", appointments: 8, patients: 6 },
+  { date: "2024-07-31", appointments: 6, patients: 5 },
+  { date: "2024-08-01", appointments: 10, patients: 8 },
+  { date: "2024-08-02", appointments: 7, patients: 6 },
+  { date: "2024-08-03", appointments: 5, patients: 4 },
 ];
 
 // Mock data for today's appointments

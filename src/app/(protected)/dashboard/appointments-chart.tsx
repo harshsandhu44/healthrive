@@ -20,15 +20,19 @@ const chartConfig = {
     label: "Appointments",
     color: "hsl(var(--chart-1))",
   },
+  patients: {
+    label: "New Patients",
+    color: "hsl(var(--chart-2))",
+  },
 };
 
 export function AppointmentsChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Appointments Overview</CardTitle>
+        <CardTitle>Appointments & Patients Overview</CardTitle>
         <CardDescription>
-          Daily appointments booked over the last 30 days
+          Daily appointments and new patients over the last 30 days
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -69,6 +73,14 @@ export function AppointmentsChart() {
               fillOpacity={0.4}
               stroke="var(--color-appointments)"
               stackId="a"
+            />
+            <Area
+              dataKey="patients"
+              type="natural"
+              fill="var(--color-patients)"
+              fillOpacity={0.4}
+              stroke="var(--color-patients)"
+              stackId="b"
             />
           </AreaChart>
         </ChartContainer>
