@@ -9,17 +9,11 @@ import {
   SortingState,
   getFilteredRowModel,
   ColumnFiltersState,
+  getPaginationRowModel,
 } from "@tanstack/react-table";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -32,8 +26,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import {
   MoreHorizontal,
@@ -42,8 +45,13 @@ import {
   Clock,
   User,
   ArrowUpDown,
+  Calendar,
+  Phone,
+  Edit,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
-import { todaysAppointments, type Appointment } from "@/lib/mock-data";
+import { allAppointments, type Appointment } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 
 const statusColors = {
@@ -75,6 +83,9 @@ function AppointmentActions({ appointment }: { appointment: Appointment }) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        
         {appointment.status === "scheduled" && (
           <>
             <DropdownMenuItem
@@ -85,6 +96,12 @@ function AppointmentActions({ appointment }: { appointment: Appointment }) {
               Start Appointment
             </DropdownMenuItem>
             <DropdownMenuItem
+              onClick={() => handleAction("reschedule")}
+            >
+              <Calendar className="mr-2 h-4 w-4" />
+              Reschedule
+            </DropdownMenuItem>
+            <DropdownMenuItem
               onClick={() => handleAction("cancel")}
               className="text-red-600"
             >
@@ -93,6 +110,7 @@ function AppointmentActions({ appointment }: { appointment: Appointment }) {
             </DropdownMenuItem>
           </>
         )}
+        
         {appointment.status === "in-progress" && (
           <DropdownMenuItem
             onClick={() => handleAction("complete")}
@@ -102,9 +120,24 @@ function AppointmentActions({ appointment }: { appointment: Appointment }) {
             Mark Complete
           </DropdownMenuItem>
         )}
+        
+        {appointment.status === "completed" && (
+          <DropdownMenuItem
+            onClick={() => handleAction("view-notes")}
+          >
+            <Edit className="mr-2 h-4 w-4" />
+            View Notes
+          </DropdownMenuItem>
+        )}
+        
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => handleAction("view-patient")}>
           <User className="mr-2 h-4 w-4" />
           View Patient
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleAction("call-patient")}>
+          <Phone className="mr-2 h-4 w-4" />
+          Call Patient
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -121,14 +154,37 @@ const columns: ColumnDef<Appointment>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="h-auto p-0 font-medium"
         >
-          Time
+          Date & Time
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
-    cell: ({ row }) => (
-      <div className="font-medium">{row.getValue("time")}</div>
-    ),
+    cell: ({ row }) => {
+      const datetime = new Date(row.getValue("time"));
+      return (
+        <div className="space-y-1">
+          <div className="font-medium">
+            {datetime.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </div>
+          <div className="text-sm text-muted-foreground">
+            {datetime.toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
+            })}
+          </div>
+        </div>
+      );
+    },
+    sortingFn: (rowA, rowB) => {
+      const dateA = new Date(rowA.getValue("time"));
+      const dateB = new Date(rowB.getValue("time"));
+      return dateA.getTime() - dateB.getTime();
+    },
   },
   {
     accessorKey: "patientName",
@@ -194,7 +250,7 @@ const columns: ColumnDef<Appointment>[] = [
           variant="secondary"
           className={cn(statusColors[status], "capitalize")}
         >
-          {status}
+          {status.replace("-", " ")}
         </Badge>
       );
     },
@@ -203,7 +259,7 @@ const columns: ColumnDef<Appointment>[] = [
     accessorKey: "notes",
     header: "Notes",
     cell: ({ row }) => (
-      <div className="max-w-[200px] truncate">{row.getValue("notes")}</div>
+      <div className="max-w-[300px] truncate">{row.getValue("notes")}</div>
     ),
   },
   {
@@ -216,12 +272,14 @@ const columns: ColumnDef<Appointment>[] = [
   },
 ];
 
-interface DataTableProps {
+interface AppointmentsDataTableProps {
   data: Appointment[];
 }
 
-function DataTable({ data }: DataTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([]);
+export function AppointmentsDataTable({ data }: AppointmentsDataTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "time", desc: false }
+  ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
@@ -230,16 +288,23 @@ function DataTable({ data }: DataTableProps) {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
       columnFilters,
     },
+    initialState: {
+      pagination: {
+        pageSize: 10,
+      },
+    },
   });
 
   return (
     <div className="space-y-4">
+      {/* Filters */}
       <div className="flex items-center space-x-2">
         <Input
           placeholder="Filter patients..."
@@ -251,7 +316,47 @@ function DataTable({ data }: DataTableProps) {
           }
           className="max-w-sm"
         />
+        <Select
+          value={
+            (table.getColumn("status")?.getFilterValue() as string) ?? "all"
+          }
+          onValueChange={(value) =>
+            table.getColumn("status")?.setFilterValue(value === "all" ? "" : value)
+          }
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+            <SelectItem value="in-progress">In Progress</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
+          value={
+            (table.getColumn("type")?.getFilterValue() as string) ?? "all"
+          }
+          onValueChange={(value) =>
+            table.getColumn("type")?.setFilterValue(value === "all" ? "" : value)
+          }
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="consultation">Consultation</SelectItem>
+            <SelectItem value="follow-up">Follow-up</SelectItem>
+            <SelectItem value="surgery">Surgery</SelectItem>
+            <SelectItem value="emergency">Emergency</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
+      {/* Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -264,7 +369,7 @@ function DataTable({ data }: DataTableProps) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
                   );
@@ -283,7 +388,7 @@ function DataTable({ data }: DataTableProps) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </TableCell>
                   ))}
@@ -302,27 +407,35 @@ function DataTable({ data }: DataTableProps) {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between space-x-2 py-4">
         <div className="text-sm text-muted-foreground">
           {table.getFilteredRowModel().rows.length} appointment(s) total.
         </div>
+        <div className="flex items-center space-x-2">
+          <p className="text-sm font-medium">
+            Page {table.getState().pagination.pageIndex + 1} of{" "}
+            {table.getPageCount()}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
-  );
-}
-
-export function AppointmentsTable() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Today&apos;s Appointments</CardTitle>
-        <CardDescription>
-          Manage and track appointments scheduled for today
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <DataTable data={todaysAppointments} />
-      </CardContent>
-    </Card>
   );
 }

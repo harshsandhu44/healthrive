@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { appointmentsChartData } from "./mock-data";
+import { appointmentsChartData } from "@/lib/mock-data";
 
 const chartConfig = {
   appointments: {
