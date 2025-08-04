@@ -32,7 +32,10 @@ export function AppointmentsChart() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-[250px] w-full"
+        >
           <AreaChart
             accessibilityLayer
             data={appointmentsChartData}
