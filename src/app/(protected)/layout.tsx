@@ -16,7 +16,7 @@ export default function ProtectedLayout({ children }: PropsWithChildren) {
       <AppSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
-        <div className="flex flex-1 flex-col">
+        <div className="max-h-[calc(100vh-var(--header-height)-1rem)] flex flex-1 flex-col overflow-y-auto">
           <div className="@container/main container py-4 md:py-6 flex flex-1 flex-col gap-2">
             {children}
           </div>
