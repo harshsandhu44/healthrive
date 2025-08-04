@@ -1,77 +1,81 @@
-'use server'
+"use server";
 
-import { createClient } from '@/lib/supabase/server'
-import { auth } from '@clerk/nextjs/server'
-import type { DoctorRow } from '@/lib/types/database'
-import type { Doctor } from '@/lib/mock-data'
-import { transformDoctorRow } from '@/lib/transforms/database'
-import type { TablesInsert, TablesUpdate } from '@/lib/types/supabase'
-
-const FALLBACK_ORG_ID = 'org_30ml1ttUdsl67pQecd3KPXnBVHT' // Development fallback
+import { createClient } from "@/lib/supabase/server";
+import { auth } from "@clerk/nextjs/server";
+import type { DoctorRow } from "@/lib/types/database";
+import type { Doctor } from "@/lib/mock-data";
+import { transformDoctorRow } from "@/lib/transforms/database";
+import type { TablesInsert, TablesUpdate } from "@/lib/types/supabase";
 
 export async function getDoctors(): Promise<Doctor[]> {
   try {
-    const { orgId } = await auth()
-    const organizationId = orgId || FALLBACK_ORG_ID
-    
-    const supabase = await createClient()
-    
+    const { orgId } = await auth();
+    const organizationId = orgId;
+
+    const supabase = await createClient();
+
     const { data, error } = await supabase
-      .from('doctors')
-      .select('*')
-      .eq('organization_id', organizationId)
-      .order('name')
-    
+      .from("doctors")
+      .select("*")
+      .eq("organization_id", organizationId)
+      .order("name");
+
     if (error) {
-      console.error('Error fetching doctors:', error)
-      throw error
+      console.error("Error fetching doctors:", error);
+      throw error;
     }
-    
-    return (data as DoctorRow[]).map(transformDoctorRow)
+
+    return (data as DoctorRow[]).map(transformDoctorRow);
   } catch (error) {
-    console.error('Error in getDoctors:', error)
-    throw error
+    console.error("Error in getDoctors:", error);
+    throw error;
   }
 }
 
 export async function getDoctor(id: string): Promise<Doctor | null> {
   try {
-    const { orgId } = await auth()
-    const organizationId = orgId || FALLBACK_ORG_ID
-    
-    const supabase = await createClient()
-    
+    const { orgId } = await auth();
+    const organizationId = orgId;
+
+    const supabase = await createClient();
+
     const { data, error } = await supabase
-      .from('doctors')
-      .select('*')
-      .eq('id', id)
-      .eq('organization_id', organizationId)
-      .single()
-    
+      .from("doctors")
+      .select("*")
+      .eq("id", id)
+      .eq("organization_id", organizationId)
+      .single();
+
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         // No rows returned
-        return null
+        return null;
       }
-      console.error('Error fetching doctor:', error)
-      throw error
+      console.error("Error fetching doctor:", error);
+      throw error;
     }
-    
-    return transformDoctorRow(data as DoctorRow)
+
+    return transformDoctorRow(data as DoctorRow);
   } catch (error) {
-    console.error('Error in getDoctor:', error)
-    throw error
+    console.error("Error in getDoctor:", error);
+    throw error;
   }
 }
 
-export async function createDoctor(doctorData: Omit<Doctor, 'id'>): Promise<Doctor> {
+export async function createDoctor(
+  doctorData: Omit<Doctor, "id">,
+): Promise<Doctor> {
   try {
-    const { orgId } = await auth()
-    const organizationId = orgId || FALLBACK_ORG_ID
-    
-    const supabase = await createClient()
-    
-    const insertData: TablesInsert<'doctors'> = {
+    const { orgId } = await auth();
+    const organizationId = orgId;
+
+    if (!organizationId) {
+      throw new Error("Organization ID is required");
+    }
+
+    const supabase = await createClient();
+
+    const insertData: TablesInsert<"doctors"> = {
       id: crypto.randomUUID(),
       organization_id: organizationId,
       name: doctorData.name,
@@ -80,81 +84,88 @@ export async function createDoctor(doctorData: Omit<Doctor, 'id'>): Promise<Doct
       gender: doctorData.gender,
       phone: doctorData.contactInfo.phone,
       email: doctorData.contactInfo.email,
-    }
-    
+    };
+
     const { data: doctor, error } = await supabase
-      .from('doctors')
+      .from("doctors")
       .insert(insertData)
       .select()
-      .single()
-    
+      .single();
+
     if (error) {
-      console.error('Error creating doctor:', error)
-      throw error
+      console.error("Error creating doctor:", error);
+      throw error;
     }
-    
-    return transformDoctorRow(doctor as DoctorRow)
+
+    return transformDoctorRow(doctor as DoctorRow);
   } catch (error) {
-    console.error('Error in createDoctor:', error)
-    throw error
+    console.error("Error in createDoctor:", error);
+    throw error;
   }
 }
 
-export async function updateDoctor(id: string, doctorData: Partial<Omit<Doctor, 'id'>>): Promise<Doctor> {
+export async function updateDoctor(
+  id: string,
+  doctorData: Partial<Omit<Doctor, "id">>,
+): Promise<Doctor> {
   try {
-    const { orgId } = await auth()
-    const organizationId = orgId || FALLBACK_ORG_ID
-    
-    const supabase = await createClient()
-    
-    const updateData: TablesUpdate<'doctors'> = {}
-    
-    if (doctorData.name) updateData.name = doctorData.name
-    if (doctorData.dateOfBirth) updateData.date_of_birth = doctorData.dateOfBirth
-    if (doctorData.specialization) updateData.specialization = doctorData.specialization
-    if (doctorData.gender) updateData.gender = doctorData.gender
-    if (doctorData.contactInfo?.phone) updateData.phone = doctorData.contactInfo.phone
-    if (doctorData.contactInfo?.email) updateData.email = doctorData.contactInfo.email
-    
+    const { orgId } = await auth();
+    const organizationId = orgId;
+
+    const supabase = await createClient();
+
+    const updateData: TablesUpdate<"doctors"> = {};
+
+    if (doctorData.name) updateData.name = doctorData.name;
+    if (doctorData.dateOfBirth)
+      updateData.date_of_birth = doctorData.dateOfBirth;
+    if (doctorData.specialization)
+      updateData.specialization = doctorData.specialization;
+    if (doctorData.gender) updateData.gender = doctorData.gender;
+    if (doctorData.contactInfo?.phone)
+      updateData.phone = doctorData.contactInfo.phone;
+    if (doctorData.contactInfo?.email)
+      updateData.email = doctorData.contactInfo.email;
+
     const { data: doctor, error } = await supabase
-      .from('doctors')
+      .from("doctors")
       .update(updateData)
-      .eq('id', id)
-      .eq('organization_id', organizationId)
+      .eq("id", id)
+      .eq("organization_id", organizationId)
       .select()
-      .single()
-    
+      .single();
+
     if (error) {
-      console.error('Error updating doctor:', error)
-      throw error
+      console.error("Error updating doctor:", error);
+      throw error;
     }
-    
-    return transformDoctorRow(doctor as DoctorRow)
+
+    return transformDoctorRow(doctor as DoctorRow);
   } catch (error) {
-    console.error('Error in updateDoctor:', error)
-    throw error
+    console.error("Error in updateDoctor:", error);
+    throw error;
   }
 }
 
 export async function deleteDoctor(id: string): Promise<void> {
   try {
-    const { orgId } = await auth()
-    const organizationId = orgId || FALLBACK_ORG_ID
-    
-    const supabase = await createClient()
-    
+    const { orgId } = await auth();
+    const organizationId = orgId;
+
+    const supabase = await createClient();
+
     const { error } = await supabase
-      .from('doctors')
+      .from("doctors")
       .delete()
-      .eq('id', id)
-      .eq('organization_id', organizationId)
-    
+      .eq("id", id)
+      .eq("organization_id", organizationId);
+
     if (error) {
-      console.error('Error deleting doctor:', error)
-      throw error
+      console.error("Error deleting doctor:", error);
+      throw error;
     }
   } catch (error) {
-    console.error('Error in deleteDoctor:', error)
-    throw error
+    console.error("Error in deleteDoctor:", error);
+    throw error;
   }
 }
