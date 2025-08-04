@@ -1,6 +1,3 @@
-"use client";
-
-import { use } from "react";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +10,7 @@ import {
   ArrowLeft,
   Stethoscope,
 } from "lucide-react";
-import { allDoctors } from "@/lib/mock-data";
+import { getDoctor } from "@/lib/actions/doctors";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -43,9 +40,9 @@ const specializationColors = {
   Anesthesiology: "bg-slate-500/10 text-slate-700 dark:text-slate-400",
 };
 
-export default function DoctorDetailsPage({ params }: DoctorDetailsPageProps) {
-  const { id } = use(params);
-  const doctor = allDoctors.find((d) => d.id === id);
+export default async function DoctorDetailsPage({ params }: DoctorDetailsPageProps) {
+  const { id } = await params;
+  const doctor = await getDoctor(id);
 
   if (!doctor) {
     notFound();

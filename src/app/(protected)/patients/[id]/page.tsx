@@ -1,6 +1,3 @@
-"use client";
-
-import { use } from "react";
 import { notFound } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +17,7 @@ import {
   Wine,
   ArrowLeft,
 } from "lucide-react";
-import { allPatients } from "@/lib/mock-data";
+import { getPatient } from "@/lib/actions/patients";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -51,11 +48,11 @@ const noteTypeColors = {
   consultation: "bg-orange-500/10 text-orange-700 dark:text-orange-400",
 };
 
-export default function PatientDetailsPage({
+export default async function PatientDetailsPage({
   params,
 }: PatientDetailsPageProps) {
-  const { id } = use(params);
-  const patient = allPatients.find((p) => p.id === id);
+  const { id } = await params;
+  const patient = await getPatient(id);
 
   if (!patient) {
     notFound();
