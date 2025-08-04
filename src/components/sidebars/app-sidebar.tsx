@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { LayoutDashboardIcon, PhoneCallIcon } from "lucide-react";
+import { LayoutDashboardIcon, PhoneCallIcon, User2Icon } from "lucide-react";
 import { Logo } from "../icons";
 
 export const AppSidebar = ({
@@ -21,6 +21,7 @@ export const AppSidebar = ({
   const navItems = [
     { icon: LayoutDashboardIcon, label: "Dashboard", href: "/dashboard" },
     { icon: PhoneCallIcon, label: "Appointments", href: "/appointments" },
+    { icon: User2Icon, label: "Patients", href: "/patients" },
   ];
 
   return (
