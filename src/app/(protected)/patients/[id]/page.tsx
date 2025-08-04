@@ -17,7 +17,7 @@ import {
   Wine,
   ArrowLeft,
 } from "lucide-react";
-import { getPatient } from "@/lib/actions/patients";
+import { getPatient } from "../actions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 

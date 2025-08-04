@@ -1,7 +1,9 @@
 import { AppointmentsDataTable } from "./appointments-table";
-import { allAppointments } from "@/lib/mock-data";
+import { getAppointments } from "./actions";
 
-export default function AppointmentsPage() {
+export default async function AppointmentsPage() {
+  const appointments = await getAppointments();
+
   return (
     <main className="space-y-6">
       <div>
@@ -10,7 +12,7 @@ export default function AppointmentsPage() {
           Manage and track all appointments across your healthcare facility.
         </p>
       </div>
-      <AppointmentsDataTable data={allAppointments} />
+      <AppointmentsDataTable data={appointments} />
     </main>
   );
 }

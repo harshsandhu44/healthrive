@@ -1,5 +1,5 @@
 import { PatientsDataTable } from "./patients-data-table";
-import { getPatients } from "@/lib/actions/patients";
+import { getPatients } from "./actions";
 
 export default async function PatientsPage() {
   const patients = await getPatients();

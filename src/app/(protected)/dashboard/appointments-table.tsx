@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import { todaysAppointments, type Appointment } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import { getTodaysAppointments } from "../appointments/actions";
 
 const statusColors = {
   scheduled: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
@@ -311,7 +312,9 @@ function DataTable({ data }: DataTableProps) {
   );
 }
 
-export function AppointmentsTable() {
+export async function AppointmentsTable() {
+  const appointments = await getTodaysAppointments();
+
   return (
     <Card>
       <CardHeader>
@@ -321,7 +324,7 @@ export function AppointmentsTable() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <DataTable data={todaysAppointments} />
+        <DataTable data={appointments} />
       </CardContent>
     </Card>
   );

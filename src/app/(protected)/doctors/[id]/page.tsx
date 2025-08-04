@@ -10,7 +10,7 @@ import {
   ArrowLeft,
   Stethoscope,
 } from "lucide-react";
-import { getDoctor } from "@/lib/actions/doctors";
+import { getDoctor } from "../actions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 

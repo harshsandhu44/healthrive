@@ -53,6 +53,9 @@ import {
 import { allDoctors, type Doctor } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { deleteDoctor } from "./actions";
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 const genderColors = {
   male: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
@@ -79,14 +82,27 @@ interface DoctorActionsProps {
 }
 
 function DoctorActions({ doctor }: DoctorActionsProps) {
-  const handleAction = (action: string) => {
-    console.log(`${action} doctor:`, doctor.id);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const handleDeleteDoctor = () => {
+    if (confirm(`Are you sure you want to delete doctor ${doctor.name}? This action cannot be undone.`)) {
+      startTransition(async () => {
+        try {
+          await deleteDoctor(doctor.id);
+          router.refresh();
+        } catch (error) {
+          console.error('Error deleting doctor:', error);
+          alert('Failed to delete doctor. Please try again.');
+        }
+      });
+    }
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="h-8 w-8 p-0" disabled={isPending}>
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
@@ -95,31 +111,44 @@ function DoctorActions({ doctor }: DoctorActionsProps) {
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={() => handleAction("view-profile")}>
-          <User className="mr-2 h-4 w-4" />
-          View Profile
+        <DropdownMenuItem asChild>
+          <Link href={`/doctors/${doctor.id}`}>
+            <User className="mr-2 h-4 w-4" />
+            View Details
+          </Link>
         </DropdownMenuItem>
         
-        <DropdownMenuItem onClick={() => handleAction("edit-doctor")}>
+        <DropdownMenuItem disabled>
           <Edit className="mr-2 h-4 w-4" />
           Edit Doctor
         </DropdownMenuItem>
         
-        <DropdownMenuItem onClick={() => handleAction("schedule-appointment")}>
+        <DropdownMenuItem disabled>
           <Calendar className="mr-2 h-4 w-4" />
           Schedule with Doctor
         </DropdownMenuItem>
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={() => handleAction("call-doctor")}>
+        <DropdownMenuItem disabled>
           <Phone className="mr-2 h-4 w-4" />
           Call Doctor
         </DropdownMenuItem>
         
-        <DropdownMenuItem onClick={() => handleAction("email-doctor")}>
+        <DropdownMenuItem disabled>
           <Mail className="mr-2 h-4 w-4" />
           Email Doctor
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        <DropdownMenuItem 
+          onClick={handleDeleteDoctor}
+          className="text-red-600 focus:text-red-600"
+          disabled={isPending}
+        >
+          <Edit className="mr-2 h-4 w-4" />
+          {isPending ? 'Deleting...' : 'Delete Doctor'}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

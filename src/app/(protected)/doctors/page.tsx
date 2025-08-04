@@ -1,5 +1,5 @@
 import { DoctorsDataTable } from "./doctors-table";
-import { getDoctors } from "@/lib/actions/doctors";
+import { getDoctors } from "./actions";
 
 export default async function DoctorsPage() {
   const doctors = await getDoctors();
