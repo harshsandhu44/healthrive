@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  getSortedRowModel,
+  SortingState,
+  getFilteredRowModel,
+  ColumnFiltersState,
+} from "@tanstack/react-table";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,12 +34,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   MoreHorizontal,
   CheckCircle,
   XCircle,
   Clock,
   User,
+  ArrowUpDown,
 } from "lucide-react";
 import { todaysAppointments, type Appointment } from "./mock-data";
 import { cn } from "@/lib/utils";
@@ -98,6 +111,206 @@ function AppointmentActions({ appointment }: { appointment: Appointment }) {
   );
 }
 
+const columns: ColumnDef<Appointment>[] = [
+  {
+    accessorKey: "time",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="h-auto p-0 font-medium"
+        >
+          Time
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("time")}</div>
+    ),
+  },
+  {
+    accessorKey: "patientName",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="h-auto p-0 font-medium"
+        >
+          Patient
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => (
+      <div>
+        <div className="font-medium">{row.getValue("patientName")}</div>
+        <div className="text-sm text-muted-foreground">
+          {row.original.patientId}
+        </div>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => {
+      const type = row.getValue("type") as keyof typeof typeColors;
+      return (
+        <Badge
+          variant="secondary"
+          className={cn(typeColors[type], "capitalize")}
+        >
+          {type}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: "doctor",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="h-auto p-0 font-medium"
+        >
+          Doctor
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => <div>{row.getValue("doctor")}</div>,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as keyof typeof statusColors;
+      return (
+        <Badge
+          variant="secondary"
+          className={cn(statusColors[status], "capitalize")}
+        >
+          {status}
+        </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: "notes",
+    header: "Notes",
+    cell: ({ row }) => (
+      <div className="max-w-[200px] truncate">{row.getValue("notes")}</div>
+    ),
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const appointment = row.original;
+      return <AppointmentActions appointment={appointment} />;
+    },
+  },
+];
+
+interface DataTableProps {
+  data: Appointment[];
+}
+
+function DataTable({ data }: DataTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  const table = useReactTable({
+    data,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center space-x-2">
+        <Input
+          placeholder="Filter patients..."
+          value={
+            (table.getColumn("patientName")?.getFilterValue() as string) ?? ""
+          }
+          onChange={(event) =>
+            table.getColumn("patientName")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+      </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No appointments found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="text-sm text-muted-foreground">
+          {table.getFilteredRowModel().rows.length} appointment(s) total.
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AppointmentsTable() {
   return (
     <Card>
@@ -108,62 +321,7 @@ export function AppointmentsTable() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Time</TableHead>
-              <TableHead>Patient</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Doctor</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Notes</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {todaysAppointments.map((appointment) => (
-              <TableRow key={appointment.id}>
-                <TableCell className="font-medium">
-                  {appointment.time}
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{appointment.patientName}</div>
-                    <div className="text-sm text-muted-foreground">
-                      {appointment.patientId}
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="secondary"
-                    className={cn(typeColors[appointment.type], "capitalize")}
-                  >
-                    {appointment.type}
-                  </Badge>
-                </TableCell>
-                <TableCell>{appointment.doctor}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="secondary"
-                    className={cn(
-                      statusColors[appointment.status],
-                      "capitalize",
-                    )}
-                  >
-                    {appointment.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="max-w-[200px] truncate">
-                  {appointment.notes}
-                </TableCell>
-                <TableCell className="text-right">
-                  <AppointmentActions appointment={appointment} />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <DataTable data={todaysAppointments} />
       </CardContent>
     </Card>
   );
