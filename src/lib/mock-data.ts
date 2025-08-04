@@ -9,6 +9,99 @@ export interface Appointment {
   notes?: string;
 }
 
+export interface Diagnosis {
+  code: string; // ICD-10 code
+  description: string;
+  dateOfDiagnosis: string;
+  status: "active" | "resolved" | "chronic";
+}
+
+export interface Medication {
+  name: string;
+  dosage: string;
+  frequency: string;
+  route: "oral" | "intravenous" | "topical" | "injection" | "inhalation";
+  startDate: string;
+  endDate?: string;
+  reason: string;
+}
+
+export interface Procedure {
+  code: string; // CPT code
+  description: string;
+  dateOfProcedure: string;
+  provider: string;
+}
+
+export interface LabResult {
+  testName: string;
+  result: string;
+  units: string;
+  referenceRange: string;
+  dateOfTest: string;
+}
+
+export interface VitalSigns {
+  dateTime: string;
+  bloodPressureSystolic: number;
+  bloodPressureDiastolic: number;
+  heartRate: number;
+  temperature: number; // in Fahrenheit
+  respiratoryRate: number;
+  weight: number; // in lbs
+  height: number; // in inches
+}
+
+export interface ClinicalNote {
+  dateTime: string;
+  noteType: "progress" | "discharge" | "admission" | "consultation";
+  content: string;
+  provider: string;
+}
+
+export interface Patient {
+  // Demographics
+  id: string;
+  name: string;
+  dateOfBirth: string;
+  age: number;
+  gender: "male" | "female";
+  contactInfo: {
+    address: string;
+    phone: string;
+    email: string;
+  };
+  emergencyContact: {
+    name: string;
+    phone: string;
+    relationship: string;
+  };
+  
+  // Medical History
+  diagnoses: Diagnosis[];
+  medications: Medication[];
+  procedures: Procedure[];
+  labResults: LabResult[];
+  vitalSigns: VitalSigns[];
+  clinicalNotes: ClinicalNote[];
+  
+  // Other Information
+  allergies: string[];
+  socialHistory: {
+    smokingStatus: "never" | "former" | "current";
+    alcoholConsumption: "none" | "occasional" | "moderate" | "heavy";
+  };
+  familyHistory: string[];
+  insurance: {
+    provider: string;
+    policyNumber: string;
+  };
+  
+  // System Information
+  status: "active" | "inactive" | "discharged";
+  registrationDate: string;
+}
+
 export interface DashboardMetrics {
   appointments: {
     current: number;
@@ -297,5 +390,328 @@ export const allAppointments: Appointment[] = [
     status: "completed",
     doctor: "Dr. Wilson",
     notes: "Emergency room visit for allergic reaction",
+  },
+];
+
+// Mock data for patients with comprehensive medical records
+export const allPatients: Patient[] = [
+  {
+    // Demographics
+    id: "PT-001",
+    name: "Sarah Johnson",
+    dateOfBirth: "1985-03-15",
+    age: 39,
+    gender: "female",
+    contactInfo: {
+      address: "123 Oak Street, Springfield, IL 62701",
+      phone: "(555) 123-4567",
+      email: "sarah.johnson@email.com",
+    },
+    emergencyContact: {
+      name: "John Johnson",
+      phone: "(555) 123-4568",
+      relationship: "Spouse",
+    },
+    
+    // Medical History
+    diagnoses: [
+      {
+        code: "I10",
+        description: "Essential Hypertension",
+        dateOfDiagnosis: "2024-06-10T00:00:00",
+        status: "active",
+      },
+      {
+        code: "Z00.00",
+        description: "Encounter for general adult medical examination without abnormal findings",
+        dateOfDiagnosis: "2024-08-04T00:00:00",
+        status: "resolved",
+      },
+    ],
+    medications: [
+      {
+        name: "Lisinopril",
+        dosage: "10mg",
+        frequency: "Once daily",
+        route: "oral",
+        startDate: "2024-06-10T00:00:00",
+        reason: "Hypertension management",
+      },
+    ],
+    procedures: [
+      {
+        code: "99213",
+        description: "Office visit for established patient",
+        dateOfProcedure: "2024-08-04T09:00:00",
+        provider: "Dr. Smith",
+      },
+    ],
+    labResults: [
+      {
+        testName: "Complete Blood Count",
+        result: "Normal",
+        units: "Various",
+        referenceRange: "Within normal limits",
+        dateOfTest: "2024-08-04T00:00:00",
+      },
+      {
+        testName: "Lipid Panel",
+        result: "185",
+        units: "mg/dL",
+        referenceRange: "< 200",
+        dateOfTest: "2024-08-04T00:00:00",
+      },
+    ],
+    vitalSigns: [
+      {
+        dateTime: "2024-08-04T09:00:00",
+        bloodPressureSystolic: 128,
+        bloodPressureDiastolic: 82,
+        heartRate: 72,
+        temperature: 98.6,
+        respiratoryRate: 16,
+        weight: 145,
+        height: 65,
+      },
+    ],
+    clinicalNotes: [
+      {
+        dateTime: "2024-08-04T09:00:00",
+        noteType: "progress",
+        content: "Patient presents for annual physical examination. Reports feeling well with no new complaints. Blood pressure well controlled on current medication. Continue current regimen.",
+        provider: "Dr. Smith",
+      },
+    ],
+    
+    // Other Information
+    allergies: ["Penicillin"],
+    socialHistory: {
+      smokingStatus: "never",
+      alcoholConsumption: "occasional",
+    },
+    familyHistory: ["Hypertension (mother)", "Diabetes Type 2 (father)"],
+    insurance: {
+      provider: "Blue Cross Blue Shield",
+      policyNumber: "BCBS123456789",
+    },
+    
+    // System Information
+    status: "active",
+    registrationDate: "2023-01-15T00:00:00",
+  },
+  {
+    // Demographics
+    id: "PT-002",
+    name: "Michael Chen",
+    dateOfBirth: "1978-11-22",
+    age: 45,
+    gender: "male",
+    contactInfo: {
+      address: "456 Pine Avenue, Springfield, IL 62702",
+      phone: "(555) 234-5678",
+      email: "michael.chen@email.com",
+    },
+    emergencyContact: {
+      name: "Lisa Chen",
+      phone: "(555) 234-5679",
+      relationship: "Wife",
+    },
+    
+    // Medical History
+    diagnoses: [
+      {
+        code: "E11.9",
+        description: "Type 2 diabetes mellitus without complications",
+        dateOfDiagnosis: "2024-02-08T00:00:00",
+        status: "active",
+      },
+      {
+        code: "K35.9",
+        description: "Acute appendicitis, unspecified",
+        dateOfDiagnosis: "2024-07-15T00:00:00",
+        status: "resolved",
+      },
+    ],
+    medications: [
+      {
+        name: "Metformin",
+        dosage: "500mg",
+        frequency: "Twice daily",
+        route: "oral",
+        startDate: "2024-02-08T00:00:00",
+        reason: "Type 2 diabetes management",
+      },
+    ],
+    procedures: [
+      {
+        code: "44970",
+        description: "Laparoscopic appendectomy",
+        dateOfProcedure: "2024-07-15T08:00:00",
+        provider: "Dr. Taylor",
+      },
+      {
+        code: "99214",
+        description: "Office visit for established patient",
+        dateOfProcedure: "2024-08-04T10:30:00",
+        provider: "Dr. Johnson",
+      },
+    ],
+    labResults: [
+      {
+        testName: "Hemoglobin A1C",
+        result: "7.2",
+        units: "%",
+        referenceRange: "< 7.0",
+        dateOfTest: "2024-08-01T00:00:00",
+      },
+      {
+        testName: "Fasting Glucose",
+        result: "145",
+        units: "mg/dL",
+        referenceRange: "70-100",
+        dateOfTest: "2024-08-01T00:00:00",
+      },
+    ],
+    vitalSigns: [
+      {
+        dateTime: "2024-08-04T10:30:00",
+        bloodPressureSystolic: 135,
+        bloodPressureDiastolic: 88,
+        heartRate: 78,
+        temperature: 98.4,
+        respiratoryRate: 18,
+        weight: 180,
+        height: 70,
+      },
+    ],
+    clinicalNotes: [
+      {
+        dateTime: "2024-08-04T10:30:00",
+        noteType: "progress",
+        content: "Post-surgical follow-up visit. Incision sites healing well, no signs of infection. Patient reports good energy levels. Diabetes management discussed, A1C improving but still above target.",
+        provider: "Dr. Johnson",
+      },
+    ],
+    
+    // Other Information
+    allergies: ["Sulfa drugs"],
+    socialHistory: {
+      smokingStatus: "former",
+      alcoholConsumption: "moderate",
+    },
+    familyHistory: ["Diabetes Type 2 (both parents)", "Heart disease (father)"],
+    insurance: {
+      provider: "Aetna",
+      policyNumber: "AET987654321",
+    },
+    
+    // System Information
+    status: "active",
+    registrationDate: "2022-08-20T00:00:00",
+  },
+  {
+    // Demographics
+    id: "PT-003",
+    name: "Emily Davis",
+    dateOfBirth: "1992-07-08",
+    age: 32,
+    gender: "female",
+    contactInfo: {
+      address: "789 Maple Drive, Springfield, IL 62703",
+      phone: "(555) 345-6789",
+      email: "emily.davis@email.com",
+    },
+    emergencyContact: {
+      name: "Robert Davis",
+      phone: "(555) 345-6790",
+      relationship: "Father",
+    },
+    
+    // Medical History
+    diagnoses: [
+      {
+        code: "L20.9",
+        description: "Atopic dermatitis, unspecified",
+        dateOfDiagnosis: "2024-08-04T00:00:00",
+        status: "active",
+      },
+      {
+        code: "T78.40XA",
+        description: "Allergy, unspecified, initial encounter",
+        dateOfDiagnosis: "2024-05-12T00:00:00",
+        status: "resolved",
+      },
+    ],
+    medications: [
+      {
+        name: "Hydrocortisone cream",
+        dosage: "1%",
+        frequency: "Apply twice daily",
+        route: "topical",
+        startDate: "2024-08-04T00:00:00",
+        reason: "Eczema treatment",
+      },
+      {
+        name: "EpiPen",
+        dosage: "0.3mg",
+        frequency: "As needed",
+        route: "injection",
+        startDate: "2024-05-12T00:00:00",
+        reason: "Emergency allergic reaction treatment",
+      },
+    ],
+    procedures: [
+      {
+        code: "99213",
+        description: "Office visit for established patient",
+        dateOfProcedure: "2024-08-04T11:15:00",
+        provider: "Dr. Wilson",
+      },
+    ],
+    labResults: [
+      {
+        testName: "Allergen Panel",
+        result: "Positive for shellfish",
+        units: "Various",
+        referenceRange: "Negative",
+        dateOfTest: "2024-05-15T00:00:00",
+      },
+    ],
+    vitalSigns: [
+      {
+        dateTime: "2024-08-04T11:15:00",
+        bloodPressureSystolic: 118,
+        bloodPressureDiastolic: 75,
+        heartRate: 68,
+        temperature: 98.7,
+        respiratoryRate: 14,
+        weight: 125,
+        height: 64,
+      },
+    ],
+    clinicalNotes: [
+      {
+        dateTime: "2024-08-04T11:15:00",
+        noteType: "progress",
+        content: "Patient presents with eczema flare-up on arms and face. Skin appears inflamed with mild scaling. Prescribed topical steroid. Discussed trigger avoidance and skin care routine.",
+        provider: "Dr. Wilson",
+      },
+    ],
+    
+    // Other Information
+    allergies: ["Shellfish", "Tree nuts"],
+    socialHistory: {
+      smokingStatus: "never",
+      alcoholConsumption: "none",
+    },
+    familyHistory: ["Allergies (mother)", "Asthma (sister)"],
+    insurance: {
+      provider: "United Healthcare",
+      policyNumber: "UHC456789123",
+    },
+    
+    // System Information
+    status: "active",
+    registrationDate: "2023-05-10T00:00:00",
   },
 ];
