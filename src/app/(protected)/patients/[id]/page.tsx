@@ -20,7 +20,7 @@ import {
   Wine,
   ArrowLeft,
 } from "lucide-react";
-import { allPatients, type Patient } from "@/lib/mock-data";
+import { allPatients } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -51,7 +51,9 @@ const noteTypeColors = {
   consultation: "bg-orange-500/10 text-orange-700 dark:text-orange-400",
 };
 
-export default function PatientDetailsPage({ params }: PatientDetailsPageProps) {
+export default function PatientDetailsPage({
+  params,
+}: PatientDetailsPageProps) {
   const { id } = use(params);
   const patient = allPatients.find((p) => p.id === id);
 
@@ -61,7 +63,7 @@ export default function PatientDetailsPage({ params }: PatientDetailsPageProps) 
 
   return (
     <main className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col gap-4">
         <Link href="/patients">
           <Button variant="outline" size="sm">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -271,9 +273,7 @@ export default function PatientDetailsPage({ params }: PatientDetailsPageProps) 
                       <h4 className="font-medium">{medication.name}</h4>
                       <Badge
                         variant="secondary"
-                        className={cn(
-                          medicationRouteColors[medication.route],
-                        )}
+                        className={cn(medicationRouteColors[medication.route])}
                       >
                         {medication.route}
                       </Badge>
