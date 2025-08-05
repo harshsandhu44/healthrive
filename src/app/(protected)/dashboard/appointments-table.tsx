@@ -45,7 +45,6 @@ import {
 } from "lucide-react";
 import { type Appointment } from "@/lib/types/entities";
 import { cn } from "@/lib/utils";
-import { getTodaysAppointments } from "../appointments/actions";
 
 const statusColors = {
   scheduled: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
@@ -312,9 +311,11 @@ function DataTable({ data }: DataTableProps) {
   );
 }
 
-export async function AppointmentsTable() {
-  const appointments = await getTodaysAppointments();
+interface AppointmentsTableProps {
+  appointments: Appointment[];
+}
 
+export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
   return (
     <Card>
       <CardHeader>

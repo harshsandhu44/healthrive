@@ -13,13 +13,15 @@ import {
 import { TrendingUp, TrendingDown, Users, Calendar } from "lucide-react";
 import { getPatients } from "../patients/actions";
 import { getAppointments } from "../appointments/actions";
+import { getTodaysAppointments } from "../appointments/actions";
 import { AppointmentsChart } from "./appointments-chart";
 import { AppointmentsTable } from "./appointments-table";
 
 export default async function DashboardPage() {
-  const [patients, appointments] = await Promise.all([
+  const [patients, appointments, todaysAppointments] = await Promise.all([
     getPatients(),
     getAppointments(),
+    getTodaysAppointments(),
   ]);
 
   // Calculate current month and previous month data
@@ -144,7 +146,7 @@ export default async function DashboardPage() {
 
       {/* Today's Appointments Table */}
       <section>
-        <AppointmentsTable />
+        <AppointmentsTable appointments={todaysAppointments} />
       </section>
     </main>
   );
