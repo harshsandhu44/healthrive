@@ -42,7 +42,6 @@ import {
   MoreHorizontal,
   User,
   ArrowUpDown,
-  Calendar,
   Phone,
   Mail,
   Edit,
@@ -56,6 +55,7 @@ import Link from "next/link";
 import { deleteDoctor } from "./actions";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { EditDoctorModal } from "@/components/modals/edit-doctor-modal";
 
 const genderColors = {
   male: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
@@ -122,10 +122,12 @@ function DoctorActions({ doctor }: DoctorActionsProps) {
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled>
-          <Edit className="mr-2 h-4 w-4" />
-          Edit Doctor
-        </DropdownMenuItem>
+        <EditDoctorModal doctor={doctor}>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit Doctor
+          </DropdownMenuItem>
+        </EditDoctorModal>
 
         <DropdownMenuSeparator />
 
