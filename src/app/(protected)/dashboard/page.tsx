@@ -22,19 +22,62 @@ export default async function DashboardPage() {
     getAppointments(),
   ]);
 
+  // Calculate current month and previous month data
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+  // Filter appointments by current and previous month
+  const currentMonthAppointments = appointments.filter(appointment => {
+    if (!appointment.time) return false;
+    const appointmentDate = new Date(appointment.time);
+    return appointmentDate.getMonth() === currentMonth && appointmentDate.getFullYear() === currentYear;
+  });
+
+  const lastMonthAppointments = appointments.filter(appointment => {
+    if (!appointment.time) return false;
+    const appointmentDate = new Date(appointment.time);
+    return appointmentDate.getMonth() === lastMonth && appointmentDate.getFullYear() === lastMonthYear;
+  });
+
+  // Filter patients by current and previous month registration
+  const currentMonthPatients = patients.filter(patient => {
+    if (!patient.registrationDate) return false;
+    const registrationDate = new Date(patient.registrationDate);
+    return registrationDate.getMonth() === currentMonth && registrationDate.getFullYear() === currentYear;
+  });
+
+  const lastMonthPatients = patients.filter(patient => {
+    if (!patient.registrationDate) return false;
+    const registrationDate = new Date(patient.registrationDate);
+    return registrationDate.getMonth() === lastMonth && registrationDate.getFullYear() === lastMonthYear;
+  });
+
+  // Calculate percentage changes
+  const appointmentsChange = lastMonthAppointments.length === 0 
+    ? (currentMonthAppointments.length > 0 ? 100 : 0)
+    : ((currentMonthAppointments.length - lastMonthAppointments.length) / lastMonthAppointments.length) * 100;
+
+  const patientsChange = lastMonthPatients.length === 0 
+    ? (currentMonthPatients.length > 0 ? 100 : 0)
+    : ((currentMonthPatients.length - lastMonthPatients.length) / lastMonthPatients.length) * 100;
+
   const metricsCards = [
     {
       label: "Appointments",
-      value: appointments.length,
-      previous: Math.floor(appointments.length * 0.8), // Simulated previous value
-      change: 25.0,
+      value: currentMonthAppointments.length,
+      previous: lastMonthAppointments.length,
+      change: appointmentsChange,
       icon: Calendar,
     },
     {
       label: "Patients",
-      value: patients.length,
-      previous: Math.floor(patients.length * 0.85), // Simulated previous value
-      change: 17.6,
+      value: currentMonthPatients.length,
+      previous: lastMonthPatients.length,
+      change: patientsChange,
       icon: Users,
     },
   ];
