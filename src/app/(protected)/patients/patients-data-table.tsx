@@ -57,6 +57,7 @@ import Link from "next/link";
 import { deletePatient } from "./actions";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { EditPatientModal } from "@/components/modals/edit-patient-modal";
 
 const statusColors = {
   active: "bg-green-500/10 text-green-700 dark:text-green-400",
@@ -110,10 +111,12 @@ function PatientActions({ patient }: PatientActionsProps) {
           </Link>
         </DropdownMenuItem>
         
-        <DropdownMenuItem disabled>
-          <Edit className="mr-2 h-4 w-4" />
-          Edit Patient
-        </DropdownMenuItem>
+        <EditPatientModal patient={patient}>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit Patient
+          </DropdownMenuItem>
+        </EditPatientModal>
         
         <DropdownMenuItem disabled>
           <Calendar className="mr-2 h-4 w-4" />
