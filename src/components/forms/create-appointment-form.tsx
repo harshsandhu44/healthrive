@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -48,9 +49,10 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createAppointment, getAppointments } from "@/app/(protected)/appointments/actions";
 import { getDoctors } from "@/app/(protected)/doctors/actions";
-import { getPatients } from "@/app/(protected)/patients/actions";
+import { getPatients, createPatient } from "@/app/(protected)/patients/actions";
 import { APPOINTMENT_TYPES, APPOINTMENT_STATUSES } from "@/lib/constants";
 import { toast } from "sonner";
 import { type Doctor, type Patient, type Appointment } from "@/lib/types/entities";
@@ -143,6 +145,10 @@ function DateTimePicker({
 const appointmentFormSchema = z.object({
   patientName: z.string().min(2, "Patient name must be at least 2 characters."),
   patientId: z.string().optional(),
+  // New patient fields
+  patientType: z.enum(["existing", "new"]),
+  newPatientDateOfBirth: z.string().optional(),
+  newPatientGender: z.enum(["male", "female"]).optional(),
   date: z.date({ message: "Appointment date is required." }),
   time: z.string().min(1, "Appointment time is required.").refine((time) => {
     const [hours, minutes] = time.split(':').map(Number);
@@ -157,6 +163,15 @@ const appointmentFormSchema = z.object({
   status: z.enum(["scheduled", "in-progress", "completed", "cancelled"]),
   doctor: z.string().min(1, "Doctor selection is required."),
   notes: z.string().optional(),
+}).refine((data) => {
+  // If creating new patient, require additional fields
+  if (data.patientType === "new") {
+    return data.newPatientDateOfBirth && data.newPatientGender;
+  }
+  return true;
+}, {
+  message: "Date of birth and gender are required for new patients",
+  path: ["newPatientDateOfBirth"]
 });
 
 type AppointmentFormValues = z.infer<typeof appointmentFormSchema>;
@@ -192,6 +207,9 @@ export function CreateAppointmentForm({
       date: now,
       time: defaultTime,
       patientName: "",
+      patientType: "existing",
+      newPatientDateOfBirth: "",
+      newPatientGender: "male",
       notes: "",
       type: "consultation",
       status: "scheduled",
@@ -259,9 +277,56 @@ export function CreateAppointmentForm({
           return;
         }
 
+        let patientId = values.patientId || null;
+
+        // Create new patient if needed
+        if (values.patientType === "new") {
+          const newPatientData = {
+            name: values.patientName,
+            dateOfBirth: values.newPatientDateOfBirth!,
+            age: new Date().getFullYear() - new Date(values.newPatientDateOfBirth!).getFullYear(),
+            gender: values.newPatientGender!,
+            contactInfo: {
+              address: "",
+              phone: "",
+              email: "",
+            },
+            emergencyContact: {
+              name: "",
+              phone: "",
+              relationship: "",
+            },
+            insurance: {
+              provider: "",
+              policyNumber: "",
+            },
+            socialHistory: {
+              smokingStatus: "never",
+              alcoholConsumption: "none",
+            },
+            allergies: [],
+            familyHistory: [],
+            diagnoses: [],
+            medications: [],
+            procedures: [],
+            labResults: [],
+            vitalSigns: [],
+            clinicalNotes: [],
+            status: "active",
+            registrationDate: new Date().toISOString(),
+          };
+
+          const createdPatient = await createPatient(newPatientData);
+          patientId = createdPatient.id;
+          
+          toast.success("New patient created!", {
+            description: `${values.patientName} has been added to the system.`,
+          });
+        }
+
         const appointmentData = {
           patientName: values.patientName,
-          patientId: values.patientId || null,
+          patientId: patientId,
           time: appointmentDateTime.toISOString(),
           type: values.type,
           status: values.status,
@@ -325,97 +390,155 @@ export function CreateAppointmentForm({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {/* Patient Information */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <User className="h-4 w-4" />
-            <h3 className="text-sm font-medium">Patient Information</h3>
-          </div>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <CardTitle className="text-lg">Patient Information</CardTitle>
+            </div>
+            <CardDescription>
+              Select an existing patient or create a new one for this appointment.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="existing" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger 
+                  value="existing" 
+                  onClick={() => form.setValue("patientType", "existing")}
+                >
+                  Existing Patient
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="new"
+                  onClick={() => form.setValue("patientType", "new")}
+                >
+                  New Patient
+                </TabsTrigger>
+              </TabsList>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="patientName"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Patient Name *</FormLabel>
-                  <Popover open={patientOpen} onOpenChange={setPatientOpen}>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          aria-expanded={patientOpen}
-                          className={cn(
-                            "justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
-                          disabled={patientsLoading}
-                        >
-                          {patientsLoading
-                            ? "Loading patients..."
-                            : field.value || "Select or search patient..."}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
-                      <Command>
-                        <CommandInput placeholder="Search patients..." />
-                        <CommandList>
-                          <CommandEmpty>No patient found.</CommandEmpty>
-                          <CommandGroup>
-                            {patients.map((patient) => (
-                              <CommandItem
-                                value={patient.name}
-                                key={patient.id}
-                                onSelect={() => handlePatientSelect(patient)}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    patient.name === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                <div className="flex flex-col">
-                                  <span>{patient.name}</span>
-                                  <span className="text-sm text-muted-foreground">
-                                    ID: {patient.id} • Age: {patient.age}
-                                  </span>
-                                </div>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <TabsContent value="existing" className="space-y-4 mt-4">
+                <FormField
+                  control={form.control}
+                  name="patientName"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Patient Name *</FormLabel>
+                      <Popover open={patientOpen} onOpenChange={setPatientOpen}>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              aria-expanded={patientOpen}
+                              className={cn(
+                                "justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                              disabled={patientsLoading}
+                            >
+                              {patientsLoading
+                                ? "Loading patients..."
+                                : field.value || "Select or search patient..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-full p-0">
+                          <Command>
+                            <CommandInput placeholder="Search patients..." />
+                            <CommandList>
+                              <CommandEmpty>No patient found.</CommandEmpty>
+                              <CommandGroup>
+                                {patients.map((patient) => (
+                                  <CommandItem
+                                    value={patient.name}
+                                    key={patient.id}
+                                    onSelect={() => handlePatientSelect(patient)}
+                                  >
+                                    <Check
+                                      className={cn(
+                                        "mr-2 h-4 w-4",
+                                        patient.name === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                    <div className="flex flex-col">
+                                      <span>{patient.name}</span>
+                                      <span className="text-sm text-muted-foreground">
+                                        ID: {patient.id} • Age: {patient.age}
+                                      </span>
+                                    </div>
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </TabsContent>
 
-            <FormField
-              control={form.control}
-              name="patientId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Patient ID</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="Auto-filled when patient selected" 
-                      {...field} 
-                      readOnly
-                      className="bg-muted"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
+              <TabsContent value="new" className="space-y-4 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="patientName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full Name *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter patient's full name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="newPatientDateOfBirth"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date of Birth *</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="newPatientGender"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gender *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select gender" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="male">Male</SelectItem>
+                            <SelectItem value="female">Female</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
 
         {/* Appointment Details */}
         <div className="space-y-4">
