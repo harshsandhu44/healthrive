@@ -6,6 +6,45 @@ import type { PatientWithMedicalData } from "@/lib/types/database";
 import type { Patient } from "@/lib/types/entities";
 import { transformPatientWithMedicalData } from "@/lib/transforms/database";
 import type { TablesInsert, TablesUpdate } from "@/lib/types/supabase";
+import { generatePatientId } from "@/lib/utils";
+
+/**
+ * Generates a unique patient ID with collision detection
+ * Retries up to 5 times if ID already exists
+ */
+async function generateUniquePatientId(supabase: Awaited<ReturnType<typeof createClient>>, organizationId: string): Promise<string> {
+  const maxRetries = 5;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const patientId = generatePatientId();
+    
+    // Check if ID already exists in the organization
+    const { data, error } = await supabase
+      .from("patients")
+      .select("id")
+      .eq("id", patientId)
+      .eq("organization_id", organizationId)
+      .single();
+    
+    // If no data found (and no other error), the ID is unique
+    if (!data && (!error || error.code === "PGRST116")) {
+      return patientId;
+    }
+    
+    // If there was an actual error (not just "no rows"), throw it
+    if (error && error.code !== "PGRST116") {
+      console.error("Error checking patient ID uniqueness:", error);
+      throw error;
+    }
+    
+    // ID exists, try again (unless it's the last attempt)
+    if (attempt === maxRetries - 1) {
+      throw new Error("Unable to generate unique patient ID after multiple attempts");
+    }
+  }
+  
+  throw new Error("Unable to generate unique patient ID");
+}
 
 export async function getPatients(): Promise<Patient[]> {
   try {
@@ -97,9 +136,12 @@ export async function createPatient(
 
     const supabase = await createClient();
 
+    // Generate unique patient ID
+    const patientId = await generateUniquePatientId(supabase, organizationId);
+
     // Create patient record
     const insertData: TablesInsert<"patients"> = {
-      id: crypto.randomUUID(),
+      id: patientId,
       organization_id: organizationId,
       name: patientData.name,
       gender: patientData.gender,
