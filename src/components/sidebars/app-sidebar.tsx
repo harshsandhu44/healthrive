@@ -20,6 +20,7 @@ import {
   PlusIcon,
 } from "lucide-react";
 import { Logo } from "../icons";
+import { CreateAppointmentModal } from "../modals/create-appointment-modal";
 
 export const AppSidebar = ({
   ...props
@@ -51,10 +52,12 @@ export const AppSidebar = ({
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Button className="justify-start" variant="outline">
-                <PlusIcon />
-                Create an Appointment
-              </Button>
+              <CreateAppointmentModal>
+                <Button className="justify-start w-full" variant="outline">
+                  <PlusIcon />
+                  Create an Appointment
+                </Button>
+              </CreateAppointmentModal>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
