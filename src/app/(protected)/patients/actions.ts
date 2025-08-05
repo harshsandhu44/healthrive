@@ -252,7 +252,7 @@ export async function deletePatient(id: string): Promise<void> {
 
     const supabase = await createClient();
 
-    // Delete related medical records first (due to foreign key constraints)
+    // Delete all related records first (due to foreign key constraints)
     await Promise.all([
       supabase.from("diagnoses").delete().eq("patient_id", id),
       supabase.from("medications").delete().eq("patient_id", id),
@@ -260,6 +260,7 @@ export async function deletePatient(id: string): Promise<void> {
       supabase.from("lab_results").delete().eq("patient_id", id),
       supabase.from("vital_signs").delete().eq("patient_id", id),
       supabase.from("clinical_notes").delete().eq("patient_id", id),
+      supabase.from("appointments").delete().eq("patient_id", id),
     ]);
 
     // Delete patient record
