@@ -2,10 +2,50 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import type { DoctorRow } from "@/lib/types/database";
 import type { Doctor } from "@/lib/types/entities";
 import { transformDoctorRow } from "@/lib/transforms/database";
 import type { TablesInsert, TablesUpdate } from "@/lib/types/supabase";
+import { generateDoctorId } from "@/lib/utils";
+
+/**
+ * Generates a unique doctor ID with collision detection
+ * Retries up to 5 times if ID already exists
+ */
+async function generateUniqueDoctorId(supabase: Awaited<ReturnType<typeof createClient>>, organizationId: string): Promise<string> {
+  const maxRetries = 5;
+  
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    const doctorId = generateDoctorId();
+    
+    // Check if ID already exists in the organization
+    const { data, error } = await supabase
+      .from("doctors")
+      .select("id")
+      .eq("id", doctorId)
+      .eq("organization_id", organizationId)
+      .single();
+    
+    // If no data found (and no other error), the ID is unique
+    if (!data && (!error || error.code === "PGRST116")) {
+      return doctorId;
+    }
+    
+    // If there was an actual error (not just "no rows"), throw it
+    if (error && error.code !== "PGRST116") {
+      console.error("Error checking doctor ID uniqueness:", error);
+      throw error;
+    }
+    
+    // ID exists, try again (unless it's the last attempt)
+    if (attempt === maxRetries - 1) {
+      throw new Error("Unable to generate unique doctor ID after multiple attempts");
+    }
+  }
+  
+  throw new Error("Unable to generate unique doctor ID");
+}
 
 export async function getDoctors(): Promise<Doctor[]> {
   try {
@@ -75,8 +115,11 @@ export async function createDoctor(
 
     const supabase = await createClient();
 
+    // Generate unique doctor ID
+    const doctorId = await generateUniqueDoctorId(supabase, organizationId);
+
     const insertData: TablesInsert<"doctors"> = {
-      id: crypto.randomUUID(),
+      id: doctorId,
       organization_id: organizationId,
       name: doctorData.name,
       date_of_birth: doctorData.dateOfBirth,
@@ -96,6 +139,9 @@ export async function createDoctor(
       console.error("Error creating doctor:", error);
       throw error;
     }
+
+    // Revalidate the doctors route
+    revalidatePath("/doctors");
 
     return transformDoctorRow(doctor as DoctorRow);
   } catch (error) {
@@ -140,6 +186,9 @@ export async function updateDoctor(
       throw error;
     }
 
+    // Revalidate the doctors route
+    revalidatePath("/doctors");
+
     return transformDoctorRow(doctor as DoctorRow);
   } catch (error) {
     console.error("Error in updateDoctor:", error);
@@ -164,6 +213,9 @@ export async function deleteDoctor(id: string): Promise<void> {
       console.error("Error deleting doctor:", error);
       throw error;
     }
+
+    // Revalidate the doctors route
+    revalidatePath("/doctors");
   } catch (error) {
     console.error("Error in deleteDoctor:", error);
     throw error;

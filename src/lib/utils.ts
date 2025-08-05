@@ -20,3 +20,19 @@ export function generatePatientId(): string {
   
   return `pt-${uniqueId}`;
 }
+
+/**
+ * Generates a unique doctor ID in the format doc-{unique_id}
+ * Uses a 6-character alphanumeric string for the unique part
+ * @returns string in format "doc-a7x9k2"
+ */
+export function generateDoctorId(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let uniqueId = '';
+  
+  for (let i = 0; i < 6; i++) {
+    uniqueId += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  
+  return `doc-${uniqueId}`;
+}
