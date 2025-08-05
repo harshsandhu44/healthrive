@@ -1,9 +1,8 @@
-"use client";
-
 import { PatientsDataTable } from "./patients-data-table";
-import { allPatients } from "@/lib/mock-data";
+import { getPatients } from "./actions";
 
-export default function PatientsPage() {
+export default async function PatientsPage() {
+  const patients = await getPatients();
 
   return (
     <main className="space-y-6">
@@ -14,7 +13,7 @@ export default function PatientsPage() {
         </p>
       </div>
       
-      <PatientsDataTable data={allPatients} />
+      <PatientsDataTable data={patients} />
     </main>
   );
 }

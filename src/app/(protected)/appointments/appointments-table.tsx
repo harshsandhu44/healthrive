@@ -51,8 +51,11 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { allAppointments, type Appointment } from "@/lib/mock-data";
+import { type Appointment } from "@/lib/types/entities";
 import { cn } from "@/lib/utils";
+import { deleteAppointment } from "./actions";
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
 const statusColors = {
   scheduled: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
@@ -69,15 +72,27 @@ const typeColors = {
 };
 
 function AppointmentActions({ appointment }: { appointment: Appointment }) {
-  const handleAction = (action: string) => {
-    console.log(`${action} appointment:`, appointment.id);
-    // In a real app, this would make an API call
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const handleDeleteAppointment = () => {
+    if (confirm(`Are you sure you want to delete this appointment? This action cannot be undone.`)) {
+      startTransition(async () => {
+        try {
+          await deleteAppointment(appointment.id);
+          router.refresh();
+        } catch (error) {
+          console.error('Error deleting appointment:', error);
+          alert('Failed to delete appointment. Please try again.');
+        }
+      });
+    }
   };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button variant="ghost" className="h-8 w-8 p-0" disabled={isPending}>
           <span className="sr-only">Open menu</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
@@ -88,23 +103,15 @@ function AppointmentActions({ appointment }: { appointment: Appointment }) {
         
         {appointment.status === "scheduled" && (
           <>
-            <DropdownMenuItem
-              onClick={() => handleAction("start")}
-              className="text-blue-600"
-            >
+            <DropdownMenuItem disabled className="text-blue-600">
               <Clock className="mr-2 h-4 w-4" />
               Start Appointment
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => handleAction("reschedule")}
-            >
+            <DropdownMenuItem disabled>
               <Calendar className="mr-2 h-4 w-4" />
               Reschedule
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => handleAction("cancel")}
-              className="text-red-600"
-            >
+            <DropdownMenuItem disabled className="text-red-600">
               <XCircle className="mr-2 h-4 w-4" />
               Cancel
             </DropdownMenuItem>
@@ -112,32 +119,38 @@ function AppointmentActions({ appointment }: { appointment: Appointment }) {
         )}
         
         {appointment.status === "in-progress" && (
-          <DropdownMenuItem
-            onClick={() => handleAction("complete")}
-            className="text-green-600"
-          >
+          <DropdownMenuItem disabled className="text-green-600">
             <CheckCircle className="mr-2 h-4 w-4" />
             Mark Complete
           </DropdownMenuItem>
         )}
         
         {appointment.status === "completed" && (
-          <DropdownMenuItem
-            onClick={() => handleAction("view-notes")}
-          >
+          <DropdownMenuItem disabled>
             <Edit className="mr-2 h-4 w-4" />
             View Notes
           </DropdownMenuItem>
         )}
         
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => handleAction("view-patient")}>
+        <DropdownMenuItem disabled>
           <User className="mr-2 h-4 w-4" />
           View Patient
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => handleAction("call-patient")}>
+        <DropdownMenuItem disabled>
           <Phone className="mr-2 h-4 w-4" />
           Call Patient
+        </DropdownMenuItem>
+        
+        <DropdownMenuSeparator />
+        
+        <DropdownMenuItem 
+          onClick={handleDeleteAppointment}
+          className="text-red-600 focus:text-red-600"
+          disabled={isPending}
+        >
+          <XCircle className="mr-2 h-4 w-4" />
+          {isPending ? 'Deleting...' : 'Delete Appointment'}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

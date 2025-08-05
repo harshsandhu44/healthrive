@@ -43,7 +43,7 @@ import {
   User,
   ArrowUpDown,
 } from "lucide-react";
-import { todaysAppointments, type Appointment } from "@/lib/mock-data";
+import { type Appointment } from "@/lib/types/entities";
 import { cn } from "@/lib/utils";
 
 const statusColors = {
@@ -311,7 +311,11 @@ function DataTable({ data }: DataTableProps) {
   );
 }
 
-export function AppointmentsTable() {
+interface AppointmentsTableProps {
+  appointments: Appointment[];
+}
+
+export function AppointmentsTable({ appointments }: AppointmentsTableProps) {
   return (
     <Card>
       <CardHeader>
@@ -321,7 +325,7 @@ export function AppointmentsTable() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <DataTable data={todaysAppointments} />
+        <DataTable data={appointments} />
       </CardContent>
     </Card>
   );

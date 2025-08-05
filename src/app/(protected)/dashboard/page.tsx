@@ -11,24 +11,75 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TrendingUp, TrendingDown, Users, Calendar } from "lucide-react";
-import { dashboardMetrics } from "@/lib/mock-data";
+import { getPatients } from "../patients/actions";
+import { getAppointments } from "../appointments/actions";
+import { getTodaysAppointments } from "../appointments/actions";
 import { AppointmentsChart } from "./appointments-chart";
 import { AppointmentsTable } from "./appointments-table";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [patients, appointments, todaysAppointments] = await Promise.all([
+    getPatients(),
+    getAppointments(),
+    getTodaysAppointments(),
+  ]);
+
+  // Calculate current month and previous month data
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  
+  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+  // Filter appointments by current and previous month
+  const currentMonthAppointments = appointments.filter(appointment => {
+    if (!appointment.time) return false;
+    const appointmentDate = new Date(appointment.time);
+    return appointmentDate.getMonth() === currentMonth && appointmentDate.getFullYear() === currentYear;
+  });
+
+  const lastMonthAppointments = appointments.filter(appointment => {
+    if (!appointment.time) return false;
+    const appointmentDate = new Date(appointment.time);
+    return appointmentDate.getMonth() === lastMonth && appointmentDate.getFullYear() === lastMonthYear;
+  });
+
+  // Filter patients by current and previous month registration
+  const currentMonthPatients = patients.filter(patient => {
+    if (!patient.registrationDate) return false;
+    const registrationDate = new Date(patient.registrationDate);
+    return registrationDate.getMonth() === currentMonth && registrationDate.getFullYear() === currentYear;
+  });
+
+  const lastMonthPatients = patients.filter(patient => {
+    if (!patient.registrationDate) return false;
+    const registrationDate = new Date(patient.registrationDate);
+    return registrationDate.getMonth() === lastMonth && registrationDate.getFullYear() === lastMonthYear;
+  });
+
+  // Calculate percentage changes
+  const appointmentsChange = lastMonthAppointments.length === 0 
+    ? (currentMonthAppointments.length > 0 ? 100 : 0)
+    : ((currentMonthAppointments.length - lastMonthAppointments.length) / lastMonthAppointments.length) * 100;
+
+  const patientsChange = lastMonthPatients.length === 0 
+    ? (currentMonthPatients.length > 0 ? 100 : 0)
+    : ((currentMonthPatients.length - lastMonthPatients.length) / lastMonthPatients.length) * 100;
+
   const metricsCards = [
     {
       label: "Appointments",
-      value: dashboardMetrics.appointments.current,
-      previous: dashboardMetrics.appointments.previous,
-      change: dashboardMetrics.appointments.change,
+      value: currentMonthAppointments.length,
+      previous: lastMonthAppointments.length,
+      change: appointmentsChange,
       icon: Calendar,
     },
     {
       label: "Patients",
-      value: dashboardMetrics.patients.current,
-      previous: dashboardMetrics.patients.previous,
-      change: dashboardMetrics.patients.change,
+      value: currentMonthPatients.length,
+      previous: lastMonthPatients.length,
+      change: patientsChange,
       icon: Users,
     },
   ];
@@ -90,12 +141,12 @@ export default function DashboardPage() {
 
       {/* Appointments Chart */}
       <section>
-        <AppointmentsChart />
+        <AppointmentsChart appointments={appointments} patients={patients} />
       </section>
 
       {/* Today's Appointments Table */}
       <section>
-        <AppointmentsTable />
+        <AppointmentsTable appointments={todaysAppointments} />
       </section>
     </main>
   );

@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { appointmentsChartData } from "@/lib/mock-data";
+import { type Appointment, type Patient } from "@/lib/types/entities";
 
 const chartConfig = {
   appointments: {
@@ -26,13 +26,45 @@ const chartConfig = {
   },
 };
 
-export function AppointmentsChart() {
+interface AppointmentsChartProps {
+  appointments: Appointment[];
+  patients: Patient[];
+}
+
+export function AppointmentsChart({ appointments, patients }: AppointmentsChartProps) {
+  // Process the data to create chart data for the last 7 days
+  const chartData = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - i));
+    const dateString = date.toISOString().split('T')[0];
+    
+    // Count appointments for this date
+    const dayAppointments = appointments.filter(appointment => {
+      if (!appointment.time) return false;
+      const appointmentDate = new Date(appointment.time).toISOString().split('T')[0];
+      return appointmentDate === dateString;
+    }).length;
+    
+    // Count new patients registered on this date
+    const dayPatients = patients.filter(patient => {
+      if (!patient.registrationDate) return false;
+      const patientDate = new Date(patient.registrationDate).toISOString().split('T')[0];
+      return patientDate === dateString;
+    }).length;
+    
+    return {
+      date: dateString,
+      appointments: dayAppointments,
+      patients: dayPatients,
+    };
+  });
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Appointments & Patients Overview</CardTitle>
         <CardDescription>
-          Daily appointments and new patients over the last 30 days
+          Daily appointments and new patients over the last 7 days
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -42,7 +74,7 @@ export function AppointmentsChart() {
         >
           <AreaChart
             accessibilityLayer
-            data={appointmentsChartData}
+            data={chartData}
             margin={{
               left: 12,
               right: 12,

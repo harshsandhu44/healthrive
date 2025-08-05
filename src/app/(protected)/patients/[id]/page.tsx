@@ -1,6 +1,3 @@
-"use client";
-
-import { use } from "react";
 import { notFound } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +17,7 @@ import {
   Wine,
   ArrowLeft,
 } from "lucide-react";
-import { allPatients } from "@/lib/mock-data";
+import { getPatient } from "../actions";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -51,11 +48,11 @@ const noteTypeColors = {
   consultation: "bg-orange-500/10 text-orange-700 dark:text-orange-400",
 };
 
-export default function PatientDetailsPage({
+export default async function PatientDetailsPage({
   params,
 }: PatientDetailsPageProps) {
-  const { id } = use(params);
-  const patient = allPatients.find((p) => p.id === id);
+  const { id } = await params;
+  const patient = await getPatient(id);
 
   if (!patient) {
     notFound();
@@ -239,16 +236,14 @@ export default function PatientDetailsPage({
                         <Badge
                           variant="secondary"
                           className={cn(
-                            diagnosisStatusColors[diagnosis.status],
+                            diagnosisStatusColors[diagnosis.status as keyof typeof diagnosisStatusColors] || "bg-gray-500/10 text-gray-700 dark:text-gray-400",
                           )}
                         >
-                          {diagnosis.status}
+                          {diagnosis.status || 'Unknown'}
                         </Badge>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {new Date(
-                          diagnosis.dateOfDiagnosis,
-                        ).toLocaleDateString()}
+                        {diagnosis.dateOfDiagnosis ? new Date(diagnosis.dateOfDiagnosis).toLocaleDateString() : 'Unknown'}
                       </div>
                     </div>
                     <h4 className="font-medium">{diagnosis.description}</h4>
@@ -273,9 +268,9 @@ export default function PatientDetailsPage({
                       <h4 className="font-medium">{medication.name}</h4>
                       <Badge
                         variant="secondary"
-                        className={cn(medicationRouteColors[medication.route])}
+                        className={cn(medicationRouteColors[medication.route as keyof typeof medicationRouteColors] || "bg-gray-500/10 text-gray-700 dark:text-gray-400")}
                       >
-                        {medication.route}
+                        {medication.route || 'Unknown'}
                       </Badge>
                     </div>
                     <div className="grid grid-cols-2 gap-4 text-sm">
@@ -287,12 +282,12 @@ export default function PatientDetailsPage({
                       </div>
                       <div>
                         <strong>Start Date:</strong>{" "}
-                        {new Date(medication.startDate).toLocaleDateString()}
+                        {medication.startDate ? new Date(medication.startDate).toLocaleDateString() : 'Unknown'}
                       </div>
                       {medication.endDate && (
                         <div>
                           <strong>End Date:</strong>{" "}
-                          {new Date(medication.endDate).toLocaleDateString()}
+                          {medication.endDate ? new Date(medication.endDate).toLocaleDateString() : 'Unknown'}
                         </div>
                       )}
                     </div>
@@ -321,9 +316,7 @@ export default function PatientDetailsPage({
                         <Badge variant="outline">{procedure.code}</Badge>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {new Date(
-                          procedure.dateOfProcedure,
-                        ).toLocaleDateString()}
+                        {procedure.dateOfProcedure ? new Date(procedure.dateOfProcedure).toLocaleDateString() : 'Unknown'}
                       </div>
                     </div>
                     <h4 className="font-medium">{procedure.description}</h4>
@@ -350,7 +343,7 @@ export default function PatientDetailsPage({
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">{lab.testName}</h4>
                       <div className="text-sm text-muted-foreground">
-                        {new Date(lab.dateOfTest).toLocaleDateString()}
+                        {lab.dateOfTest ? new Date(lab.dateOfTest).toLocaleDateString() : 'Unknown'}
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-4 text-sm">
@@ -384,7 +377,7 @@ export default function PatientDetailsPage({
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-medium">Vital Signs</h4>
                       <div className="text-sm text-muted-foreground">
-                        {new Date(vitals.dateTime).toLocaleString()}
+                        {vitals.dateTime ? new Date(vitals.dateTime).toLocaleString() : 'Unknown'}
                       </div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -441,16 +434,16 @@ export default function PatientDetailsPage({
                       <div className="flex items-center gap-2">
                         <Badge
                           variant="secondary"
-                          className={cn(noteTypeColors[note.noteType])}
+                          className={cn(noteTypeColors[note.noteType as keyof typeof noteTypeColors] || "bg-gray-500/10 text-gray-700 dark:text-gray-400")}
                         >
-                          {note.noteType}
+                          {note.noteType || 'Note'}
                         </Badge>
                         <span className="text-sm font-medium">
                           {note.provider}
                         </span>
                       </div>
                       <div className="text-sm text-muted-foreground">
-                        {new Date(note.dateTime).toLocaleString()}
+                        {note.dateTime ? new Date(note.dateTime).toLocaleString() : 'Unknown'}
                       </div>
                     </div>
                     <p className="text-sm leading-relaxed">{note.content}</p>
