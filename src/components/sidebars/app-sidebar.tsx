@@ -12,7 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { LayoutDashboardIcon, PhoneCallIcon, User2Icon, Stethoscope } from "lucide-react";
+import {
+  LayoutDashboardIcon,
+  PhoneCallIcon,
+  User2Icon,
+  Stethoscope,
+  PlusIcon,
+} from "lucide-react";
 import { Logo } from "../icons";
 
 export const AppSidebar = ({
@@ -28,7 +34,7 @@ export const AppSidebar = ({
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
-        <SidebarMenu>
+        <SidebarMenu className="space-y-4">
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
@@ -38,6 +44,17 @@ export const AppSidebar = ({
                 <Logo className="size-8" />
                 <span className="text-base font-semibold">Healthrive</span>
               </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <Button className="justify-start" variant="outline">
+                <PlusIcon />
+                Create an Appointment
+              </Button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
