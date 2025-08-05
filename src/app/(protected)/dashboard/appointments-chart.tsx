@@ -1,3 +1,5 @@
+"use client";
+
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
@@ -11,8 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { getAppointments } from "../appointments/actions";
-import { getPatients } from "../patients/actions";
+import { type Appointment, type Patient } from "@/lib/types/entities";
 
 const chartConfig = {
   appointments: {
@@ -25,13 +26,12 @@ const chartConfig = {
   },
 };
 
-export async function AppointmentsChart() {
-  // Get real data from the backend
-  const [appointments, patients] = await Promise.all([
-    getAppointments(),
-    getPatients(),
-  ]);
+interface AppointmentsChartProps {
+  appointments: Appointment[];
+  patients: Patient[];
+}
 
+export function AppointmentsChart({ appointments, patients }: AppointmentsChartProps) {
   // Process the data to create chart data for the last 7 days
   const chartData = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
@@ -45,7 +45,7 @@ export async function AppointmentsChart() {
       return appointmentDate === dateString;
     }).length;
     
-    // Count new patients registered on this date (simplified - using a subset for demo)
+    // Count new patients registered on this date
     const dayPatients = patients.filter(patient => {
       if (!patient.registrationDate) return false;
       const patientDate = new Date(patient.registrationDate).toISOString().split('T')[0];

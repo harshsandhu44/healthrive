@@ -139,7 +139,7 @@ export default async function DashboardPage() {
 
       {/* Appointments Chart */}
       <section>
-        <AppointmentsChart />
+        <AppointmentsChart appointments={appointments} patients={patients} />
       </section>
 
       {/* Today's Appointments Table */}
