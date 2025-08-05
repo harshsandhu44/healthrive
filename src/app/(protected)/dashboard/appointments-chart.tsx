@@ -1,5 +1,3 @@
-"use client";
-
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
@@ -13,7 +11,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-// Generate dummy chart data for now - in real app would come from database
+import { getAppointments } from "../appointments/actions";
+import { getPatients } from "../patients/actions";
 
 const chartConfig = {
   appointments: {
@@ -26,15 +25,37 @@ const chartConfig = {
   },
 };
 
-export function AppointmentsChart() {
-  // Generate dummy data for the last 7 days
+export async function AppointmentsChart() {
+  // Get real data from the backend
+  const [appointments, patients] = await Promise.all([
+    getAppointments(),
+    getPatients(),
+  ]);
+
+  // Process the data to create chart data for the last 7 days
   const chartData = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - (6 - i));
+    const dateString = date.toISOString().split('T')[0];
+    
+    // Count appointments for this date
+    const dayAppointments = appointments.filter(appointment => {
+      if (!appointment.time) return false;
+      const appointmentDate = new Date(appointment.time).toISOString().split('T')[0];
+      return appointmentDate === dateString;
+    }).length;
+    
+    // Count new patients registered on this date (simplified - using a subset for demo)
+    const dayPatients = patients.filter(patient => {
+      if (!patient.registrationDate) return false;
+      const patientDate = new Date(patient.registrationDate).toISOString().split('T')[0];
+      return patientDate === dateString;
+    }).length;
+    
     return {
-      date: date.toISOString().split('T')[0],
-      appointments: Math.floor(Math.random() * 15) + 5, // 5-20 appointments
-      patients: Math.floor(Math.random() * 8) + 2, // 2-10 new patients
+      date: dateString,
+      appointments: dayAppointments,
+      patients: dayPatients,
     };
   });
 
