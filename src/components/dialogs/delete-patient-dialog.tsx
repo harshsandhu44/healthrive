@@ -10,11 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import {
-  AlertCircleIcon,
-  AlertTriangle,
-  TriangleAlertIcon,
-} from "lucide-react";
+import { AlertCircleIcon, AlertTriangle } from "lucide-react";
 import { type Patient } from "@/lib/types/entities";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
