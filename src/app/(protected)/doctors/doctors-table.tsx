@@ -64,17 +64,17 @@ const genderColors = {
 
 const specializationColors = {
   "Internal Medicine": "bg-green-500/10 text-green-700 dark:text-green-400",
-  "Cardiology": "bg-red-500/10 text-red-700 dark:text-red-400",
-  "Dermatology": "bg-orange-500/10 text-orange-700 dark:text-orange-400",
+  Cardiology: "bg-red-500/10 text-red-700 dark:text-red-400",
+  Dermatology: "bg-orange-500/10 text-orange-700 dark:text-orange-400",
   "Emergency Medicine": "bg-purple-500/10 text-purple-700 dark:text-purple-400",
   "Orthopedic Surgery": "bg-blue-500/10 text-blue-700 dark:text-blue-400",
-  "Pediatrics": "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400",
-  "Surgery": "bg-gray-500/10 text-gray-700 dark:text-gray-400",
-  "Psychiatry": "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400",
-  "Neurology": "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
+  Pediatrics: "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400",
+  Surgery: "bg-gray-500/10 text-gray-700 dark:text-gray-400",
+  Psychiatry: "bg-indigo-500/10 text-indigo-700 dark:text-indigo-400",
+  Neurology: "bg-yellow-500/10 text-yellow-700 dark:text-yellow-400",
   "Obstetrics & Gynecology": "bg-pink-500/10 text-pink-700 dark:text-pink-400",
-  "Radiology": "bg-teal-500/10 text-teal-700 dark:text-teal-400",
-  "Anesthesiology": "bg-slate-500/10 text-slate-700 dark:text-slate-400",
+  Radiology: "bg-teal-500/10 text-teal-700 dark:text-teal-400",
+  Anesthesiology: "bg-slate-500/10 text-slate-700 dark:text-slate-400",
 };
 
 interface DoctorActionsProps {
@@ -86,14 +86,18 @@ function DoctorActions({ doctor }: DoctorActionsProps) {
   const router = useRouter();
 
   const handleDeleteDoctor = () => {
-    if (confirm(`Are you sure you want to delete doctor ${doctor.name}? This action cannot be undone.`)) {
+    if (
+      confirm(
+        `Are you sure you want to delete doctor ${doctor.name}? This action cannot be undone.`,
+      )
+    ) {
       startTransition(async () => {
         try {
           await deleteDoctor(doctor.id);
           router.refresh();
         } catch (error) {
-          console.error('Error deleting doctor:', error);
-          alert('Failed to delete doctor. Please try again.');
+          console.error("Error deleting doctor:", error);
+          alert("Failed to delete doctor. Please try again.");
         }
       });
     }
@@ -110,45 +114,46 @@ function DoctorActions({ doctor }: DoctorActionsProps) {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        
+
         <DropdownMenuItem asChild>
           <Link href={`/doctors/${doctor.id}`}>
             <User className="mr-2 h-4 w-4" />
             View Details
           </Link>
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem disabled>
           <Edit className="mr-2 h-4 w-4" />
           Edit Doctor
         </DropdownMenuItem>
-        
-        <DropdownMenuItem disabled>
-          <Calendar className="mr-2 h-4 w-4" />
-          Schedule with Doctor
-        </DropdownMenuItem>
-        
+
         <DropdownMenuSeparator />
-        
-        <DropdownMenuItem disabled>
+
+        <DropdownMenuItem
+          disabled={!doctor.contactInfo.phone}
+          onClick={() => router.push(`tel:${doctor.contactInfo.phone}`)}
+        >
           <Phone className="mr-2 h-4 w-4" />
           Call Doctor
         </DropdownMenuItem>
-        
-        <DropdownMenuItem disabled>
+
+        <DropdownMenuItem
+          disabled={!doctor.contactInfo.email}
+          onClick={() => router.push(`mailto:${doctor.contactInfo.email}`)}
+        >
           <Mail className="mr-2 h-4 w-4" />
           Email Doctor
         </DropdownMenuItem>
-        
+
         <DropdownMenuSeparator />
-        
-        <DropdownMenuItem 
+
+        <DropdownMenuItem
           onClick={handleDeleteDoctor}
           className="text-red-600 focus:text-red-600"
           disabled={isPending}
         >
           <Edit className="mr-2 h-4 w-4" />
-          {isPending ? 'Deleting...' : 'Delete Doctor'}
+          {isPending ? "Deleting..." : "Delete Doctor"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -161,7 +166,7 @@ interface DoctorsDataTableProps {
 
 export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "name", desc: false }
+    { id: "name", desc: false },
   ]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
@@ -170,7 +175,10 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
     const birthDate = new Date(dateOfBirth);
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age;
@@ -232,8 +240,9 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
           <Badge
             variant="secondary"
             className={cn(
-              specializationColors[specialization as keyof typeof specializationColors] || 
-              "bg-gray-500/10 text-gray-700 dark:text-gray-400"
+              specializationColors[
+                specialization as keyof typeof specializationColors
+              ] || "bg-gray-500/10 text-gray-700 dark:text-gray-400",
             )}
           >
             {specialization}
@@ -297,7 +306,7 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
   });
 
   const uniqueSpecializations = Array.from(
-    new Set(data.map(doctor => doctor.specialization).filter(Boolean))
+    new Set(data.map((doctor) => doctor.specialization).filter(Boolean)),
   ).sort();
 
   return (
@@ -306,9 +315,7 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
       <div className="flex items-center space-x-2">
         <Input
           placeholder="Filter doctors..."
-          value={
-            (table.getColumn("name")?.getFilterValue() as string) ?? ""
-          }
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("name")?.setFilterValue(event.target.value)
           }
@@ -316,10 +323,13 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
         />
         <Select
           value={
-            (table.getColumn("specialization")?.getFilterValue() as string) ?? "all"
+            (table.getColumn("specialization")?.getFilterValue() as string) ??
+            "all"
           }
           onValueChange={(value) =>
-            table.getColumn("specialization")?.setFilterValue(value === "all" ? "" : value)
+            table
+              .getColumn("specialization")
+              ?.setFilterValue(value === "all" ? "" : value)
           }
         >
           <SelectTrigger className="w-[200px]">
@@ -339,7 +349,9 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
             (table.getColumn("gender")?.getFilterValue() as string) ?? "all"
           }
           onValueChange={(value) =>
-            table.getColumn("gender")?.setFilterValue(value === "all" ? "" : value)
+            table
+              .getColumn("gender")
+              ?.setFilterValue(value === "all" ? "" : value)
           }
         >
           <SelectTrigger className="w-[180px]">
@@ -366,7 +378,7 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext()
+                            header.getContext(),
                           )}
                     </TableHead>
                   );
@@ -385,7 +397,7 @@ export function DoctorsDataTable({ data }: DoctorsDataTableProps) {
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
