@@ -367,9 +367,7 @@ export function CreateAppointmentForm({
 
         await createAppointment(appointmentData);
 
-        toast.success("Appointment created successfully!", {
-          description: `Appointment scheduled for ${values.patientName} on ${format(appointmentDateTime, "PPP 'at' p")}`,
-        });
+        toast.success("Appointment created successfully!");
 
         // Reset with default values
         const now = new Date();
