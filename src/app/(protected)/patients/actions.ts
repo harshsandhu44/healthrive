@@ -104,6 +104,7 @@ export async function createPatient(
       name: patientData.name,
       gender: patientData.gender,
       date_of_birth: patientData.dateOfBirth,
+      address: patientData.contactInfo.address,
       phone: patientData.contactInfo.phone,
       email: patientData.contactInfo.email,
       emergency_contact_name: patientData.emergencyContact.name,
@@ -151,6 +152,8 @@ export async function updatePatient(
     if (patientData.gender) updateData.gender = patientData.gender;
     if (patientData.dateOfBirth)
       updateData.date_of_birth = patientData.dateOfBirth;
+    if (patientData.contactInfo?.address)
+      updateData.address = patientData.contactInfo.address;
     if (patientData.contactInfo?.phone)
       updateData.phone = patientData.contactInfo.phone;
     if (patientData.contactInfo?.email)

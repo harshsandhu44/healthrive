@@ -118,6 +118,7 @@ export async function createAppointment(
       id: crypto.randomUUID(),
       organization_id: organizationId,
       patient_name: appointmentData.patientName,
+      patient_id: appointmentData.patientId,
       doctor: appointmentData.doctor,
       time: appointmentData.time,
       type: appointmentData.type,
