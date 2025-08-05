@@ -10,8 +10,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { AlertTriangle } from "lucide-react";
+import {
+  AlertCircleIcon,
+  AlertTriangle,
+  TriangleAlertIcon,
+} from "lucide-react";
 import { type Patient } from "@/lib/types/entities";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 interface DeletePatientDialogProps {
   patient: Patient | null;
@@ -35,33 +40,35 @@ export function DeletePatientDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
+            <AlertTriangle className="h-5 w-5 text-destructive" />
             <AlertDialogTitle>Delete Patient</AlertDialogTitle>
           </div>
           <AlertDialogDescription className="space-y-2">
             <p>
               Are you sure you want to delete <strong>{patient.name}</strong>?
             </p>
-            <p className="text-red-600 font-medium">
-              ⚠️ This will permanently delete:
-            </p>
-            <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-4">
-              <li>All medical records (diagnoses, medications, procedures)</li>
-              <li>All lab results and vital signs</li>
-              <li>All clinical notes</li>
-              <li>All appointments for this patient</li>
-            </ul>
-            <p className="text-red-600 font-medium">
-              This action cannot be undone.
-            </p>
+            <Alert variant="destructive">
+              <AlertCircleIcon />
+              <AlertTitle>This will permanently delete:</AlertTitle>
+              <AlertDescription>
+                <ul className="list-disc list-inside space-y-1 text-sm">
+                  <li>
+                    All medical records (diagnoses, medications, procedures)
+                  </li>
+                  <li>All lab results and vital signs</li>
+                  <li>All clinical notes</li>
+                  <li>All appointments for this patient</li>
+                </ul>
+              </AlertDescription>
+            </Alert>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
           <AlertDialogAction
+            color="destructive"
             onClick={onConfirm}
             disabled={isLoading}
-            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
           >
             {isLoading ? "Deleting..." : "Delete Patient"}
           </AlertDialogAction>
