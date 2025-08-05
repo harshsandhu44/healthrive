@@ -17,7 +17,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -50,12 +56,19 @@ import {
 } from "@/components/ui/command";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createAppointment, getAppointments } from "@/app/(protected)/appointments/actions";
+import {
+  createAppointment,
+  getAppointments,
+} from "@/app/(protected)/appointments/actions";
 import { getDoctors } from "@/app/(protected)/doctors/actions";
 import { getPatients, createPatient } from "@/app/(protected)/patients/actions";
 import { APPOINTMENT_TYPES, APPOINTMENT_STATUSES } from "@/lib/constants";
 import { toast } from "sonner";
-import { type Doctor, type Patient, type Appointment } from "@/lib/types/entities";
+import {
+  type Doctor,
+  type Patient,
+  type Appointment,
+} from "@/lib/types/entities";
 
 // Date and Time Picker Component (based on your example)
 interface DateTimePickerProps {
@@ -122,9 +135,9 @@ function DateTimePicker({
           value={timeValue || ""}
           onChange={(e) => {
             const time = e.target.value;
-            // Basic business hours validation (8 AM to 6 PM)
-            const [hours] = time.split(':').map(Number);
-            if (hours < 8 || hours >= 18) {
+            // Basic business hours validation (6 AM to 10 PM)
+            const [hours] = time.split(":").map(Number);
+            if (hours < 6 || hours >= 22) {
               // Still allow the change but we'll validate in form
               onTimeChange(time);
             } else {
@@ -132,8 +145,8 @@ function DateTimePicker({
             }
           }}
           disabled={disabled}
-          min="08:00"
-          max="17:45"
+          min="06:00"
+          max="21:45"
           step="900" // 15 minute intervals
           className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
         />
@@ -142,37 +155,50 @@ function DateTimePicker({
   );
 }
 
-const appointmentFormSchema = z.object({
-  patientName: z.string().min(2, "Patient name must be at least 2 characters."),
-  patientId: z.string().optional(),
-  // New patient fields
-  patientType: z.enum(["existing", "new"]),
-  newPatientDateOfBirth: z.string().optional(),
-  newPatientGender: z.enum(["male", "female"]).optional(),
-  date: z.date({ message: "Appointment date is required." }),
-  time: z.string().min(1, "Appointment time is required.").refine((time) => {
-    const [hours, minutes] = time.split(':').map(Number);
-    const timeInMinutes = hours * 60 + minutes;
-    const startTime = 8 * 60; // 8:00 AM
-    const endTime = 18 * 60; // 6:00 PM
-    return timeInMinutes >= startTime && timeInMinutes < endTime;
-  }, {
-    message: "Appointment time must be between 8:00 AM and 6:00 PM"
-  }),
-  type: z.enum(["consultation", "follow-up", "surgery", "emergency"]),
-  status: z.enum(["scheduled", "in-progress", "completed", "cancelled"]),
-  doctor: z.string().min(1, "Doctor selection is required."),
-  notes: z.string().optional(),
-}).refine((data) => {
-  // If creating new patient, require additional fields
-  if (data.patientType === "new") {
-    return data.newPatientDateOfBirth && data.newPatientGender;
-  }
-  return true;
-}, {
-  message: "Date of birth and gender are required for new patients",
-  path: ["newPatientDateOfBirth"]
-});
+const appointmentFormSchema = z
+  .object({
+    patientName: z
+      .string()
+      .min(2, "Patient name must be at least 2 characters."),
+    patientId: z.string().optional(),
+    // New patient fields
+    patientType: z.enum(["existing", "new"]),
+    newPatientDateOfBirth: z.string().optional(),
+    newPatientGender: z.enum(["male", "female"]).optional(),
+    date: z.date({ message: "Appointment date is required." }),
+    time: z
+      .string()
+      .min(1, "Appointment time is required.")
+      .refine(
+        (time) => {
+          const [hours, minutes] = time.split(":").map(Number);
+          const timeInMinutes = hours * 60 + minutes;
+          const startTime = 6 * 60; // 6:00 AM
+          const endTime = 22 * 60; // 10:00 PM
+          return timeInMinutes >= startTime && timeInMinutes < endTime;
+        },
+        {
+          message: "Appointment time must be between 6:00 AM and 10:00 PM",
+        },
+      ),
+    type: z.enum(["consultation", "follow-up", "surgery", "emergency"]),
+    status: z.enum(["scheduled", "in-progress", "completed", "cancelled"]),
+    doctor: z.string().min(1, "Doctor selection is required."),
+    notes: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      // If creating new patient, require additional fields
+      if (data.patientType === "new") {
+        return data.newPatientDateOfBirth && data.newPatientGender;
+      }
+      return true;
+    },
+    {
+      message: "Date of birth and gender are required for new patients",
+      path: ["newPatientDateOfBirth"],
+    },
+  );
 
 type AppointmentFormValues = z.infer<typeof appointmentFormSchema>;
 
@@ -192,7 +218,9 @@ export function CreateAppointmentForm({
   const [patients, setPatients] = useState<Patient[]>([]);
   const [patientsLoading, setPatientsLoading] = useState(true);
   const [patientOpen, setPatientOpen] = useState(false);
-  const [existingAppointments, setExistingAppointments] = useState<Appointment[]>([]);
+  const [existingAppointments, setExistingAppointments] = useState<
+    Appointment[]
+  >([]);
 
   // Set default date and time to current date/time
   const now = new Date();
@@ -220,11 +248,9 @@ export function CreateAppointmentForm({
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [doctorsList, patientsList, appointmentsList] = await Promise.all([
-          getDoctors(),
-          getPatients(),
-          getAppointments(),
-        ]);
+        const [doctorsList, patientsList, appointmentsList] = await Promise.all(
+          [getDoctors(), getPatients(), getAppointments()],
+        );
         setDoctors(doctorsList);
         setPatients(patientsList);
         setExistingAppointments(appointmentsList);
@@ -246,17 +272,20 @@ export function CreateAppointmentForm({
     setPatientOpen(false);
   };
 
-  const checkAppointmentConflict = (appointmentDateTime: Date, doctor: string) => {
+  const checkAppointmentConflict = (
+    appointmentDateTime: Date,
+    doctor: string,
+  ) => {
     const appointmentTime = appointmentDateTime.getTime();
     const conflictWindow = 30 * 60 * 1000; // 30 minutes in milliseconds
-    
-    return existingAppointments.some(appointment => {
+
+    return existingAppointments.some((appointment) => {
       if (appointment.doctor !== doctor) return false;
       if (!appointment.time) return false;
-      
+
       const existingTime = new Date(appointment.time).getTime();
       const timeDiff = Math.abs(appointmentTime - existingTime);
-      
+
       return timeDiff < conflictWindow;
     });
   };
@@ -284,7 +313,9 @@ export function CreateAppointmentForm({
           const newPatientData = {
             name: values.patientName,
             dateOfBirth: values.newPatientDateOfBirth!,
-            age: new Date().getFullYear() - new Date(values.newPatientDateOfBirth!).getFullYear(),
+            age:
+              new Date().getFullYear() -
+              new Date(values.newPatientDateOfBirth!).getFullYear(),
             gender: values.newPatientGender!,
             contactInfo: {
               address: "",
@@ -318,7 +349,7 @@ export function CreateAppointmentForm({
 
           const createdPatient = await createPatient(newPatientData);
           patientId = createdPatient.id;
-          
+
           toast.success("New patient created!", {
             description: `${values.patientName} has been added to the system.`,
           });
@@ -355,30 +386,39 @@ export function CreateAppointmentForm({
         onSuccess?.();
       } catch (error) {
         console.error("Failed to create appointment:", error);
-        
+
         // Enhanced error handling with specific messages
         let errorMessage = "Failed to create appointment";
-        let errorDescription = "Please try again or contact support if the problem persists.";
-        
+        let errorDescription =
+          "Please try again or contact support if the problem persists.";
+
         if (error instanceof Error) {
           if (error.message.includes("organization_id")) {
             errorMessage = "Authentication Error";
-            errorDescription = "Please sign in again and try to create the appointment.";
+            errorDescription =
+              "Please sign in again and try to create the appointment.";
           } else if (error.message.includes("patient_id")) {
             errorMessage = "Invalid Patient";
-            errorDescription = "The selected patient ID is invalid. Please select a different patient.";
+            errorDescription =
+              "The selected patient ID is invalid. Please select a different patient.";
           } else if (error.message.includes("doctor")) {
             errorMessage = "Doctor Unavailable";
-            errorDescription = "The selected doctor may not be available. Please choose a different doctor.";
+            errorDescription =
+              "The selected doctor may not be available. Please choose a different doctor.";
           } else if (error.message.includes("time")) {
             errorMessage = "Invalid Time Slot";
-            errorDescription = "The selected time slot may not be available. Please choose a different time.";
-          } else if (error.message.includes("duplicate") || error.message.includes("unique")) {
+            errorDescription =
+              "The selected time slot may not be available. Please choose a different time.";
+          } else if (
+            error.message.includes("duplicate") ||
+            error.message.includes("unique")
+          ) {
             errorMessage = "Duplicate Appointment";
-            errorDescription = "An appointment with similar details already exists. Please check and modify your appointment.";
+            errorDescription =
+              "An appointment with similar details already exists. Please check and modify your appointment.";
           }
         }
-        
+
         toast.error(errorMessage, {
           description: errorDescription,
         });
@@ -397,19 +437,20 @@ export function CreateAppointmentForm({
               <CardTitle className="text-lg">Patient Information</CardTitle>
             </div>
             <CardDescription>
-              Select an existing patient or create a new one for this appointment.
+              Select an existing patient or create a new one for this
+              appointment.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="existing" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger 
-                  value="existing" 
+                <TabsTrigger
+                  value="existing"
                   onClick={() => form.setValue("patientType", "existing")}
                 >
                   Existing Patient
                 </TabsTrigger>
-                <TabsTrigger 
+                <TabsTrigger
                   value="new"
                   onClick={() => form.setValue("patientType", "new")}
                 >
@@ -433,7 +474,7 @@ export function CreateAppointmentForm({
                               aria-expanded={patientOpen}
                               className={cn(
                                 "justify-between",
-                                !field.value && "text-muted-foreground"
+                                !field.value && "text-muted-foreground",
                               )}
                               disabled={patientsLoading}
                             >
@@ -454,14 +495,16 @@ export function CreateAppointmentForm({
                                   <CommandItem
                                     value={patient.name}
                                     key={patient.id}
-                                    onSelect={() => handlePatientSelect(patient)}
+                                    onSelect={() =>
+                                      handlePatientSelect(patient)
+                                    }
                                   >
                                     <Check
                                       className={cn(
                                         "mr-2 h-4 w-4",
                                         patient.name === field.value
                                           ? "opacity-100"
-                                          : "opacity-0"
+                                          : "opacity-0",
                                       )}
                                     />
                                     <div className="flex flex-col">
@@ -492,7 +535,10 @@ export function CreateAppointmentForm({
                       <FormItem>
                         <FormLabel>Full Name *</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter patient's full name" {...field} />
+                          <Input
+                            placeholder="Enter patient's full name"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -519,7 +565,10 @@ export function CreateAppointmentForm({
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Gender *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select gender" />

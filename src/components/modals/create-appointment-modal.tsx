@@ -33,7 +33,9 @@ export const CreateAppointmentModal = ({ children }: PropsWithChildren) => {
             Create a new appointment for your patient.
           </DrawerDescription>
         </DrawerHeader>
-        <CreateAppointmentForm />
+        <div className="pb-12 container overflow-y-auto">
+          <CreateAppointmentForm />
+        </div>
       </DrawerContent>
     </Drawer>
   ) : (
