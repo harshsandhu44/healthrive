@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 import type { PatientWithMedicalData } from "@/lib/types/database";
 import type { Patient } from "@/lib/types/entities";
 import { transformPatientWithMedicalData } from "@/lib/transforms/database";
@@ -171,6 +172,9 @@ export async function createPatient(
       throw patientError;
     }
 
+    // Revalidate the patients route
+    revalidatePath("/patients");
+
     return (await getPatient(patient.id)) as Patient;
   } catch (error) {
     console.error("Error in createPatient:", error);
@@ -231,6 +235,9 @@ export async function updatePatient(
       throw error;
     }
 
+    // Revalidate the patients route
+    revalidatePath("/patients");
+
     return (await getPatient(id)) as Patient;
   } catch (error) {
     console.error("Error in updatePatient:", error);
@@ -245,7 +252,7 @@ export async function deletePatient(id: string): Promise<void> {
 
     const supabase = await createClient();
 
-    // Delete related medical records first (due to foreign key constraints)
+    // Delete all related records first (due to foreign key constraints)
     await Promise.all([
       supabase.from("diagnoses").delete().eq("patient_id", id),
       supabase.from("medications").delete().eq("patient_id", id),
@@ -253,6 +260,7 @@ export async function deletePatient(id: string): Promise<void> {
       supabase.from("lab_results").delete().eq("patient_id", id),
       supabase.from("vital_signs").delete().eq("patient_id", id),
       supabase.from("clinical_notes").delete().eq("patient_id", id),
+      supabase.from("appointments").delete().eq("patient_id", id),
     ]);
 
     // Delete patient record
@@ -266,6 +274,9 @@ export async function deletePatient(id: string): Promise<void> {
       console.error("Error deleting patient:", error);
       throw error;
     }
+
+    // Revalidate the patients route
+    revalidatePath("/patients");
   } catch (error) {
     console.error("Error in deletePatient:", error);
     throw error;

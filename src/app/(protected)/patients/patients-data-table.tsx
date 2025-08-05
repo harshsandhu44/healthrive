@@ -57,6 +57,8 @@ import Link from "next/link";
 import { deletePatient } from "./actions";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { EditPatientModal } from "@/components/modals/edit-patient-modal";
+import { DeletePatientDialog } from "@/components/dialogs/delete-patient-dialog";
 
 const statusColors = {
   active: "bg-green-500/10 text-green-700 dark:text-green-400",
@@ -75,20 +77,20 @@ interface PatientActionsProps {
 
 function PatientActions({ patient }: PatientActionsProps) {
   const [isPending, startTransition] = useTransition();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
 
   const handleDeletePatient = () => {
-    if (confirm(`Are you sure you want to delete patient ${patient.name}? This action cannot be undone.`)) {
-      startTransition(async () => {
-        try {
-          await deletePatient(patient.id);
-          router.refresh();
-        } catch (error) {
-          console.error('Error deleting patient:', error);
-          alert('Failed to delete patient. Please try again.');
-        }
-      });
-    }
+    startTransition(async () => {
+      try {
+        await deletePatient(patient.id);
+        setShowDeleteDialog(false);
+        router.refresh();
+      } catch (error) {
+        console.error('Error deleting patient:', error);
+        alert('Failed to delete patient. Please try again.');
+      }
+    });
   };
 
   return (
@@ -110,10 +112,12 @@ function PatientActions({ patient }: PatientActionsProps) {
           </Link>
         </DropdownMenuItem>
         
-        <DropdownMenuItem disabled>
-          <Edit className="mr-2 h-4 w-4" />
-          Edit Patient
-        </DropdownMenuItem>
+        <EditPatientModal patient={patient}>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <Edit className="mr-2 h-4 w-4" />
+            Edit Patient
+          </DropdownMenuItem>
+        </EditPatientModal>
         
         <DropdownMenuItem disabled>
           <Calendar className="mr-2 h-4 w-4" />
@@ -140,14 +144,22 @@ function PatientActions({ patient }: PatientActionsProps) {
         <DropdownMenuSeparator />
         
         <DropdownMenuItem 
-          onClick={handleDeletePatient}
+          onClick={() => setShowDeleteDialog(true)}
           className="text-red-600 focus:text-red-600"
           disabled={isPending}
         >
           <FileText className="mr-2 h-4 w-4" />
-          {isPending ? 'Deleting...' : 'Delete Patient'}
+          Delete Patient
         </DropdownMenuItem>
       </DropdownMenuContent>
+      
+      <DeletePatientDialog
+        patient={patient}
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={handleDeletePatient}
+        isLoading={isPending}
+      />
     </DropdownMenu>
   );
 }
