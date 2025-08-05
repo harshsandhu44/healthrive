@@ -48,11 +48,12 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Textarea } from "@/components/ui/textarea";
-import { createAppointment } from "@/app/(protected)/appointments/actions";
+import { createAppointment, getAppointments } from "@/app/(protected)/appointments/actions";
 import { getDoctors } from "@/app/(protected)/doctors/actions";
+import { getPatients } from "@/app/(protected)/patients/actions";
 import { APPOINTMENT_TYPES, APPOINTMENT_STATUSES } from "@/lib/constants";
 import { toast } from "sonner";
-import { type Doctor } from "@/lib/types/entities";
+import { type Doctor, type Patient, type Appointment } from "@/lib/types/entities";
 
 // Date and Time Picker Component (based on your example)
 interface DateTimePickerProps {
@@ -99,9 +100,12 @@ function DateTimePicker({
                 onDateChange(date);
                 setOpen(false);
               }}
-              disabled={(date) =>
-                date < new Date(new Date().setHours(0, 0, 0, 0))
-              }
+              disabled={(date) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                // Disable past dates and Sundays (day 0)
+                return date < today || date.getDay() === 0;
+              }}
             />
           </PopoverContent>
         </Popover>
@@ -113,10 +117,22 @@ function DateTimePicker({
         <Input
           type="time"
           id="time-picker"
-          step="1"
           value={timeValue || ""}
-          onChange={(e) => onTimeChange(e.target.value)}
+          onChange={(e) => {
+            const time = e.target.value;
+            // Basic business hours validation (8 AM to 6 PM)
+            const [hours] = time.split(':').map(Number);
+            if (hours < 8 || hours >= 18) {
+              // Still allow the change but we'll validate in form
+              onTimeChange(time);
+            } else {
+              onTimeChange(time);
+            }
+          }}
           disabled={disabled}
+          min="08:00"
+          max="17:45"
+          step="900" // 15 minute intervals
           className="bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
         />
       </div>
@@ -128,7 +144,15 @@ const appointmentFormSchema = z.object({
   patientName: z.string().min(2, "Patient name must be at least 2 characters."),
   patientId: z.string().optional(),
   date: z.date({ message: "Appointment date is required." }),
-  time: z.string().min(1, "Appointment time is required."),
+  time: z.string().min(1, "Appointment time is required.").refine((time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    const timeInMinutes = hours * 60 + minutes;
+    const startTime = 8 * 60; // 8:00 AM
+    const endTime = 18 * 60; // 6:00 PM
+    return timeInMinutes >= startTime && timeInMinutes < endTime;
+  }, {
+    message: "Appointment time must be between 8:00 AM and 6:00 PM"
+  }),
   type: z.enum(["consultation", "follow-up", "surgery", "emergency"]),
   status: z.enum(["scheduled", "in-progress", "completed", "cancelled"]),
   doctor: z.string().min(1, "Doctor selection is required."),
@@ -150,6 +174,10 @@ export function CreateAppointmentForm({
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [doctorsLoading, setDoctorsLoading] = useState(true);
   const [doctorOpen, setDoctorOpen] = useState(false);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [patientsLoading, setPatientsLoading] = useState(true);
+  const [patientOpen, setPatientOpen] = useState(false);
+  const [existingAppointments, setExistingAppointments] = useState<Appointment[]>([]);
 
   // Set default date and time to current date/time
   const now = new Date();
@@ -170,22 +198,50 @@ export function CreateAppointmentForm({
     },
   });
 
-  // Load doctors on component mount
+  // Load doctors and patients on component mount
   useEffect(() => {
-    const loadDoctors = async () => {
+    const loadData = async () => {
       try {
-        const doctorsList = await getDoctors();
+        const [doctorsList, patientsList, appointmentsList] = await Promise.all([
+          getDoctors(),
+          getPatients(),
+          getAppointments(),
+        ]);
         setDoctors(doctorsList);
+        setPatients(patientsList);
+        setExistingAppointments(appointmentsList);
       } catch (error) {
-        console.error("Failed to load doctors:", error);
-        toast.error("Failed to load doctors list");
+        console.error("Failed to load data:", error);
+        toast.error("Failed to load doctors and patients list");
       } finally {
         setDoctorsLoading(false);
+        setPatientsLoading(false);
       }
     };
 
-    loadDoctors();
+    loadData();
   }, []);
+
+  const handlePatientSelect = (patient: Patient) => {
+    form.setValue("patientName", patient.name);
+    form.setValue("patientId", patient.id);
+    setPatientOpen(false);
+  };
+
+  const checkAppointmentConflict = (appointmentDateTime: Date, doctor: string) => {
+    const appointmentTime = appointmentDateTime.getTime();
+    const conflictWindow = 30 * 60 * 1000; // 30 minutes in milliseconds
+    
+    return existingAppointments.some(appointment => {
+      if (appointment.doctor !== doctor) return false;
+      if (!appointment.time) return false;
+      
+      const existingTime = new Date(appointment.time).getTime();
+      const timeDiff = Math.abs(appointmentTime - existingTime);
+      
+      return timeDiff < conflictWindow;
+    });
+  };
 
   const onSubmit = (values: AppointmentFormValues) => {
     startTransition(async () => {
@@ -194,6 +250,14 @@ export function CreateAppointmentForm({
         const appointmentDateTime = new Date(values.date);
         const [hours, minutes] = values.time.split(":");
         appointmentDateTime.setHours(parseInt(hours), parseInt(minutes));
+
+        // Check for appointment conflicts
+        if (checkAppointmentConflict(appointmentDateTime, values.doctor)) {
+          toast.error("Appointment Conflict", {
+            description: `Dr. ${values.doctor} already has an appointment within 30 minutes of this time. Please choose a different time slot.`,
+          });
+          return;
+        }
 
         const appointmentData = {
           patientName: values.patientName,
@@ -226,9 +290,32 @@ export function CreateAppointmentForm({
         onSuccess?.();
       } catch (error) {
         console.error("Failed to create appointment:", error);
-        toast.error("Failed to create appointment", {
-          description:
-            "Please try again or contact support if the problem persists.",
+        
+        // Enhanced error handling with specific messages
+        let errorMessage = "Failed to create appointment";
+        let errorDescription = "Please try again or contact support if the problem persists.";
+        
+        if (error instanceof Error) {
+          if (error.message.includes("organization_id")) {
+            errorMessage = "Authentication Error";
+            errorDescription = "Please sign in again and try to create the appointment.";
+          } else if (error.message.includes("patient_id")) {
+            errorMessage = "Invalid Patient";
+            errorDescription = "The selected patient ID is invalid. Please select a different patient.";
+          } else if (error.message.includes("doctor")) {
+            errorMessage = "Doctor Unavailable";
+            errorDescription = "The selected doctor may not be available. Please choose a different doctor.";
+          } else if (error.message.includes("time")) {
+            errorMessage = "Invalid Time Slot";
+            errorDescription = "The selected time slot may not be available. Please choose a different time.";
+          } else if (error.message.includes("duplicate") || error.message.includes("unique")) {
+            errorMessage = "Duplicate Appointment";
+            errorDescription = "An appointment with similar details already exists. Please check and modify your appointment.";
+          }
+        }
+        
+        toast.error(errorMessage, {
+          description: errorDescription,
         });
       }
     });
@@ -249,11 +336,61 @@ export function CreateAppointmentForm({
               control={form.control}
               name="patientName"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col">
                   <FormLabel>Patient Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter patient's full name" {...field} />
-                  </FormControl>
+                  <Popover open={patientOpen} onOpenChange={setPatientOpen}>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={patientOpen}
+                          className={cn(
+                            "justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                          disabled={patientsLoading}
+                        >
+                          {patientsLoading
+                            ? "Loading patients..."
+                            : field.value || "Select or search patient..."}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search patients..." />
+                        <CommandList>
+                          <CommandEmpty>No patient found.</CommandEmpty>
+                          <CommandGroup>
+                            {patients.map((patient) => (
+                              <CommandItem
+                                value={patient.name}
+                                key={patient.id}
+                                onSelect={() => handlePatientSelect(patient)}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    patient.name === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                <div className="flex flex-col">
+                                  <span>{patient.name}</span>
+                                  <span className="text-sm text-muted-foreground">
+                                    ID: {patient.id} • Age: {patient.age}
+                                  </span>
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                   <FormMessage />
                 </FormItem>
               )}
@@ -266,7 +403,12 @@ export function CreateAppointmentForm({
                 <FormItem>
                   <FormLabel>Patient ID</FormLabel>
                   <FormControl>
-                    <Input placeholder="PT-001 (optional)" {...field} />
+                    <Input 
+                      placeholder="Auto-filled when patient selected" 
+                      {...field} 
+                      readOnly
+                      className="bg-muted"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
