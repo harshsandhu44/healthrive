@@ -1,10 +1,10 @@
 import { Logo } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Preloader } from "@/components/Preloader";
 import { ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
 import { HomeIcon } from "lucide-react";
-import Link from "next/link";
 import { PropsWithChildren } from "react";
+import Link from "next/link";
 
 export default function AuthLayout({ children }: PropsWithChildren) {
   return (
@@ -22,7 +22,7 @@ export default function AuthLayout({ children }: PropsWithChildren) {
         <div />
       </div>
       <ClerkLoading>
-        <Skeleton className="w-full h-96" />
+        <Preloader />
       </ClerkLoading>
       <ClerkLoaded>{children}</ClerkLoaded>
     </div>
