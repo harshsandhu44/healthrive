@@ -3,13 +3,13 @@
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import type { 
-  DataExportRequest, 
-  DataExportType, 
+import type {
+  DataExportRequest,
+  DataExportType,
   ExportedData,
   AuditLogEntry,
   LoginEvent,
-  ActivitySummary
+  ActivitySummary,
 } from "@/lib/types/data-export";
 import { getPatients } from "../../patients/actions";
 import { getAppointments } from "../../appointments/actions";
@@ -21,12 +21,12 @@ import { generateId } from "@/lib/utils";
 export async function createDataExportRequest(
   dataTypes: DataExportType[],
   format: "json" | "csv" | "xml" = "json",
-  includeFiles: boolean = false
+  includeFiles: boolean = false,
 ): Promise<{ success: boolean; requestId?: string; error?: string }> {
   try {
     const { userId, orgId } = await auth();
     const user = await currentUser();
-    
+
     if (!userId || !orgId || !user) {
       return { success: false, error: "Authentication required" };
     }
@@ -48,19 +48,17 @@ export async function createDataExportRequest(
       dataTypes,
     };
 
-    const { error } = await supabase
-      .from("data_export_requests")
-      .insert({
-        id: requestId,
-        user_id: userId,
-        organization_id: orgId,
-        status: exportRequest.status,
-        requested_at: exportRequest.requestedAt,
-        expires_at: exportRequest.expiresAt,
-        format: exportRequest.format,
-        include_files: exportRequest.includeFiles,
-        data_types: exportRequest.dataTypes,
-      });
+    const { error } = await supabase.from("data_export_requests").insert({
+      id: requestId,
+      user_id: userId,
+      organization_id: orgId,
+      status: exportRequest.status,
+      requested_at: exportRequest.requestedAt,
+      expires_at: exportRequest.expiresAt,
+      format: exportRequest.format,
+      include_files: exportRequest.includeFiles,
+      data_types: exportRequest.dataTypes,
+    });
 
     if (error) {
       console.error("Error creating export request:", error);
@@ -73,7 +71,7 @@ export async function createDataExportRequest(
       "data_export_requested",
       "data_export_request",
       requestId,
-      { dataTypes, format, includeFiles }
+      { dataTypes, format, includeFiles },
     );
 
     // Start background processing (in a real app, this would be a background job)
@@ -95,7 +93,7 @@ export async function getDataExportRequests(): Promise<DataExportRequest[]> {
     if (!userId || !orgId) return [];
 
     const supabase = await createClient();
-    
+
     const { data, error } = await supabase
       .from("data_export_requests")
       .select("*")
@@ -109,7 +107,7 @@ export async function getDataExportRequests(): Promise<DataExportRequest[]> {
       return [];
     }
 
-    return (data || []).map(row => ({
+    return (data || []).map((row) => ({
       id: row.id,
       userId: row.user_id,
       organizationId: row.organization_id,
@@ -131,21 +129,21 @@ export async function getDataExportRequests(): Promise<DataExportRequest[]> {
 /**
  * Download data export
  */
-export async function downloadDataExport(requestId: string): Promise<{ 
-  success: boolean; 
-  data?: ExportedData; 
-  error?: string 
+export async function downloadDataExport(requestId: string): Promise<{
+  success: boolean;
+  data?: ExportedData;
+  error?: string;
 }> {
   try {
     const { userId, orgId } = await auth();
     const user = await currentUser();
-    
+
     if (!userId || !orgId || !user) {
       return { success: false, error: "Authentication required" };
     }
 
     const supabase = await createClient();
-    
+
     // Verify export request belongs to user and is ready
     const { data: request, error: requestError } = await supabase
       .from("data_export_requests")
@@ -168,14 +166,18 @@ export async function downloadDataExport(requestId: string): Promise<{
     }
 
     // Generate the export data
-    const exportedData = await generateExportData(request.data_types, userId, orgId);
+    const exportedData = await generateExportData(
+      request.data_types,
+      userId,
+      orgId,
+    );
 
     // Log the download
     await logAuditEvent(
       userId,
       "data_export_downloaded",
       "data_export_request",
-      requestId
+      requestId,
     );
 
     return { success: true, data: exportedData };
@@ -191,40 +193,40 @@ export async function downloadDataExport(requestId: string): Promise<{
 async function processDataExport(requestId: string): Promise<void> {
   try {
     const supabase = await createClient();
-    
+
     // Update status to processing
     await supabase
       .from("data_export_requests")
-      .update({ 
+      .update({
         status: "processing",
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq("id", requestId);
 
     // Simulate processing time (in real app, this would do actual work)
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Update status to completed
     await supabase
       .from("data_export_requests")
-      .update({ 
+      .update({
         status: "completed",
         completed_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq("id", requestId);
 
     revalidatePath("/settings/data-export");
   } catch (error) {
     console.error("Error processing data export:", error);
-    
+
     // Update status to failed
     const supabase = await createClient();
     await supabase
       .from("data_export_requests")
-      .update({ 
+      .update({
         status: "failed",
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       })
       .eq("id", requestId);
   }
@@ -236,7 +238,7 @@ async function processDataExport(requestId: string): Promise<void> {
 async function generateExportData(
   dataTypes: DataExportType[],
   userId: string,
-  organizationId: string
+  organizationId: string,
 ): Promise<ExportedData> {
   const user = await currentUser();
   const exportedData: ExportedData = {
@@ -257,7 +259,9 @@ async function generateExportData(
       email: user.emailAddresses[0]?.emailAddress || "",
       name: user.fullName || "",
       createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : "",
-      lastLoginAt: user.lastSignInAt ? new Date(user.lastSignInAt).toISOString() : undefined,
+      lastLoginAt: user.lastSignInAt
+        ? new Date(user.lastSignInAt).toISOString()
+        : undefined,
       preferences: user.unsafeMetadata,
     };
   }
@@ -305,11 +309,11 @@ async function logAuditEvent(
   action: string,
   resource: string,
   resourceId?: string,
-  details?: Record<string, unknown>
+  details?: Record<string, unknown>,
 ): Promise<void> {
   try {
     const supabase = await createClient();
-    
+
     await supabase.from("audit_logs").insert({
       id: generateId(),
       user_id: userId,
@@ -329,12 +333,16 @@ async function logAuditEvent(
 /**
  * Get audit logs for user
  */
-async function getAuditLogs(userId: string, _organizationId: string): Promise<AuditLogEntry[]> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function getAuditLogs(
+  userId: string,
+  organizationId: string,
+): Promise<AuditLogEntry[]> {
   try {
     const supabase = await createClient();
     const twelveMonthsAgo = new Date();
     twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
-    
+
     const { data, error } = await supabase
       .from("audit_logs")
       .select("*")
@@ -348,7 +356,7 @@ async function getAuditLogs(userId: string, _organizationId: string): Promise<Au
       return [];
     }
 
-    return (data || []).map(row => ({
+    return (data || []).map((row) => ({
       id: row.id,
       timestamp: row.timestamp,
       userId: row.user_id,
@@ -368,7 +376,8 @@ async function getAuditLogs(userId: string, _organizationId: string): Promise<Au
 /**
  * Get login history for user
  */
-async function getLoginHistory(_userId: string): Promise<LoginEvent[]> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function getLoginHistory(userId: string): Promise<LoginEvent[]> {
   // In a real app, you'd fetch from your auth logs
   // For now, return empty array as Clerk doesn't expose this data directly
   return [];
@@ -377,34 +386,42 @@ async function getLoginHistory(_userId: string): Promise<LoginEvent[]> {
 /**
  * Get activity summary for user
  */
-async function getActivitySummary(userId: string, _organizationId: string): Promise<ActivitySummary> {
+async function getActivitySummary(
+  userId: string,
+  _organizationId: string,
+): Promise<ActivitySummary> {
   try {
     const supabase = await createClient();
     const user = await currentUser();
-    
+
     // Get counts for various activities
-    const [patientsResult, appointmentsResult, exportsResult] = await Promise.all([
-      supabase
-        .from("patients")
-        .select("id", { count: "exact" })
-        .eq("organization_id", _organizationId),
-      supabase
-        .from("appointments")
-        .select("id", { count: "exact" })
-        .eq("organization_id", _organizationId),
-      supabase
-        .from("data_export_requests")
-        .select("id", { count: "exact" })
-        .eq("user_id", userId)
-    ]);
+    const [patientsResult, appointmentsResult, exportsResult] =
+      await Promise.all([
+        supabase
+          .from("patients")
+          .select("id", { count: "exact" })
+          .eq("organization_id", _organizationId),
+        supabase
+          .from("appointments")
+          .select("id", { count: "exact" })
+          .eq("organization_id", _organizationId),
+        supabase
+          .from("data_export_requests")
+          .select("id", { count: "exact" })
+          .eq("user_id", userId),
+      ]);
 
     return {
       totalLogins: 0, // Would be fetched from auth logs
-      lastLoginAt: user?.lastSignInAt ? new Date(user.lastSignInAt).toISOString() : undefined,
+      lastLoginAt: user?.lastSignInAt
+        ? new Date(user.lastSignInAt).toISOString()
+        : undefined,
       patientsCreated: patientsResult.count || 0,
       appointmentsScheduled: appointmentsResult.count || 0,
       dataExports: exportsResult.count || 0,
-      accountCreatedAt: user?.createdAt ? new Date(user.createdAt).toISOString() : new Date().toISOString(),
+      accountCreatedAt: user?.createdAt
+        ? new Date(user.createdAt).toISOString()
+        : new Date().toISOString(),
     };
   } catch (error) {
     console.error("Error generating activity summary:", error);
