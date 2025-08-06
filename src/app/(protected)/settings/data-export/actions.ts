@@ -333,9 +333,9 @@ async function logAuditEvent(
 /**
  * Get audit logs for user
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function getAuditLogs(
   userId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   organizationId: string,
 ): Promise<AuditLogEntry[]> {
   try {
