@@ -36,8 +36,3 @@ export function generateDoctorId(): string {
 
   return `doc-${uniqueId}`;
 }
-
-export function checkBillingStatus(): string {
-  // Implement billing status check logic here
-  return "active";
-}
