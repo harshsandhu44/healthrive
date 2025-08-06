@@ -13,8 +13,8 @@ export default clerkMiddleware(async (auth, req) => {
   // check if user with organization has a billing plan
   if (
     orgId &&
-    (!has({ plan: "org:starter" }) ||
-      !has({ plan: "org:pro" }) ||
+    (!has({ plan: "org:starter" }) &&
+      !has({ plan: "org:pro" }) &&
       !has({ plan: "org:enterprise" })) &&
     !req.url.includes("/billing")
   ) {
