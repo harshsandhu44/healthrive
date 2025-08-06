@@ -18,9 +18,12 @@ import {
   User2Icon,
   Stethoscope,
   PlusIcon,
+  Settings2Icon,
+  LifeBuoyIcon,
 } from "lucide-react";
 import { Logo } from "../icons";
 import { CreateAppointmentModal } from "../modals/create-appointment-modal";
+import { SettingsModal } from "../settings";
 
 export const AppSidebar = ({
   ...props
@@ -30,6 +33,10 @@ export const AppSidebar = ({
     { icon: PhoneCallIcon, label: "Appointments", href: "/appointments" },
     { icon: User2Icon, label: "Patients", href: "/patients" },
     { icon: Stethoscope, label: "Doctors", href: "/doctors" },
+  ];
+
+  const footerItems = [
+    { icon: LifeBuoyIcon, label: "Help", href: "/help", disabled: true },
   ];
 
   return (
@@ -90,6 +97,47 @@ export const AppSidebar = ({
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {footerItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton
+                    asChild
+                    className="data-[slot=sidebar-menu-button]:!p-1.5"
+                  >
+                    <Button
+                      disabled={item.disabled}
+                      asChild
+                      className="justify-start w-full"
+                      variant="ghost"
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        {item.label}
+                      </Link>
+                    </Button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+              <SettingsModal
+                trigger={
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      className="data-[slot=sidebar-menu-button]:!p-1.5"
+                    >
+                      <Button className="justify-start w-full" variant="ghost">
+                        <Settings2Icon />
+                        Settings
+                      </Button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                }
+              />
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <UserButton
           showName
           appearance={{
