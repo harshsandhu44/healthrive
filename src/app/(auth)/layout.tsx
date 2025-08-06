@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
 import { HomeIcon } from "lucide-react";
-import Link from "next/link";
 import { PropsWithChildren } from "react";
+import Link from "next/link";
 
 export default function AuthLayout({ children }: PropsWithChildren) {
   return (
