@@ -1,5 +1,11 @@
-import { PropsWithChildren } from "react";
+import { PublicHeader } from "@/components/headers/public-header";
+import type { PropsWithChildren } from "react";
 
 export default function PublicLayout({ children }: PropsWithChildren) {
-  return <>{children}</>;
+  return (
+    <div>
+      <PublicHeader />
+      {children}
+    </div>
+  );
 }
