@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useConsentContext } from "@/components/providers/consent-provider";
-import { ConsentPreferences } from "@/lib/types/consent";
+import type { ConsentPreferences as ConsentPreferencesType } from "@/lib/types/consent";
 import { Shield, BarChart3, Target, Sparkles, Save, RotateCcw, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -71,11 +71,11 @@ const CONSENT_CATEGORIES = [
 ];
 
 export function ConsentPreferences() {
-  const { consentState, updatePreference, withdrawConsent, resetConsent, getConsentData } = useConsentContext();
-  const [localPreferences, setLocalPreferences] = useState<ConsentPreferences>(consentState.preferences);
+  const { consentState, updatePreference, withdrawConsent, getConsentData } = useConsentContext();
+  const [localPreferences, setLocalPreferences] = useState<ConsentPreferencesType>(consentState.preferences);
   const [hasChanges, setHasChanges] = useState(false);
 
-  const handlePreferenceChange = (category: keyof ConsentPreferences, checked: boolean) => {
+  const handlePreferenceChange = (category: keyof ConsentPreferencesType, checked: boolean) => {
     const newPreferences = {
       ...localPreferences,
       [category]: category === "essential" ? true : checked,
@@ -90,7 +90,7 @@ export function ConsentPreferences() {
     
     Object.entries(localPreferences).forEach(([key, value]) => {
       if (key !== "essential") {
-        const success = updatePreference(key as keyof ConsentPreferences, value);
+        const success = updatePreference(key as keyof ConsentPreferencesType, value);
         if (!success) hasErrors = true;
       }
     });

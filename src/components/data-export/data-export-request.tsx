@@ -15,7 +15,7 @@ import {
   type DataExportType, 
   type DataExportRequest 
 } from "@/lib/types/data-export";
-import { createDataExportRequest, getDataExportRequests } from "@/app/(protected)/settings/data-export/actions";
+import { createDataExportRequest } from "@/app/(protected)/settings/data-export/actions";
 import { 
   Download, 
   FileText, 
@@ -202,7 +202,7 @@ export function DataExportRequestComponent({ existingRequests }: DataExportReque
                 {/* Format Selection */}
                 <div className="space-y-3">
                   <h4 className="font-medium">Export Format</h4>
-                  <RadioGroup value={format} onValueChange={(value: any) => setFormat(value)}>
+                  <RadioGroup value={format} onValueChange={(value: "json" | "csv" | "xml") => setFormat(value)}>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="json" id="json" />
                       <Label htmlFor="json" className="text-sm">

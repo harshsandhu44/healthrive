@@ -1,4 +1,4 @@
-import type { Patient, Doctor, Appointment } from "./entities";
+import type { Patient, Appointment } from "./entities";
 import type { ConsentData } from "./consent";
 
 export interface DataExportRequest {
@@ -39,7 +39,7 @@ export interface ExportedData {
     name: string;
     createdAt: string;
     lastLoginAt?: string;
-    preferences?: Record<string, any>;
+    preferences?: Record<string, unknown>;
   };
   patientRecords?: Patient[];
   appointments?: Appointment[];
@@ -58,7 +58,7 @@ export interface AuditLogEntry {
   action: string;
   resource: string;
   resourceId?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   ipAddress?: string;
   userAgent?: string;
 }

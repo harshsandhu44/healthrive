@@ -18,6 +18,7 @@ import {
   User2Icon,
   Stethoscope,
   PlusIcon,
+  Settings2Icon,
 } from "lucide-react";
 import { Logo } from "../icons";
 import { CreateAppointmentModal } from "../modals/create-appointment-modal";
@@ -30,6 +31,10 @@ export const AppSidebar = ({
     { icon: PhoneCallIcon, label: "Appointments", href: "/appointments" },
     { icon: User2Icon, label: "Patients", href: "/patients" },
     { icon: Stethoscope, label: "Doctors", href: "/doctors" },
+  ];
+
+  const footerItems = [
+    { icon: Settings2Icon, label: "Settings", href: "/settings" },
   ];
 
   return (
@@ -90,6 +95,31 @@ export const AppSidebar = ({
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {footerItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                  <SidebarMenuButton
+                    asChild
+                    className="data-[slot=sidebar-menu-button]:!p-1.5"
+                  >
+                    <Button
+                      asChild
+                      className="justify-start w-full"
+                      variant="ghost"
+                    >
+                      <Link href={item.href}>
+                        <item.icon />
+                        {item.label}
+                      </Link>
+                    </Button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <UserButton
           showName
           appearance={{

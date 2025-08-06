@@ -23,6 +23,9 @@ export async function getMarkdownContent(filename: string) {
   return {
     filename,
     contentHtml,
+    title: matterResult.data.title as string | undefined,
+    description: matterResult.data.description as string | undefined,
+    lastUpdated: matterResult.data.lastUpdated as string | undefined,
     ...matterResult.data,
   };
 }

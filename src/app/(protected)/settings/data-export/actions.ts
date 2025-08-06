@@ -305,7 +305,7 @@ async function logAuditEvent(
   action: string,
   resource: string,
   resourceId?: string,
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 ): Promise<void> {
   try {
     const supabase = await createClient();
@@ -329,7 +329,7 @@ async function logAuditEvent(
 /**
  * Get audit logs for user
  */
-async function getAuditLogs(userId: string, organizationId: string): Promise<AuditLogEntry[]> {
+async function getAuditLogs(userId: string, _organizationId: string): Promise<AuditLogEntry[]> {
   try {
     const supabase = await createClient();
     const twelveMonthsAgo = new Date();
@@ -368,7 +368,7 @@ async function getAuditLogs(userId: string, organizationId: string): Promise<Aud
 /**
  * Get login history for user
  */
-async function getLoginHistory(userId: string): Promise<LoginEvent[]> {
+async function getLoginHistory(_userId: string): Promise<LoginEvent[]> {
   // In a real app, you'd fetch from your auth logs
   // For now, return empty array as Clerk doesn't expose this data directly
   return [];
@@ -377,7 +377,7 @@ async function getLoginHistory(userId: string): Promise<LoginEvent[]> {
 /**
  * Get activity summary for user
  */
-async function getActivitySummary(userId: string, organizationId: string): Promise<ActivitySummary> {
+async function getActivitySummary(userId: string, _organizationId: string): Promise<ActivitySummary> {
   try {
     const supabase = await createClient();
     const user = await currentUser();
@@ -387,11 +387,11 @@ async function getActivitySummary(userId: string, organizationId: string): Promi
       supabase
         .from("patients")
         .select("id", { count: "exact" })
-        .eq("organization_id", organizationId),
+        .eq("organization_id", _organizationId),
       supabase
         .from("appointments")
         .select("id", { count: "exact" })
-        .eq("organization_id", organizationId),
+        .eq("organization_id", _organizationId),
       supabase
         .from("data_export_requests")
         .select("id", { count: "exact" })

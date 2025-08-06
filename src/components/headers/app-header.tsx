@@ -1,5 +1,7 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { OrganizationSwitcher } from "@clerk/nextjs";
+import { SettingsModal } from "@/components/settings";
+import { ThemeToggle } from "@/components/theme";
 
 export const SiteHeader = () => {
   return (
@@ -7,6 +9,8 @@ export const SiteHeader = () => {
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="-ml-1" />
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle variant="inline" showDescription={false} />
+          <SettingsModal />
           <OrganizationSwitcher hidePersonal />
         </div>
       </div>
