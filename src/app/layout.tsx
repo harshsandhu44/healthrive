@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { PropsWithChildren } from "react";
 import { APP_DESCRIPTION, APP_NAME } from "@/lib/constants";
 import { RootProvider } from "@/components/providers";
+import { CookieConsentBanner } from "@/components/consent/cookie-consent-banner";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
       <body>
         <RootProvider>
           {children}
+          <CookieConsentBanner />
           <Toaster />
         </RootProvider>
       </body>
