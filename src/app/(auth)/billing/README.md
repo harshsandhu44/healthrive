@@ -6,32 +6,41 @@ Choose the perfect plan for your healthcare organization. All plans include our 
 **Perfect for small practices and clinics getting started**
 
 **All current features included:**
-- ✅ **Patient Management** - Unlimited patients with complete profiles
+- ✅ **Patient Management**
+  - Unlimited patients with complete profiles
   - Demographics, contact information, insurance details
   - Emergency contacts and medical history
   - Patient search and filtering
-- ✅ **Doctor Management** - Add and manage healthcare providers
+- ✅ **Doctor Management**
+  - Add and manage healthcare providers
   - Doctor profiles with specializations
   - Contact information and scheduling availability
-- ✅ **Appointment Scheduling** - Comprehensive scheduling system
+- ✅ **Appointment Scheduling**
+  - Comprehensive scheduling system
   - Book, reschedule, and cancel appointments
   - View today's appointments at a glance
   - Appointment status tracking
-- ✅ **Dashboard Analytics** - Real-time insights
+- ✅ **Dashboard Analytics**
+  - Real-time insights
   - Monthly patient and appointment metrics
   - Trend analysis with percentage changes
   - Visual charts and data visualization
-- ✅ **Medical Records** - Complete patient health records
+- ✅ **Medical Records**
+  - Complete patient health records
   - Diagnoses with ICD codes and status tracking
   - Medication management with dosage and frequency
   - Medical procedures and provider information
   - Lab results with reference ranges
   - Vital signs tracking (BP, heart rate, temperature, etc.)
   - Clinical notes with timestamps
-- ✅ **Multi-Organization Support** - Secure data isolation
-- ✅ **Data Export** - Export patient and appointment data
-- ✅ **Responsive Design** - Works on all devices
-- ✅ **Search & Filtering** - Advanced data table capabilities
+- ✅ **Multi-Organization Support**
+  - Secure data isolation
+- ✅ **Data Export**
+  - Export patient and appointment data
+- ✅ **Responsive Design**
+  - Works on all devices
+- ✅ **Search & Filtering**
+  - Advanced data table capabilities
 
 ---
 
