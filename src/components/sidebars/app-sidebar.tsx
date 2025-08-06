@@ -19,9 +19,11 @@ import {
   Stethoscope,
   PlusIcon,
   Settings2Icon,
+  LifeBuoyIcon,
 } from "lucide-react";
 import { Logo } from "../icons";
 import { CreateAppointmentModal } from "../modals/create-appointment-modal";
+import { SettingsModal } from "../settings";
 
 export const AppSidebar = ({
   ...props
@@ -34,7 +36,7 @@ export const AppSidebar = ({
   ];
 
   const footerItems = [
-    { icon: Settings2Icon, label: "Settings", href: "/settings" },
+    { icon: LifeBuoyIcon, label: "Help", href: "/help", disabled: true },
   ];
 
   return (
@@ -105,6 +107,7 @@ export const AppSidebar = ({
                     className="data-[slot=sidebar-menu-button]:!p-1.5"
                   >
                     <Button
+                      disabled={item.disabled}
                       asChild
                       className="justify-start w-full"
                       variant="ghost"
@@ -117,6 +120,21 @@ export const AppSidebar = ({
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SettingsModal
+                trigger={
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      asChild
+                      className="data-[slot=sidebar-menu-button]:!p-1.5"
+                    >
+                      <Button className="justify-start w-full" variant="ghost">
+                        <Settings2Icon />
+                        Settings
+                      </Button>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                }
+              />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
