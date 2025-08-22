@@ -9,14 +9,14 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { createClient } from "@/lib/db/client";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   email: z.email({ message: "Please enter a valid email." }),
@@ -27,12 +27,9 @@ interface SendOtpProps {
 }
 
 export function SendOtp({ onOtpSent }: SendOtpProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
   const supabase = createClient();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,7 +40,6 @@ export function SendOtp({ onOtpSent }: SendOtpProps) {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setMessage(null);
 
     try {
       const { error } = await supabase.auth.signInWithOtp({
@@ -54,20 +50,16 @@ export function SendOtp({ onOtpSent }: SendOtpProps) {
       });
 
       if (error) {
-        setMessage({ type: "error", text: error.message });
+        toast.error(error.message, {
+          duration: 5000,
+        });
         return;
       }
 
-      setMessage({
-        type: "success",
-        text: "OTP sent successfully! Check your email.",
-      });
+      toast.success("OTP sent successfully! Check your email.");
       onOtpSent?.(values.email);
     } catch {
-      setMessage({
-        type: "error",
-        text: "Failed to send OTP. Please try again.",
-      });
+      toast.error("Failed to send OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -81,20 +73,16 @@ export function SendOtp({ onOtpSent }: SendOtpProps) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input placeholder="Enter your email" {...field} />
               </FormControl>
+              <FormDescription>
+                We will send you an OTP to verify your email address.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
-        {message && (
-          <Alert variant={message.type === "error" ? "destructive" : "default"}>
-            <AlertDescription>{message.text}</AlertDescription>
-          </Alert>
-        )}
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Sending..." : "Send OTP"}

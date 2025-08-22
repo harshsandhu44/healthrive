@@ -97,7 +97,7 @@ export default function SetupProfile({ onComplete }: SetupProfileProps) {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Complete your profile</h1>
+        <h2 className="text-2xl font-semibold">Complete your profile</h2>
         <p className="text-muted-foreground">
           Tell us a bit about yourself to get started
         </p>

@@ -1,14 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useState } from "react";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,6 +19,7 @@ import {
 import {
   InputOTP,
   InputOTPGroup,
+  InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -82,11 +85,7 @@ export default function VerifyOtp({
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Verify your email</h1>
-        <p className="text-muted-foreground">
-          Enter the 6-digit code sent to{" "}
-          <span className="font-medium">{email}</span>
-        </p>
+        <h2 className="text-xl font-semibold">Verify your email</h2>
       </div>
 
       <Form {...form}>
@@ -98,17 +97,28 @@ export default function VerifyOtp({
               <FormItem>
                 <FormLabel>One-Time Password</FormLabel>
                 <FormControl>
-                  <InputOTP maxLength={6} {...field}>
+                  <InputOTP
+                    maxLength={6}
+                    pattern={REGEXP_ONLY_DIGITS}
+                    {...field}
+                  >
                     <InputOTPGroup>
                       <InputOTPSlot index={0} />
                       <InputOTPSlot index={1} />
                       <InputOTPSlot index={2} />
+                    </InputOTPGroup>
+                    <InputOTPSeparator />
+                    <InputOTPGroup>
                       <InputOTPSlot index={3} />
                       <InputOTPSlot index={4} />
                       <InputOTPSlot index={5} />
                     </InputOTPGroup>
                   </InputOTP>
                 </FormControl>
+                <FormDescription>
+                  Enter the 6-digit code sent to{" "}
+                  <span className="font-medium">{email}</span>
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

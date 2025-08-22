@@ -28,7 +28,6 @@ export default function SignInPage() {
   };
 
   const handleProfileComplete = () => {
-    // Navigation to dashboard is handled in SetupProfile component
     router.push("/dashboard");
   };
 
