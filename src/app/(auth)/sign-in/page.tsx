@@ -1,7 +1,9 @@
+import { SendOtp } from "./components/send-otp";
+
 export default async function SignInPage() {
   return (
     <div>
-      <h1>Sign In</h1>
+      <SendOtp />
     </div>
   );
 }
