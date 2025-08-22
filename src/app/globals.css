@@ -1,9 +1,87 @@
 @import "tailwindcss" important;
 @import "tw-animate-css";
 
+/**
+* @license
+*
+* Font Family: Array
+* Designed by: Frode Helland
+* URL: https://www.fontshare.com/fonts/array
+* © 2025 Indian Type Foundry
+*
+* Array Regular
+* Array Semibold
+* Array Bold
+*
+*/
+
+@font-face {
+  font-family: "Array";
+  src:
+    url("/fonts/Array-Regular.woff2") format("woff2"),
+    url("/fonts/Array-Regular.woff") format("woff"),
+    url("/fonts/Array-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Array";
+  src:
+    url("/fonts/Array-Semibold.woff2") format("woff2"),
+    url("/fonts/Array-Semibold.woff") format("woff"),
+    url("/fonts/Array-Semibold.ttf") format("truetype");
+  font-weight: 600;
+  font-display: swap;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Array";
+  src:
+    url("/fonts/Array-Bold.woff2") format("woff2"),
+    url("/fonts/Array-Bold.woff") format("woff"),
+    url("/fonts/Array-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+  font-style: normal;
+}
+
+/**
+* @license
+*
+* Font Family: Outfit
+* Designed by: On Brand Investments Pty Ltd, Rodrigo Fuenzalida
+* URL: https://www.fontshare.com/fonts/outfit
+* © 2025 Indian Type Foundry
+*
+* Outfit Variable (Variable font)
+
+/**
+* This is a variable font
+* You can control variable axes as shown below:
+* font-variation-settings: wght 100.0;
+*
+* available axes:
+'wght' (range from 100.0 to 900.0
+*/
+
+@font-face {
+  font-family: "Outfit";
+  src:
+    url("/fonts/Outfit-Variable.woff2") format("woff2"),
+    url("/fonts/Outfit-Variable.woff") format("woff"),
+    url("/fonts/Outfit-Variable.ttf") format("truetype");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-sans: "Outfit", sans-serif;
+  --font-mono: "Array", monospace;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -117,4 +195,8 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
+}
+
+.container {
+  @apply mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8;
 }
