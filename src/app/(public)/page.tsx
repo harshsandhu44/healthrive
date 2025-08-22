@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export default function Page() {
@@ -11,8 +12,8 @@ export default function Page() {
           <p className="text-xl text-pretty">
             On the mission to build a 21st Century Healthcare System
           </p>
-          <Button size="lg" className="mt-4 w-full md:w-fit text-lg">
-            Let&apos;s get started!
+          <Button asChild size="lg" className="mt-4 w-full md:w-fit text-lg">
+            <Link href="/sign-in">Let&apos;s get started!</Link>
           </Button>
         </div>
       </section>
