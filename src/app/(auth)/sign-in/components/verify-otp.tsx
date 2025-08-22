@@ -1,7 +1,145 @@
-export default function VerifyOtp() {
+"use client";
+
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { createClient } from "@/lib/db/client";
+
+const formSchema = z.object({
+  token: z.string().min(6, { message: "OTP must be 6 characters." }),
+});
+
+interface VerifyOtpProps {
+  email: string;
+  onVerified?: () => void;
+  onBack?: () => void;
+}
+
+export default function VerifyOtp({
+  email,
+  onVerified,
+  onBack,
+}: VerifyOtpProps) {
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const supabase = createClient();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      token: "",
+    },
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    setMessage(null);
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: values.token,
+        type: "email",
+      });
+
+      if (error) {
+        setMessage({ type: "error", text: error.message });
+        return;
+      }
+
+      setMessage({ type: "success", text: "OTP verified successfully!" });
+      onVerified?.();
+    } catch {
+      setMessage({
+        type: "error",
+        text: "Failed to verify OTP. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
-    <div>
-      <p>Verify OTP</p>
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold">Verify your email</h1>
+        <p className="text-muted-foreground">
+          Enter the 6-digit code sent to{" "}
+          <span className="font-medium">{email}</span>
+        </p>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="token"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>One-Time Password</FormLabel>
+                <FormControl>
+                  <InputOTP maxLength={6} {...field}>
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {message && (
+            <Alert
+              variant={message.type === "error" ? "destructive" : "default"}
+            >
+              <AlertDescription>{message.text}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-2">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Verifying..." : "Verify OTP"}
+            </Button>
+
+            {onBack && (
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={onBack}
+              >
+                Back to email
+              </Button>
+            )}
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }
