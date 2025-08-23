@@ -2,9 +2,24 @@
 
 import type { PropsWithChildren } from "react";
 
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { SettingsContent } from "./content";
 
 export function Settings({ children }: PropsWithChildren) {
   const isMobile = useIsMobile();
@@ -13,13 +28,30 @@ export function Settings({ children }: PropsWithChildren) {
     // mobile settings
     <Drawer>
       <DrawerTrigger asChild>{children}</DrawerTrigger>
-      <DrawerContent>{/* TODO: settings */}</DrawerContent>
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Settings</DrawerTitle>
+          <DrawerDescription>
+            Manage your account settings and preferences.
+          </DrawerDescription>
+        </DrawerHeader>
+        <div className="pb-6 container">
+          <SettingsContent />
+        </div>
+      </DrawerContent>
     </Drawer>
   ) : (
-    // TODO: desktop settings
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent>{/* TODO: settings */}</DialogContent>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Settings</DialogTitle>
+          <DialogDescription>
+            Manage your account settings and preferences.
+          </DialogDescription>
+        </DialogHeader>
+        <SettingsContent />
+      </DialogContent>
     </Dialog>
   );
 }
