@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +47,7 @@ export default function VerifyOtp({
     text: string;
   } | null>(null);
   const supabase = createClient();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,8 +72,21 @@ export default function VerifyOtp({
         return;
       }
 
+      // Check if user already has profile data
+      const { data: { user } } = await supabase.auth.getUser();
+      const hasExistingProfile = user?.user_metadata?.first_name && user?.user_metadata?.last_name;
+
       setMessage({ type: "success", text: "OTP verified successfully!" });
-      onVerified?.();
+      
+      if (hasExistingProfile) {
+        // User already has profile data, redirect to dashboard
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1000);
+      } else {
+        // New user, proceed to profile setup
+        onVerified?.();
+      }
     } catch {
       setMessage({
         type: "error",
