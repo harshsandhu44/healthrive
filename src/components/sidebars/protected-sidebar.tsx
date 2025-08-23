@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { LayoutDashboardIcon, StethoscopeIcon, UsersIcon } from "lucide-react";
 
 import {
@@ -13,21 +12,10 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { getUserWithProfile } from "@/lib/db/auth";
 
 export async function ProtectedSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
-  const { user } = await getUserWithProfile();
-
-  if (!user) {
-    redirect("/sign-in");
-  }
-
-  const firstName = user.user_metadata?.first_name || "";
-  const lastName = user.user_metadata?.last_name || "";
-
-  const title = `Dr. ${firstName} ${lastName}`;
   const items = [
     { icon: LayoutDashboardIcon, label: "Dashboard", href: "/dashboard" },
     { icon: UsersIcon, label: "Patients", href: "/patients" },
@@ -39,13 +27,8 @@ export async function ProtectedSidebar({
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <div className="space-y-1">
-                <span className="text-xl font-mono">{title}</span>
-              </div>
+            <SidebarMenuButton className="p-3">
+              <span className="text-xl font-mono">Vylune</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
