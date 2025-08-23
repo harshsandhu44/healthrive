@@ -2,6 +2,7 @@ import {
   LayoutDashboardIcon,
   SettingsIcon,
   StethoscopeIcon,
+  UserIcon,
   UsersIcon,
 } from "lucide-react";
 
@@ -18,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Settings } from "@/app/(protected)/components/settings";
+import { UserProfile } from "@/app/(protected)/components/user-profile";
 
 export async function ProtectedSidebar({
   ...props
@@ -63,14 +65,18 @@ export async function ProtectedSidebar({
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        {/* TODO: settings */}
         <Settings>
           <Button variant="ghost" className="justify-start">
             <SettingsIcon />
             <span>Settings</span>
           </Button>
         </Settings>
-        {/* TODO: user profile popover */}
+        <UserProfile>
+          <Button variant="ghost" className="justify-start">
+            <UserIcon />
+            <span>Profile</span>
+          </Button>
+        </UserProfile>
       </SidebarFooter>
     </Sidebar>
   );
