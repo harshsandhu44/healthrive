@@ -1,3 +1,4 @@
+import { ProtectedHeader } from "@/components/headers";
 import { ProtectedSidebar } from "@/components/sidebars";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
@@ -13,12 +14,9 @@ export default function ProtectedLayout({ children }: LayoutProps<"/">) {
     >
       <ProtectedSidebar variant="inset" />
       <SidebarInset>
-        {/*<SiteHeader />*/}
+        <ProtectedHeader />
         <div className="@container/main flex flex-1 flex-col gap-2">
-          {/*<SectionCards />*/}
           {children}
-          {/*<ChartAreaInteractive />*/}
-          {/*<DataTable data={data} />*/}
         </div>
       </SidebarInset>
     </SidebarProvider>
