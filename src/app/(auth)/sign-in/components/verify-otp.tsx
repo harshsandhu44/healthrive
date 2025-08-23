@@ -23,8 +23,8 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { createClient } from "@/lib/db/client";
+import { toast } from "sonner";
 
 const formSchema = z.object({
   token: z.string().min(6, { message: "OTP must be 6 characters." }),
@@ -42,10 +42,6 @@ export default function VerifyOtp({
   onBack,
 }: VerifyOtpProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
   const supabase = createClient();
   const router = useRouter();
 
@@ -58,7 +54,6 @@ export default function VerifyOtp({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    setMessage(null);
 
     try {
       const { error } = await supabase.auth.verifyOtp({
@@ -68,16 +63,19 @@ export default function VerifyOtp({
       });
 
       if (error) {
-        setMessage({ type: "error", text: error.message });
+        toast.error(error.message);
         return;
       }
 
       // Check if user already has profile data
-      const { data: { user } } = await supabase.auth.getUser();
-      const hasExistingProfile = user?.user_metadata?.first_name && user?.user_metadata?.last_name;
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const hasExistingProfile =
+        user?.user_metadata?.first_name && user?.user_metadata?.last_name;
 
-      setMessage({ type: "success", text: "OTP verified successfully!" });
-      
+      toast.success("OTP verified successfully!");
+
       if (hasExistingProfile) {
         // User already has profile data, redirect to dashboard
         setTimeout(() => {
@@ -88,10 +86,7 @@ export default function VerifyOtp({
         onVerified?.();
       }
     } catch {
-      setMessage({
-        type: "error",
-        text: "Failed to verify OTP. Please try again.",
-      });
+      toast.error("Failed to verify OTP. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -138,14 +133,6 @@ export default function VerifyOtp({
               </FormItem>
             )}
           />
-
-          {message && (
-            <Alert
-              variant={message.type === "error" ? "destructive" : "default"}
-            >
-              <AlertDescription>{message.text}</AlertDescription>
-            </Alert>
-          )}
 
           <div className="space-y-2">
             <Button type="submit" className="w-full" disabled={isLoading}>

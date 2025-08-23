@@ -1,4 +1,4 @@
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { getUserWithProfile } from "@/lib/db/auth";
 import { redirect } from "next/navigation";
 
@@ -18,11 +18,13 @@ export default async function DashboardPage() {
   return (
     <div className="container mx-auto p-6">
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back{firstName ? `, ${firstName}` : ""}!
-          </p>
+        <div className="flex justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground">
+              Welcome back{firstName ? `, ${firstName}` : ""}!
+            </p>
+          </div>
           <SignOut className={buttonVariants({ variant: "ghost" })} />
         </div>
 
@@ -53,16 +55,10 @@ export default async function DashboardPage() {
 
           <div className="p-6 border rounded-lg">
             <h3 className="font-semibold">Quick Actions</h3>
-            <div className="mt-2 space-y-2">
-              <button className="text-sm text-primary hover:underline">
-                View Patients
-              </button>
-              <button className="text-sm text-primary hover:underline">
-                Schedule
-              </button>
-              <button className="text-sm text-primary hover:underline">
-                Settings
-              </button>
+            <div className="mt-2 flex flex-col space-y-2">
+              <Button variant="secondary">View Patients</Button>
+              <Button variant="secondary">Schedule</Button>
+              <Button variant="secondary">Settings</Button>
             </div>
           </div>
 
