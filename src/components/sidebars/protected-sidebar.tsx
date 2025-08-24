@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   LayoutDashboardIcon,
   SettingsIcon,
@@ -25,9 +26,17 @@ export async function ProtectedSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const items = [
-    { icon: LayoutDashboardIcon, label: "Dashboard", href: "/dashboard" },
-    { icon: UsersIcon, label: "Patients", href: "/patients" },
-    { icon: StethoscopeIcon, label: "Appointments", href: "/appointments" },
+    {
+      icon: LayoutDashboardIcon,
+      label: "Dashboard",
+      href: { pathname: "/dashboard" },
+    },
+    { icon: UsersIcon, label: "Patients", href: { pathname: "/patients" } },
+    {
+      icon: StethoscopeIcon,
+      label: "Appointments",
+      href: { pathname: "/appointments" },
+    },
   ];
 
   return (
@@ -53,9 +62,11 @@ export async function ProtectedSidebar({
               {items.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton asChild tooltip={item.label}>
-                    <Button variant="ghost" className="justify-start">
-                      {item.icon && <item.icon />}
-                      <span>{item.label}</span>
+                    <Button asChild variant="ghost" className="justify-start">
+                      <Link href={item.href}>
+                        {item.icon && <item.icon />}
+                        <span>{item.label}</span>
+                      </Link>
                     </Button>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
