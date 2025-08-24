@@ -4,17 +4,22 @@ import { PlusIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
-export function QuickActions() {
+interface QuickActionsProps {
+  onAddPatient: () => void;
+  onSearchPatient: () => void;
+}
+
+export function QuickActions({ onAddPatient, onSearchPatient }: QuickActionsProps) {
   const quickActions = [
     {
       label: "Add Patient",
       icon: PlusIcon,
-      action: () => console.log("Add Patient"),
+      action: onAddPatient,
     },
     {
       label: "Find Patient",
       icon: SearchIcon,
-      action: () => console.log("Find Patient"),
+      action: onSearchPatient,
     },
   ];
 
