@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
+import { RootProvider } from "@/components/providers";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Vylune",
@@ -10,10 +10,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body>
-        {children}
-        <Toaster />
+        <RootProvider>{children}</RootProvider>
       </body>
     </html>
   );
