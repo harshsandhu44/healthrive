@@ -1,13 +1,15 @@
 "use client";
 
 import { createClient } from "@/lib/db/client";
+import { LogOutIcon } from "lucide-react";
 import { redirect } from "next/navigation";
 
 interface SignOutProps {
+  iconOnly?: boolean;
   className?: string;
 }
 
-export function SignOut({ className }: SignOutProps) {
+export function SignOut({ iconOnly = false, className }: SignOutProps) {
   const supabase = createClient();
 
   const signOut = () => {
@@ -18,7 +20,7 @@ export function SignOut({ className }: SignOutProps) {
   return (
     <form action={signOut}>
       <button type="submit" className={className}>
-        Sign Out
+        {iconOnly ? <LogOutIcon className="text-destructive" /> : "Sign Out"}
       </button>
     </form>
   );

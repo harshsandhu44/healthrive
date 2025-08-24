@@ -1,8 +1,6 @@
-import { Button, buttonVariants } from "@/components/ui/button";
-import { getUserWithProfile } from "@/lib/db/auth";
 import { redirect } from "next/navigation";
-
-import { SignOut } from "../components/SignOut";
+import { Button } from "@/components/ui/button";
+import { getUserWithProfile } from "@/lib/db/auth";
 
 export default async function DashboardPage() {
   const { user, profile } = await getUserWithProfile();
@@ -25,7 +23,6 @@ export default async function DashboardPage() {
               Welcome back{firstName ? `, ${firstName}` : ""}!
             </p>
           </div>
-          <SignOut className={buttonVariants({ variant: "ghost" })} />
         </div>
 
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -48,7 +45,9 @@ export default async function DashboardPage() {
               )}
               <p>
                 <span className="font-medium">Account Type:</span>{" "}
-                {profile.account_type}
+                <span className="capitalize">
+                  {profile.account_type.split("_").join(" ")}
+                </span>
               </p>
             </div>
           </div>
