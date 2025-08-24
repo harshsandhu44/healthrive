@@ -15,7 +15,7 @@ export default function ProtectedLayout({ children }: LayoutProps<"/">) {
       <ProtectedSidebar variant="inset" />
       <SidebarInset>
         <ProtectedHeader />
-        <div className="@container/main flex flex-1 flex-col gap-2">
+        <div className="@container/main container p-4 lg:p-6 max-h-[calc(100vh-64px)] flex flex-1 flex-col gap-2 overflow-y-auto">
           {children}
         </div>
       </SidebarInset>

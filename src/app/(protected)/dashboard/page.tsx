@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   const phone = user.user_metadata?.phone || "";
 
   return (
-    <div className="container mx-auto p-6">
+    <div>
       <div className="space-y-6">
         <div className="flex justify-between gap-4">
           <div>
