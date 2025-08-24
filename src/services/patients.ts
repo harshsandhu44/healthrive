@@ -45,7 +45,7 @@ export class PatientsService {
   }
 
   static async getPatientById(id: string) {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("patients")
       .select("*")
@@ -60,13 +60,22 @@ export class PatientsService {
   }
 
   static async createPatient(patientData: PatientCreate) {
-    const supabase = await createClient();
+    const supabase = createClient();
     const id = generatePatientId();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
 
     const { data, error } = await supabase
       .from("patients")
       .insert({
         id,
+        user_id: user.id,
         ...patientData,
       })
       .select()
@@ -80,7 +89,7 @@ export class PatientsService {
   }
 
   static async updatePatient(patientData: PatientUpdate) {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { data, error } = await supabase
       .from("patients")
       .update(patientData)
@@ -96,7 +105,7 @@ export class PatientsService {
   }
 
   static async deletePatient(id: string) {
-    const supabase = await createClient();
+    const supabase = createClient();
     const { error } = await supabase.from("patients").delete().eq("id", id);
 
     if (error) {

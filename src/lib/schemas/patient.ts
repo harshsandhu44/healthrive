@@ -27,9 +27,17 @@ export const PatientSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   post_code: z.string().optional(),
+  created_at: z.string().optional(),
+  updated_at: z.string().optional(),
+  user_id: z.string().uuid(),
 });
 
-export const PatientCreateSchema = PatientSchema.omit({ id: true });
+export const PatientCreateSchema = PatientSchema.omit({ 
+  id: true, 
+  created_at: true, 
+  updated_at: true, 
+  user_id: true 
+});
 
 export const PatientUpdateSchema = PatientSchema.partial().required({ id: true });
 

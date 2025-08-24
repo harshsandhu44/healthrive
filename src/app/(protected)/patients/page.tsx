@@ -55,7 +55,7 @@ export default function PatientsPage() {
     try {
       setSubmitting(true);
       const newPatient = await PatientsService.createPatient(data);
-      setPatients(prev => [newPatient, ...prev]);
+      setPatients((prev) => [newPatient, ...prev]);
       setShowAddDialog(false);
       toast.success("Patient added successfully");
     } catch (error) {
@@ -68,15 +68,15 @@ export default function PatientsPage() {
 
   const handleUpdatePatient = async (data: PatientCreate) => {
     if (!editingPatient) return;
-    
+
     try {
       setSubmitting(true);
       const updatedPatient = await PatientsService.updatePatient({
         id: editingPatient.id,
         ...data,
       });
-      setPatients(prev => 
-        prev.map(p => p.id === updatedPatient.id ? updatedPatient : p)
+      setPatients((prev) =>
+        prev.map((p) => (p.id === updatedPatient.id ? updatedPatient : p)),
       );
       setEditingPatient(null);
       toast.success("Patient updated successfully");
@@ -92,7 +92,7 @@ export default function PatientsPage() {
     try {
       setSubmitting(true);
       await PatientsService.deletePatient(patient.id);
-      setPatients(prev => prev.filter(p => p.id !== patient.id));
+      setPatients((prev) => prev.filter((p) => p.id !== patient.id));
       toast.success("Patient deleted successfully");
     } catch (error) {
       toast.error("Failed to delete patient");
@@ -118,7 +118,7 @@ export default function PatientsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <QuickActions 
+          <QuickActions
             onAddPatient={() => setShowAddDialog(true)}
             onSearchPatient={handleSearch}
           />
@@ -138,7 +138,7 @@ export default function PatientsPage() {
               placeholder="Search patients..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
             <Button onClick={handleSearch} variant="outline">
               <SearchIcon className="h-4 w-4" />
@@ -175,10 +175,7 @@ export default function PatientsPage() {
           title="Add New Patient"
           description="Enter the patient's information to add them to the system."
           content={
-            <PatientForm 
-              onSubmit={handleAddPatient}
-              isLoading={submitting}
-            />
+            <PatientForm onSubmit={handleAddPatient} isLoading={submitting} />
           }
         >
           <div />
@@ -191,7 +188,7 @@ export default function PatientsPage() {
           title="Edit Patient"
           description="Update the patient's information."
           content={
-            <PatientForm 
+            <PatientForm
               patient={editingPatient}
               onSubmit={handleUpdatePatient}
               isLoading={submitting}
