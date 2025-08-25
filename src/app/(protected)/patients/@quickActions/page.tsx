@@ -1,3 +1,4 @@
+import { enableCreatePatientFlag, enableSearchPatientFlag } from "@/flags";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,10 +7,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Link from "next/link";
 import { CreatePatientModal } from "../components/create-patient-modal";
 
 export default async function QuickActions() {
+  const enableCreate = await enableCreatePatientFlag();
+  const enableSearch = await enableSearchPatientFlag();
+
   return (
     <Card className="max-w-md">
       <CardHeader>
@@ -17,12 +20,14 @@ export default async function QuickActions() {
         <CardDescription>Perform common tasks quickly</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-x-1">
+        <div className="grid grid-cols-2 gap-x-2">
           <CreatePatientModal>
-            <Button variant="outline">Create Patient</Button>
+            <Button disabled={!enableCreate} variant="outline">
+              Create Patient
+            </Button>
           </CreatePatientModal>
-          <Button asChild variant="outline">
-            <Link href={{ pathname: "/patients/search" }}>Search Patients</Link>
+          <Button disabled={!enableSearch} variant="outline">
+            Search Patients
           </Button>
         </div>
       </CardContent>
