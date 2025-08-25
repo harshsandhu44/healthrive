@@ -42,7 +42,7 @@ import {
   PatientCreateSchema,
   type PatientCreate,
 } from "@/lib/schemas/patient";
-import { PatientsAPI } from "@/lib/api/patients";
+import { createPatient } from "../actions";
 
 interface PatientFormProps {
   onSuccess?: () => void;
@@ -95,10 +95,25 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
   const onSubmit = async (data: PatientCreate) => {
     setIsSubmitting(true);
     try {
-      await PatientsAPI.createPatient(data);
-      toast.success("Patient created successfully");
-      form.reset();
-      onSuccess?.();
+      const result = await createPatient(data);
+      
+      if (result.success) {
+        toast.success("Patient created successfully");
+        form.reset();
+        onSuccess?.();
+      } else {
+        toast.error(result.error || "Failed to create patient");
+        
+        // Handle validation errors by setting them on the form
+        if (result.details) {
+          Object.entries(result.details).forEach(([field, messages]) => {
+            form.setError(field as keyof PatientCreate, {
+              type: "server",
+              message: messages.join(", ")
+            });
+          });
+        }
+      }
     } catch (error) {
       console.error("Failed to create patient:", error);
       toast.error("Failed to create patient");
@@ -164,6 +179,7 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
+                      captionLayout="dropdown"
                       mode="single"
                       selected={field.value ? new Date(field.value) : undefined}
                       onSelect={(date) => {
@@ -172,7 +188,6 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
                       disabled={(date) =>
                         date > new Date() || date < new Date("1900-01-01")
                       }
-                      initialFocus
                     />
                   </PopoverContent>
                 </Popover>
