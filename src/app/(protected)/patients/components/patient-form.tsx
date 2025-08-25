@@ -220,78 +220,80 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
           )}
         />
 
-        <div className="space-y-4">
-          <h3 className="text-sm font-medium">Address</h3>
-          <div className="grid grid-cols-1 gap-4">
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address Line 1</FormLabel>
-                  <FormControl>
-                    <Input placeholder="123 Main St" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Accordion type="single" collapsible className="w-full" defaultValue="address-info">
+          <AccordionItem value="address-info">
+            <AccordionTrigger>Address Information</AccordionTrigger>
+            <AccordionContent className="space-y-4">
               <FormField
                 control={form.control}
-                name="city"
+                name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel>Address Line 1</FormLabel>
                     <FormControl>
-                      <Input placeholder="New York" {...field} />
+                      <Input placeholder="123 Main St" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="New York" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State</FormLabel>
+                      <FormControl>
+                        <Input placeholder="NY" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="post_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Post Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="10001" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               <FormField
                 control={form.control}
-                name="state"
+                name="country"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>State</FormLabel>
+                    <FormLabel>Country</FormLabel>
                     <FormControl>
-                      <Input placeholder="NY" {...field} />
+                      <Input placeholder="United States" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="post_code"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Post Code</FormLabel>
-                    <FormControl>
-                      <Input placeholder="10001" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Input placeholder="United States" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
 
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="medical-history">
