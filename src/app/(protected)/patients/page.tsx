@@ -1,40 +1,27 @@
-import { Suspense } from "react";
-import { getPatients } from "@/lib/data/patients";
-import { PatientsClient } from "./components/patients-client";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { createClient } from "@/lib/db/server";
 
-interface PatientsPageProps {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}
+export default async function PatientsPage() {
+  const supabase = await createClient();
 
-export default async function PatientsPage({ searchParams }: PatientsPageProps) {
-  const params = await searchParams;
-  const search = typeof params.search === "string" ? params.search : undefined;
-
-  // Fetch initial data on server-side
-  const { data: initialPatients, count } = await getPatients({
-    search,
-    limit: 100,
-  });
+  const { data: patients, count } = await supabase.from("patients").select("*");
+  console.info(patients, count);
 
   return (
-    <main className="space-y-6">
-      <section className="font-mono">
-        <h1 className="text-3xl">Patients</h1>
-        <p>Manage your patients here!</p>
-      </section>
-
-      <Suspense
-        fallback={
-          <div className="text-center py-10">
-            <p className="text-muted-foreground">Loading patients...</p>
-          </div>
-        }
-      >
-        <PatientsClient 
-          initialPatients={initialPatients}
-          initialCount={count}
-        />
-      </Suspense>
-    </main>
+    <section>
+      <Card>
+        <CardHeader>
+          <CardTitle>Patients</CardTitle>
+          <CardDescription>{count ?? 0} patients</CardDescription>
+        </CardHeader>
+        <CardContent>{/* TODO: data table */}</CardContent>
+      </Card>
+    </section>
   );
 }
