@@ -62,6 +62,7 @@ export const PatientSchema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   post_code: z.string().optional(),
+  country: z.string().optional(),
   created_at: z.string().optional(),
   updated_at: z.string().optional(),
   user_id: z.string().uuid(),

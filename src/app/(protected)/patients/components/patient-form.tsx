@@ -28,6 +28,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import {
   BLOOD_TYPES,
@@ -43,6 +51,17 @@ interface PatientFormProps {
 
 export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Auto-detect country from user's timezone
+  const getDefaultCountry = () => {
+    try {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const country = timezone.split('/')[1]?.replace('_', ' ') || '';
+      return country;
+    } catch {
+      return '';
+    }
+  };
 
   const form = useForm<PatientCreate>({
     resolver: zodResolver(PatientCreateSchema),
@@ -80,6 +99,7 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
       city: "",
       state: "",
       post_code: "",
+      country: getDefaultCountry(),
     },
   });
 
@@ -137,9 +157,36 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Date of Birth *</FormLabel>
-                <FormControl>
-                  <Input type="date" {...field} />
-                </FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className="w-full pl-3 text-left font-normal"
+                      >
+                        {field.value ? (
+                          format(new Date(field.value), "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value ? new Date(field.value) : undefined}
+                      onSelect={(date) => {
+                        field.onChange(date ? format(date, "yyyy-MM-dd") : "");
+                      }}
+                      disabled={(date) =>
+                        date > new Date() || date < new Date("1900-01-01")
+                      }
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
                 <FormMessage />
               </FormItem>
             )}
@@ -241,6 +288,19 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
                 )}
               />
             </div>
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <FormControl>
+                    <Input placeholder="United States" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
         </div>
 
