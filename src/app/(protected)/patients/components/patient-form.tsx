@@ -51,17 +51,6 @@ interface PatientFormProps {
 
 export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Auto-detect country from user's timezone
-  const getDefaultCountry = () => {
-    try {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const country = timezone.split('/')[1]?.replace('_', ' ') || '';
-      return country;
-    } catch {
-      return '';
-    }
-  };
 
   const form = useForm<PatientCreate>({
     resolver: zodResolver(PatientCreateSchema),
@@ -99,7 +88,7 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
       city: "",
       state: "",
       post_code: "",
-      country: getDefaultCountry(),
+      country: "India",
     },
   });
 
@@ -120,7 +109,7 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -307,7 +296,7 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="medical-history">
             <AccordionTrigger>Medical History</AccordionTrigger>
-            <AccordionContent className="space-y-4">
+            <AccordionContent className="space-y-6">
               <FormField
                 control={form.control}
                 name="medical_history.allergies"
@@ -356,7 +345,7 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
                 )}
               />
 
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <FormLabel>Family History</FormLabel>
                 <div className="grid grid-cols-2 gap-4">
                   <FormField

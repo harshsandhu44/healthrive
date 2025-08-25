@@ -11,7 +11,6 @@ export default async function PatientsPage() {
   const supabase = await createClient();
 
   const { data: patients, count } = await supabase.from("patients").select("*");
-  console.info(patients, count);
 
   return (
     <section>
