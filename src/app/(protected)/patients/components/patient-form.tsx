@@ -220,16 +220,21 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
           )}
         />
 
-        <Accordion type="single" collapsible className="w-full" defaultValue="address-info">
+        <Accordion
+          type="single"
+          collapsible
+          className="w-full"
+          defaultValue="address-info"
+        >
           <AccordionItem value="address-info">
-            <AccordionTrigger>Address Information</AccordionTrigger>
+            <AccordionTrigger>Address Information (optional)</AccordionTrigger>
             <AccordionContent className="space-y-4">
               <FormField
                 control={form.control}
                 name="address"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Address Line 1</FormLabel>
+                    <FormLabel>Address Line</FormLabel>
                     <FormControl>
                       <Input placeholder="123 Main St" {...field} />
                     </FormControl>
@@ -297,8 +302,8 @@ export function PatientForm({ onSuccess, onCancel }: PatientFormProps) {
 
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="medical-history">
-            <AccordionTrigger>Medical History</AccordionTrigger>
-            <AccordionContent className="space-y-6">
+            <AccordionTrigger>Medical History (optional)</AccordionTrigger>
+            <AccordionContent className="space-y-4">
               <FormField
                 control={form.control}
                 name="medical_history.allergies"
