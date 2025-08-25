@@ -36,6 +36,7 @@ import {
   PatientSchema,
   bloodTypeOptions,
 } from "@/lib/schemas/patient";
+import { usePatientDialogStore } from "@/stores/patient-dialog-store";
 
 interface PatientFormProps {
   patient?: Patient;
@@ -46,6 +47,7 @@ interface PatientFormProps {
 export function PatientForm({ patient, onSubmit, isLoading }: PatientFormProps) {
   const isEdit = !!patient;
   const schema = isEdit ? PatientSchema : PatientCreateSchema;
+  const { closeAddDialog, closeEditDialog } = usePatientDialogStore();
   
   const form = useForm<PatientCreate>({
     resolver: zodResolver(schema),
@@ -249,6 +251,14 @@ export function PatientForm({ patient, onSubmit, isLoading }: PatientFormProps) 
         </div>
 
         <div className="flex justify-end space-x-2 pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={isEdit ? closeEditDialog : closeAddDialog}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "Saving..." : isEdit ? "Update Patient" : "Add Patient"}
           </Button>

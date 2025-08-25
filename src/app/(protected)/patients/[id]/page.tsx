@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PatientsService } from "@/services/patients";
+import { getPatientById } from "@/lib/data/patients";
 
 interface PatientDetailsPageProps {
   params: Promise<{ id: string }>;
@@ -21,7 +21,7 @@ export default async function PatientDetailsPage({ params }: PatientDetailsPageP
   
   let patient;
   try {
-    patient = await PatientsService.getPatientById(id);
+    patient = await getPatientById(id);
   } catch (error) {
     console.error("Error fetching patient:", error);
     notFound();

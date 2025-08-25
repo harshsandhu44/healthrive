@@ -3,18 +3,19 @@
 import { PlusIcon, SearchIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { usePatientDialogStore } from "@/stores/patient-dialog-store";
 
 interface QuickActionsProps {
-  onAddPatient: () => void;
   onSearchPatient: () => void;
 }
 
-export function QuickActions({ onAddPatient, onSearchPatient }: QuickActionsProps) {
+export function QuickActions({ onSearchPatient }: QuickActionsProps) {
+  const { openAddDialog } = usePatientDialogStore();
   const quickActions = [
     {
       label: "Add Patient",
       icon: PlusIcon,
-      action: onAddPatient,
+      action: openAddDialog,
     },
     {
       label: "Find Patient",
