@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify your email - Vylune</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        .otp-section {
+            background-color: #f8fafc;
+            border: 2px dashed #e5e7eb;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .otp-code {
+            font-size: 36px;
+            font-weight: bold;
+            letter-spacing: 6px;
+            color: #1f2937;
+            margin: 16px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .otp-label {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        .magic-link-section {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .magic-link-button {
+            display: inline-block;
+            background-color: #2563eb;
+            color: #ffffff;
+            padding: 12px 32px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            margin: 10px 0;
+            transition: background-color 0.2s;
+        }
+        .magic-link-button:hover {
+            background-color: #1d4ed8;
+        }
+        .divider {
+            text-align: center;
+            margin: 30px 0;
+            color: #9ca3af;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #e5e7eb;
+            z-index: 1;
+        }
+        .divider span {
+            background-color: #ffffff;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .security-notice {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .security-notice h4 {
+            margin: 0 0 8px 0;
+            color: #92400e;
+            font-size: 16px;
+        }
+        .security-notice p {
+            margin: 0;
+            color: #92400e;
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+        }
+        .footer a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .expiry {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 24px;
+            }
+            .otp-code {
+                font-size: 28px;
+                letter-spacing: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏥 Vylune</div>
+            <div class="subtitle">Healthcare Platform</div>
+        </div>
+
+        <h1 style="color: #1f2937; margin-bottom: 16px;">Verify your email address</h1>
+        <p style="color: #4b5563; margin-bottom: 24px;">
+            Hi there! Welcome to Vylune. To complete your sign-in, please use the verification code below or click the magic link.
+        </p>
+
+        <div class="otp-section">
+            <div class="otp-label">Your verification code:</div>
+            <div class="otp-code">{{ .Token }}</div>
+            <div class="expiry">⏰ Expires in 1 hour</div>
+        </div>
+
+        <div class="divider">
+            <span>OR</span>
+        </div>
+
+        <div class="magic-link-section">
+            <p style="color: #4b5563; margin-bottom: 16px;">
+                Click the button below to sign in instantly:
+            </p>
+            <a href="{{ .ConfirmationURL }}" class="magic-link-button">
+                🔐 Sign in to Vylune
+            </a>
+            <p style="color: #6b7280; font-size: 12px; margin-top: 12px;">
+                This link will expire in 1 hour for security reasons.
+            </p>
+        </div>
+
+        <div class="security-notice">
+            <h4>🔒 Security Notice</h4>
+            <p>
+                For your security, this code and link will only work once. If you didn't request this email, 
+                you can safely ignore it. Your account remains secure.
+            </p>
+        </div>
+
+        <div style="margin-top: 30px; padding: 20px; background-color: #f8fafc; border-radius: 8px;">
+            <h3 style="margin: 0 0 12px 0; color: #1f2937; font-size: 18px;">💡 What's next?</h3>
+            <ul style="margin: 0; padding-left: 20px; color: #4b5563;">
+                <li>Complete your healthcare profile</li>
+                <li>Schedule your first appointment</li>
+                <li>Enable push notifications for reminders</li>
+                <li>Explore our patient management features</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>
+                This email was sent by <strong>Vylune</strong><br>
+                If you have any questions, please contact our support team at 
+                <a href="mailto:support@vylune.com">support@vylune.com</a>
+            </p>
+            <p style="margin-top: 16px;">
+                <a href="https://vylune.com/privacy">Privacy Policy</a> | 
+                <a href="https://vylune.com/terms">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
