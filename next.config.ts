@@ -6,6 +6,13 @@ const nextConfig: NextConfig = {
   
   // PWA configuration
   async headers() {
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    // More permissive CSP for development, stricter for production
+    const connectSrc = isDevelopment 
+      ? "'self' http://127.0.0.1:54321 http://localhost:* https: wss: ws:"
+      : "'self' https://*.supabase.co https://*.supabase.in https: wss:";
+    
     return [
       {
         // Apply security headers to all routes
@@ -17,7 +24,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https: wss:; font-src 'self'; manifest-src 'self';",
+            value: `default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src ${connectSrc}; font-src 'self'; manifest-src 'self';`,
           },
         ],
       },
