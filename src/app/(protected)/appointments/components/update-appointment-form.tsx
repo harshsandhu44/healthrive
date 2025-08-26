@@ -75,20 +75,35 @@ export function UpdateAppointmentForm({
   });
 
   // Initialize date/time state from existing appointment
+  // Convert UTC datetime back to user's local timezone for display
   useEffect(() => {
     if (appointment.datetime) {
-      const [date, time] = appointment.datetime.split("T");
-      setSelectedDate(new Date(date));
-      setSelectedTime(time?.substring(0, 5) || "");
+      // Parse UTC datetime and convert to user's local timezone
+      const utcDate = new Date(appointment.datetime);
+      
+      // Extract local date and time components
+      const year = utcDate.getFullYear();
+      const month = String(utcDate.getMonth() + 1).padStart(2, '0');
+      const day = String(utcDate.getDate()).padStart(2, '0');
+      const hours = String(utcDate.getHours()).padStart(2, '0');
+      const minutes = String(utcDate.getMinutes()).padStart(2, '0');
+      
+      setSelectedDate(new Date(year, utcDate.getMonth(), utcDate.getDate()));
+      setSelectedTime(`${hours}:${minutes}`);
     }
   }, [appointment.datetime]);
 
   // Update datetime when either date or time changes
+  // Convert user's local timezone to UTC before saving
   const updateDateTime = () => {
     if (selectedDate && selectedTime) {
+      // Create a Date object from user's local date and time input
       const dateString = format(selectedDate, "yyyy-MM-dd");
-      const datetime = `${dateString}T${selectedTime}:00`;
-      form.setValue("datetime", datetime);
+      const localDateTime = new Date(`${dateString}T${selectedTime}:00`);
+      
+      // Convert to UTC ISO string for storage
+      const utcDateTime = localDateTime.toISOString();
+      form.setValue("datetime", utcDateTime);
     } else {
       form.setValue("datetime", "");
     }
@@ -114,11 +129,20 @@ export function UpdateAppointmentForm({
       status: appointment.status,
     });
     
-    // Reset date/time state as well
+    // Reset date/time state as well - convert UTC back to local timezone
     if (appointment.datetime) {
-      const [date, time] = appointment.datetime.split("T");
-      setSelectedDate(new Date(date));
-      setSelectedTime(time?.substring(0, 5) || "");
+      // Parse UTC datetime and convert to user's local timezone
+      const utcDate = new Date(appointment.datetime);
+      
+      // Extract local date and time components
+      const year = utcDate.getFullYear();
+      const month = String(utcDate.getMonth() + 1).padStart(2, '0');
+      const day = String(utcDate.getDate()).padStart(2, '0');
+      const hours = String(utcDate.getHours()).padStart(2, '0');
+      const minutes = String(utcDate.getMinutes()).padStart(2, '0');
+      
+      setSelectedDate(new Date(year, utcDate.getMonth(), utcDate.getDate()));
+      setSelectedTime(`${hours}:${minutes}`);
     }
   }, [appointment, form]);
 

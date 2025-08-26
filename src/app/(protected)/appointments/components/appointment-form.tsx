@@ -86,11 +86,16 @@ export function AppointmentForm({ onSuccess, onCancel }: AppointmentFormProps) {
   });
 
   // Update datetime when either date or time changes
+  // Convert user's local timezone to UTC before saving
   const updateDateTime = () => {
     if (selectedDate && selectedTime) {
+      // Create a Date object from user's local date and time input
       const dateString = format(selectedDate, "yyyy-MM-dd");
-      const datetime = `${dateString}T${selectedTime}:00`;
-      form.setValue("datetime", datetime);
+      const localDateTime = new Date(`${dateString}T${selectedTime}:00`);
+      
+      // Convert to UTC ISO string for storage
+      const utcDateTime = localDateTime.toISOString();
+      form.setValue("datetime", utcDateTime);
     } else {
       form.setValue("datetime", "");
     }

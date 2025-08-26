@@ -44,6 +44,7 @@ export async function createAppointment(data: AppointmentCreate): Promise<Action
     const appointmentData = validation.data;
     const id = generateAppointmentId();
 
+    // Note: datetime should be in UTC format from the form
     // Insert appointment
     const { data: insertedAppointment, error: insertError } = await supabase
       .from("appointments")
@@ -104,6 +105,7 @@ export async function updateAppointment(data: AppointmentUpdate): Promise<Action
 
     const { id, ...updateData } = validation.data;
 
+    // Note: datetime should be in UTC format from the form
     // Update appointment
     const { data: updatedAppointment, error: updateError } = await supabase
       .from("appointments")
