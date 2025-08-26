@@ -76,43 +76,49 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST() {
-  // Test both cron jobs
+  // Test database notification functions (replaces old cron job testing)
   try {
-    console.log('Testing cron jobs...');
+    console.log('Testing database notification functions...');
 
-    // Test scheduling cron job
-    const scheduleResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/cron/schedule`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
       }
-    });
+    );
 
-    const scheduleResult = await scheduleResponse.json();
+    // Test the new database functions
+    const { data: scheduleResult, error: scheduleError } = await supabaseAdmin
+      .rpc('schedule_appointment_reminders');
 
-    // Test notifications cron job  
-    const notificationsResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/cron/notifications`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    const notificationsResult = await notificationsResponse.json();
+    const { data: notificationsResult, error: notificationsError } = await supabaseAdmin
+      .rpc('process_due_notifications');
 
     return NextResponse.json({
       success: true,
-      message: 'Cron jobs tested',
+      message: 'Database notification functions tested',
       results: {
-        schedule: scheduleResult,
-        notifications: notificationsResult
+        schedule: {
+          success: !scheduleError,
+          count: scheduleResult || 0,
+          error: scheduleError?.message
+        },
+        notifications: {
+          success: !notificationsError,
+          count: notificationsResult || 0,
+          error: notificationsError?.message
+        }
       }
     });
 
   } catch (error) {
-    console.error('Cron job test error:', error);
+    console.error('Database function test error:', error);
     return NextResponse.json(
-      { error: 'Failed to test cron jobs', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to test database functions', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
