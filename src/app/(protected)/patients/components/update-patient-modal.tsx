@@ -17,19 +17,27 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { PatientForm } from "./patient-form";
+import { UpdatePatientForm } from "./update-patient-form";
+import { Patient } from "@/lib/schemas/patient";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-interface CreatePatientModalProps {
+interface UpdatePatientModalProps {
+  patient: Patient;
   children: React.ReactNode;
+  onSuccess?: () => void;
 }
 
-export function CreatePatientModal({ children }: CreatePatientModalProps) {
+export function UpdatePatientModal({
+  patient,
+  children,
+  onSuccess,
+}: UpdatePatientModalProps) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
 
   const handleSuccess = () => {
     setOpen(false);
+    onSuccess?.();
     window.location.reload();
   };
 
@@ -45,13 +53,17 @@ export function CreatePatientModal({ children }: CreatePatientModalProps) {
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader className="text-left">
-            <DrawerTitle>Create New Patient</DrawerTitle>
+            <DrawerTitle>Update Patient</DrawerTitle>
             <DrawerDescription>
-              Add a new patient to your practice. Fill in the required information below.
+              Update {patient.first_name} {patient.last_name}&apos;s information.
             </DrawerDescription>
           </DrawerHeader>
           <div className="px-4 pb-4 max-h-[80vh] overflow-y-auto">
-            <PatientForm onSuccess={handleSuccess} onCancel={handleCancel} />
+            <UpdatePatientForm
+              patient={patient}
+              onSuccess={handleSuccess}
+              onCancel={handleCancel}
+            />
           </div>
         </DrawerContent>
       </Drawer>
@@ -65,12 +77,16 @@ export function CreatePatientModal({ children }: CreatePatientModalProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Patient</DialogTitle>
+          <DialogTitle>Update Patient</DialogTitle>
           <DialogDescription>
-            Add a new patient to your practice. Fill in the required information below.
+            Update {patient.first_name} {patient.last_name}&apos;s information.
           </DialogDescription>
         </DialogHeader>
-        <PatientForm onSuccess={handleSuccess} onCancel={handleCancel} />
+        <UpdatePatientForm
+          patient={patient}
+          onSuccess={handleSuccess}
+          onCancel={handleCancel}
+        />
       </DialogContent>
     </Dialog>
   );

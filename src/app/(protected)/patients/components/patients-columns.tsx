@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Patient } from "@/lib/schemas/patient";
+import { UpdatePatientModal } from "./update-patient-modal";
 
 export const patientsColumns: ColumnDef<Patient>[] = [
   {
@@ -166,10 +167,12 @@ export const patientsColumns: ColumnDef<Patient>[] = [
               <Eye className="mr-2 h-4 w-4" />
               View patient
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Pencil className="mr-2 h-4 w-4" />
-              Edit patient
-            </DropdownMenuItem>
+            <UpdatePatientModal patient={patient}>
+              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <Pencil className="mr-2 h-4 w-4" />
+                Edit patient
+              </DropdownMenuItem>
+            </UpdatePatientModal>
             <DropdownMenuItem className="text-destructive">
               <Trash2 className="mr-2 h-4 w-4" />
               Delete patient
