@@ -21,14 +21,22 @@ import { UpdateAppointmentModal } from "./update-appointment-modal";
 interface AppointmentWithPatient {
   id: string;
   datetime: string;
+  user_id: string;
   patient_id: string;
   notes?: string;
-  appointment_type?: string;
+  appointment_type?:
+    | "consultation"
+    | "follow-up"
+    | "checkup"
+    | "procedure"
+    | "emergency"
+    | "telehealth"
+    | "other";
   duration_minutes: number;
   location?: string;
   reason?: string;
   no_show: boolean;
-  status: string;
+  status: "pending" | "confirmed" | "completed" | "cancelled";
   created_at: string;
   updated_at: string;
   patients: {
@@ -88,7 +96,8 @@ export const appointmentsColumns: ColumnDef<AppointmentWithPatient>[] = [
       <DataTableColumnHeader column={column} title="Patient" />
     ),
     cell: ({ row }) => {
-      const patient = row.getValue("patients") as AppointmentWithPatient["patients"];
+      const patient = row.original
+        .patients as AppointmentWithPatient["patients"];
       return (
         <div className="space-y-1">
           <div className="font-medium">

@@ -18,29 +18,29 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { UpdateAppointmentForm } from "./update-appointment-form";
+import { Appointment } from "@/lib/schemas/appointment";
 
 interface UpdateAppointmentModalProps {
-  appointment: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  appointment: Appointment;
   children: React.ReactNode;
   onSuccess?: () => void;
 }
 
 export function UpdateAppointmentModal({
-  appointment: _appointment, // eslint-disable-line @typescript-eslint/no-unused-vars
+  appointment,
   children,
-  onSuccess: _onSuccess, // eslint-disable-line @typescript-eslint/no-unused-vars
+  onSuccess,
 }: UpdateAppointmentModalProps) {
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSuccess = () => {
     setOpen(false);
-    // onSuccess?.();
-    window.location.reload();
+    onSuccess?.();
+    // Revalidation now handled in server action for seamless experience
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleCancel = () => {
     setOpen(false);
   };
@@ -59,7 +59,11 @@ export function UpdateAppointmentModal({
             </DrawerDescription>
           </DrawerHeader>
           <div className="px-4 pb-4 max-h-[80vh] overflow-y-auto">
-            <div>Update form will be implemented here</div>
+            <UpdateAppointmentForm 
+              appointment={appointment} 
+              onSuccess={handleSuccess} 
+              onCancel={handleCancel} 
+            />
           </div>
         </DrawerContent>
       </Drawer>
@@ -78,7 +82,11 @@ export function UpdateAppointmentModal({
             Update appointment details.
           </DialogDescription>
         </DialogHeader>
-        <div>Update form will be implemented here</div>
+        <UpdateAppointmentForm 
+          appointment={appointment} 
+          onSuccess={handleSuccess} 
+          onCancel={handleCancel} 
+        />
       </DialogContent>
     </Dialog>
   );

@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/server";
 import { 
   AppointmentCreateSchema,
@@ -62,6 +63,9 @@ export async function createAppointment(data: AppointmentCreate): Promise<Action
       };
     }
 
+    // Revalidate the appointments page to show the new appointment
+    revalidatePath("/appointments");
+
     return {
       success: true,
       data: insertedAppointment as Appointment
@@ -122,6 +126,9 @@ export async function updateAppointment(data: AppointmentUpdate): Promise<Action
         error: "Failed to update appointment"
       };
     }
+
+    // Revalidate the appointments page to show the updated appointment
+    revalidatePath("/appointments");
 
     return {
       success: true,

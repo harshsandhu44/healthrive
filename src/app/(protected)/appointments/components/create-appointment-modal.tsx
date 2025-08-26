@@ -18,6 +18,7 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { AppointmentForm } from "./appointment-form";
 
 interface CreateAppointmentModalProps {
   children: React.ReactNode;
@@ -27,13 +28,11 @@ export function CreateAppointmentModal({ children }: CreateAppointmentModalProps
   const [open, setOpen] = useState(false);
   const isMobile = useIsMobile();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSuccess = () => {
     setOpen(false);
-    window.location.reload();
+    // Revalidation now handled in server action for seamless experience
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleCancel = () => {
     setOpen(false);
   };
@@ -52,7 +51,7 @@ export function CreateAppointmentModal({ children }: CreateAppointmentModalProps
             </DrawerDescription>
           </DrawerHeader>
           <div className="px-4 pb-4 max-h-[80vh] overflow-y-auto">
-            <div>Form will be implemented here</div>
+            <AppointmentForm onSuccess={handleSuccess} onCancel={handleCancel} />
           </div>
         </DrawerContent>
       </Drawer>
@@ -71,7 +70,7 @@ export function CreateAppointmentModal({ children }: CreateAppointmentModalProps
             Schedule a new appointment with a patient.
           </DialogDescription>
         </DialogHeader>
-        <div>Form will be implemented here</div>
+        <AppointmentForm onSuccess={handleSuccess} onCancel={handleCancel} />
       </DialogContent>
     </Dialog>
   );

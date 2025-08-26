@@ -46,6 +46,10 @@ export const AppointmentCreateSchema = AppointmentSchema.omit({
   created_at: true, 
   updated_at: true, 
   user_id: true 
+}).extend({
+  duration_minutes: z.number().min(5).max(480).default(30),
+  no_show: z.boolean().default(false),
+  status: AppointmentStatusEnum.default("pending"),
 });
 
 export const AppointmentUpdateSchema = AppointmentSchema.partial().required({ id: true });

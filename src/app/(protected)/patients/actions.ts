@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/db/server";
 import { 
   PatientCreateSchema,
@@ -62,6 +63,9 @@ export async function createPatient(data: PatientCreate): Promise<ActionResult> 
       };
     }
 
+    // Revalidate the patients page to show the new patient
+    revalidatePath("/patients");
+
     return {
       success: true,
       data: insertedPatient as Patient
@@ -122,6 +126,9 @@ export async function updatePatient(data: PatientUpdate): Promise<ActionResult> 
         error: "Failed to update patient"
       };
     }
+
+    // Revalidate the patients page to show the updated patient
+    revalidatePath("/patients");
 
     return {
       success: true,

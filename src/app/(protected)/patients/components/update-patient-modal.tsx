@@ -38,7 +38,7 @@ export function UpdatePatientModal({
   const handleSuccess = () => {
     setOpen(false);
     onSuccess?.();
-    window.location.reload();
+    // Revalidation now handled in server action for seamless experience
   };
 
   const handleCancel = () => {

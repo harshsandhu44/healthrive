@@ -30,7 +30,7 @@ export function CreatePatientModal({ children }: CreatePatientModalProps) {
 
   const handleSuccess = () => {
     setOpen(false);
-    window.location.reload();
+    // Revalidation now handled in server action for seamless experience
   };
 
   const handleCancel = () => {
