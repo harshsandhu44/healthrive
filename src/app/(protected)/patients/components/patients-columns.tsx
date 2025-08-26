@@ -1,7 +1,15 @@
 "use client";
 
+import Link from "next/link";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoreHorizontal, Eye, Pencil, Trash2 } from "lucide-react";
+import {
+  MoreHorizontal,
+  Eye,
+  Pencil,
+  Trash2,
+  PhoneIcon,
+  ClipboardCopyIcon,
+} from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -157,9 +165,16 @@ export const patientsColumns: ColumnDef<Patient>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuItem asChild>
+              <Link href={`tel:${patient.phone_number}`}>
+                <PhoneIcon className="mr-2 h-4 w-4" />
+                Call patient
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(patient.id)}
             >
+              <ClipboardCopyIcon className="mr-2 size-4" />
               Copy patient ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
