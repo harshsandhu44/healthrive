@@ -24,9 +24,19 @@ export const enableSearchPatientFlag = flag<boolean>({
   decide: () => false,
 });
 
+export const enableCronJobsFlag = flag<boolean>({
+  key: "cron-jobs",
+  options: [true, false],
+  decide: () => false,
+});
+
 export const patientsFlag = [
   enableCreatePatientFlag,
   enableEditPatientFlag,
   enableDeletePatientFlag,
   enableSearchPatientFlag,
+];
+
+export const cronFlags = [
+  enableCronJobsFlag,
 ];
