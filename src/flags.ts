@@ -30,6 +30,12 @@ export const enableCronJobsFlag = flag<boolean>({
   decide: () => false,
 });
 
+export const enableNotificationPromptFlag = flag<boolean>({
+  key: "notification-prompt",
+  options: [true, false],
+  decide: () => true,
+});
+
 export const patientsFlag = [
   enableCreatePatientFlag,
   enableEditPatientFlag,
@@ -39,4 +45,8 @@ export const patientsFlag = [
 
 export const cronFlags = [
   enableCronJobsFlag,
+];
+
+export const notificationFlags = [
+  enableNotificationPromptFlag,
 ];

@@ -1,6 +1,7 @@
 import { ProtectedHeader } from "@/components/headers";
 import { ProtectedSidebar } from "@/components/sidebars";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { NotificationPermissionWrapper } from "@/components/notifications/NotificationPermissionWrapper";
 
 export default function ProtectedLayout({ children }: LayoutProps<"/">) {
   return (
@@ -19,6 +20,9 @@ export default function ProtectedLayout({ children }: LayoutProps<"/">) {
           {children}
         </div>
       </SidebarInset>
+      
+      {/* Notification Permission Prompt */}
+      <NotificationPermissionWrapper />
     </SidebarProvider>
   );
 }
