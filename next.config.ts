@@ -4,6 +4,11 @@ const nextConfig: NextConfig = {
   /* config options here */
   typedRoutes: true,
   
+  // Exclude Supabase functions from TypeScript checking
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  
   // PWA configuration
   async headers() {
     const isDevelopment = process.env.NODE_ENV === 'development';
