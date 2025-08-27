@@ -48,11 +48,10 @@ interface UpdateAppointmentFormProps {
   onCancel?: () => void;
 }
 
-
-export function UpdateAppointmentForm({ 
-  appointment, 
-  onSuccess, 
-  onCancel 
+export function UpdateAppointmentForm({
+  appointment,
+  onSuccess,
+  onCancel,
 }: UpdateAppointmentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
@@ -80,14 +79,12 @@ export function UpdateAppointmentForm({
     if (appointment.datetime) {
       // Parse UTC datetime and convert to user's local timezone
       const utcDate = new Date(appointment.datetime);
-      
+
       // Extract local date and time components
       const year = utcDate.getFullYear();
-      const month = String(utcDate.getMonth() + 1).padStart(2, '0');
-      const day = String(utcDate.getDate()).padStart(2, '0');
-      const hours = String(utcDate.getHours()).padStart(2, '0');
-      const minutes = String(utcDate.getMinutes()).padStart(2, '0');
-      
+      const hours = String(utcDate.getHours()).padStart(2, "0");
+      const minutes = String(utcDate.getMinutes()).padStart(2, "0");
+
       setSelectedDate(new Date(year, utcDate.getMonth(), utcDate.getDate()));
       setSelectedTime(`${hours}:${minutes}`);
     }
@@ -100,7 +97,7 @@ export function UpdateAppointmentForm({
       // Create a Date object from user's local date and time input
       const dateString = format(selectedDate, "yyyy-MM-dd");
       const localDateTime = new Date(`${dateString}T${selectedTime}:00`);
-      
+
       // Convert to UTC ISO string for storage
       const utcDateTime = localDateTime.toISOString();
       form.setValue("datetime", utcDateTime);
@@ -112,6 +109,7 @@ export function UpdateAppointmentForm({
   // Update datetime when date or time changes
   useEffect(() => {
     updateDateTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, selectedTime]);
 
   // Reset form when appointment changes
@@ -128,19 +126,17 @@ export function UpdateAppointmentForm({
       no_show: appointment.no_show,
       status: appointment.status,
     });
-    
+
     // Reset date/time state as well - convert UTC back to local timezone
     if (appointment.datetime) {
       // Parse UTC datetime and convert to user's local timezone
       const utcDate = new Date(appointment.datetime);
-      
+
       // Extract local date and time components
       const year = utcDate.getFullYear();
-      const month = String(utcDate.getMonth() + 1).padStart(2, '0');
-      const day = String(utcDate.getDate()).padStart(2, '0');
-      const hours = String(utcDate.getHours()).padStart(2, '0');
-      const minutes = String(utcDate.getMinutes()).padStart(2, '0');
-      
+      const hours = String(utcDate.getHours()).padStart(2, "0");
+      const minutes = String(utcDate.getMinutes()).padStart(2, "0");
+
       setSelectedDate(new Date(year, utcDate.getMonth(), utcDate.getDate()));
       setSelectedTime(`${hours}:${minutes}`);
     }
@@ -150,19 +146,19 @@ export function UpdateAppointmentForm({
     setIsSubmitting(true);
     try {
       const result = await updateAppointment(data);
-      
+
       if (result.success) {
         toast.success("Appointment updated successfully");
         onSuccess?.();
       } else {
         toast.error(result.error || "Failed to update appointment");
-        
+
         // Handle validation errors by setting them on the form
         if (result.details) {
           Object.entries(result.details).forEach(([field, messages]) => {
             form.setError(field as keyof AppointmentUpdate, {
               type: "server",
-              message: messages.join(", ")
+              message: messages.join(", "),
             });
           });
         }
@@ -174,7 +170,6 @@ export function UpdateAppointmentForm({
       setIsSubmitting(false);
     }
   };
-
 
   return (
     <Form {...form}>
@@ -294,8 +289,8 @@ export function UpdateAppointmentForm({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Duration *</FormLabel>
-                <Select 
-                  onValueChange={(value) => field.onChange(parseInt(value))} 
+                <Select
+                  onValueChange={(value) => field.onChange(parseInt(value))}
                   value={field.value?.toString()}
                 >
                   <FormControl>
@@ -305,7 +300,10 @@ export function UpdateAppointmentForm({
                   </FormControl>
                   <SelectContent>
                     {durationOptions.map((duration) => (
-                      <SelectItem key={duration.value} value={duration.value.toString()}>
+                      <SelectItem
+                        key={duration.value}
+                        value={duration.value.toString()}
+                      >
                         {duration.label}
                       </SelectItem>
                     ))}

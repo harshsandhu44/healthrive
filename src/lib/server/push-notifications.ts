@@ -1,18 +1,14 @@
 // Server-side push notification utilities
-import webpush from 'web-push';
-import { createClient } from '@supabase/supabase-js';
+import webpush from "web-push";
+import { createClient } from "@supabase/supabase-js";
 
 // Configure web-push with VAPID keys
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY!;
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:support@vylune.com';
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || "mailto:support@vylune.com";
 
 if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
-  webpush.setVapidDetails(
-    VAPID_SUBJECT,
-    VAPID_PUBLIC_KEY,
-    VAPID_PRIVATE_KEY
-  );
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 }
 
 export interface PushNotificationPayload {
@@ -21,6 +17,7 @@ export interface PushNotificationPayload {
   icon?: string;
   badge?: string;
   tag?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: Record<string, any>;
   actions?: Array<{
     action: string;
@@ -38,6 +35,7 @@ export interface PushSubscriptionData {
 }
 
 export class PushNotificationService {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private supabaseAdmin: any;
 
   constructor() {
@@ -48,72 +46,92 @@ export class PushNotificationService {
       {
         auth: {
           autoRefreshToken: false,
-          persistSession: false
-        }
-      }
+          persistSession: false,
+        },
+      },
     );
   }
 
   // Send push notification to a specific user
-  async sendToUser(userId: string, payload: PushNotificationPayload): Promise<boolean> {
+  async sendToUser(
+    userId: string,
+    payload: PushNotificationPayload,
+  ): Promise<boolean> {
     try {
       // Get all push subscriptions for the user
       const { data: subscriptions, error } = await this.supabaseAdmin
-        .from('push_subscriptions')
-        .select('*')
-        .eq('user_id', userId);
+        .from("push_subscriptions")
+        .select("*")
+        .eq("user_id", userId);
 
       if (error) {
-        console.error('Failed to get push subscriptions:', error);
+        console.error("Failed to get push subscriptions:", error);
         return false;
       }
 
       if (!subscriptions || subscriptions.length === 0) {
-        console.log('No push subscriptions found for user:', userId);
+        console.log("No push subscriptions found for user:", userId);
         return false;
       }
 
       // Send notification to all user's subscriptions
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const sendPromises = subscriptions.map((sub: any) =>
-        this.sendToSubscription({
-          endpoint: sub.endpoint,
-          keys: {
-            p256dh: sub.p256dh,
-            auth: sub.auth
-          }
-        }, payload)
+        this.sendToSubscription(
+          {
+            endpoint: sub.endpoint,
+            keys: {
+              p256dh: sub.p256dh,
+              auth: sub.auth,
+            },
+          },
+          payload,
+        ),
       );
 
       const results = await Promise.allSettled(sendPromises);
-      
+
       // Count successful sends
-      const successCount = results.filter(result => result.status === 'fulfilled').length;
+      const successCount = results.filter(
+        (result) => result.status === "fulfilled",
+      ).length;
       const totalCount = results.length;
 
-      console.log(`Push notification sent: ${successCount}/${totalCount} subscriptions successful`);
+      console.log(
+        `Push notification sent: ${successCount}/${totalCount} subscriptions successful`,
+      );
 
       // Clean up failed subscriptions
       await this.cleanupFailedSubscriptions(results, subscriptions);
 
       return successCount > 0;
     } catch (error) {
-      console.error('Failed to send push notification to user:', error);
+      console.error("Failed to send push notification to user:", error);
       return false;
     }
   }
 
   // Send push notification to multiple users
-  async sendToUsers(userIds: string[], payload: PushNotificationPayload): Promise<number> {
+  async sendToUsers(
+    userIds: string[],
+    payload: PushNotificationPayload,
+  ): Promise<number> {
     try {
-      const sendPromises = userIds.map(userId => this.sendToUser(userId, payload));
+      const sendPromises = userIds.map((userId) =>
+        this.sendToUser(userId, payload),
+      );
       const results = await Promise.allSettled(sendPromises);
-      
-      const successCount = results.filter(result => result.status === 'fulfilled').length;
-      console.log(`Bulk push notification sent: ${successCount}/${userIds.length} users successful`);
-      
+
+      const successCount = results.filter(
+        (result) => result.status === "fulfilled",
+      ).length;
+      console.log(
+        `Bulk push notification sent: ${successCount}/${userIds.length} users successful`,
+      );
+
       return successCount;
     } catch (error) {
-      console.error('Failed to send bulk push notifications:', error);
+      console.error("Failed to send bulk push notifications:", error);
       return 0;
     }
   }
@@ -121,37 +139,41 @@ export class PushNotificationService {
   // Send push notification to a specific subscription
   private async sendToSubscription(
     subscription: PushSubscriptionData,
-    payload: PushNotificationPayload
+    payload: PushNotificationPayload,
   ): Promise<void> {
     try {
       const pushPayload = JSON.stringify({
         title: payload.title,
         body: payload.body,
-        icon: payload.icon || '/icons/icon-192.png',
-        badge: payload.badge || '/icons/icon-72.png',
-        tag: payload.tag || 'vylune-notification',
+        icon: payload.icon || "/icons/icon-192.png",
+        badge: payload.badge || "/icons/icon-72.png",
+        tag: payload.tag || "vylune-notification",
         requireInteraction: true,
         actions: payload.actions || [
-          { action: 'view', title: 'View' },
-          { action: 'dismiss', title: 'Dismiss' }
+          { action: "view", title: "View" },
+          { action: "dismiss", title: "Dismiss" },
         ],
         data: {
-          url: '/',
+          url: "/",
           timestamp: Date.now(),
-          ...payload.data
-        }
+          ...payload.data,
+        },
       });
 
       await webpush.sendNotification(subscription, pushPayload);
-      console.log('Push notification sent successfully to:', subscription.endpoint.substring(0, 50) + '...');
+      console.log(
+        "Push notification sent successfully to:",
+        subscription.endpoint.substring(0, 50) + "...",
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      console.error('Failed to send push notification:', error);
-      
+      console.error("Failed to send push notification:", error);
+
       // If the subscription is invalid, we'll clean it up in the parent function
       if (error.statusCode === 410 || error.statusCode === 404) {
-        throw new Error('Invalid subscription');
+        throw new Error("Invalid subscription");
       }
-      
+
       throw error;
     }
   }
@@ -159,13 +181,17 @@ export class PushNotificationService {
   // Clean up failed/invalid subscriptions
   private async cleanupFailedSubscriptions(
     results: PromiseSettledResult<void>[],
-    subscriptions: any[]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    subscriptions: any[],
   ): Promise<void> {
     try {
       const failedIndexes: number[] = [];
-      
+
       results.forEach((result, index) => {
-        if (result.status === 'rejected' && result.reason.message === 'Invalid subscription') {
+        if (
+          result.status === "rejected" &&
+          result.reason.message === "Invalid subscription"
+        ) {
           failedIndexes.push(index);
         }
       });
@@ -175,37 +201,43 @@ export class PushNotificationService {
       }
 
       // Delete invalid subscriptions from database
-      const invalidEndpoints = failedIndexes.map(index => subscriptions[index].endpoint);
-      
+      const invalidEndpoints = failedIndexes.map(
+        (index) => subscriptions[index].endpoint,
+      );
+
       const { error } = await this.supabaseAdmin
-        .from('push_subscriptions')
+        .from("push_subscriptions")
         .delete()
-        .in('endpoint', invalidEndpoints);
+        .in("endpoint", invalidEndpoints);
 
       if (error) {
-        console.error('Failed to cleanup invalid subscriptions:', error);
+        console.error("Failed to cleanup invalid subscriptions:", error);
       } else {
-        console.log(`Cleaned up ${failedIndexes.length} invalid push subscriptions`);
+        console.log(
+          `Cleaned up ${failedIndexes.length} invalid push subscriptions`,
+        );
       }
     } catch (error) {
-      console.error('Error during subscription cleanup:', error);
+      console.error("Error during subscription cleanup:", error);
     }
   }
 
   // Get due notifications that need to be sent
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getDueNotifications(): Promise<any[]> {
     try {
-      const { data, error } = await this.supabaseAdmin
-        .rpc('get_due_notifications');
+      const { data, error } = await this.supabaseAdmin.rpc(
+        "get_due_notifications",
+      );
 
       if (error) {
-        console.error('Failed to get due notifications:', error);
+        console.error("Failed to get due notifications:", error);
         return [];
       }
 
       return data || [];
     } catch (error) {
-      console.error('Error getting due notifications:', error);
+      console.error("Error getting due notifications:", error);
       return [];
     }
   }
@@ -213,35 +245,37 @@ export class PushNotificationService {
   // Mark notifications as sent
   async markNotificationsAsSent(notificationIds: string[]): Promise<void> {
     try {
-      const { error } = await this.supabaseAdmin
-        .rpc('mark_notifications_as_sent', {
-          notification_ids: notificationIds
-        });
+      const { error } = await this.supabaseAdmin.rpc(
+        "mark_notifications_as_sent",
+        {
+          notification_ids: notificationIds,
+        },
+      );
 
       if (error) {
-        console.error('Failed to mark notifications as sent:', error);
+        console.error("Failed to mark notifications as sent:", error);
       } else {
         console.log(`Marked ${notificationIds.length} notifications as sent`);
       }
     } catch (error) {
-      console.error('Error marking notifications as sent:', error);
+      console.error("Error marking notifications as sent:", error);
     }
   }
 
   // Process all due notifications and send push notifications
   async processDueNotifications(): Promise<number> {
     try {
-      console.log('Processing due notifications...');
-      
+      console.log("Processing due notifications...");
+
       const dueNotifications = await this.getDueNotifications();
-      
+
       if (dueNotifications.length === 0) {
-        console.log('No due notifications to process');
+        console.log("No due notifications to process");
         return 0;
       }
 
       console.log(`Found ${dueNotifications.length} due notifications`);
-      
+
       let sentCount = 0;
       const processedIds: string[] = [];
 
@@ -255,20 +289,23 @@ export class PushNotificationService {
             data: {
               type: notification.type,
               appointment_id: notification.appointment_id,
-              url: '/appointments',
-              ...notification.data
-            }
+              url: "/appointments",
+              ...notification.data,
+            },
           };
 
           const success = await this.sendToUser(notification.user_id, payload);
-          
+
           if (success) {
             sentCount++;
           }
-          
+
           processedIds.push(notification.id);
         } catch (error) {
-          console.error(`Failed to process notification ${notification.id}:`, error);
+          console.error(
+            `Failed to process notification ${notification.id}:`,
+            error,
+          );
         }
       }
 
@@ -278,10 +315,12 @@ export class PushNotificationService {
         await this.markNotificationsAsSent(processedIds);
       }
 
-      console.log(`Processed ${processedIds.length} notifications, sent ${sentCount} successfully`);
+      console.log(
+        `Processed ${processedIds.length} notifications, sent ${sentCount} successfully`,
+      );
       return sentCount;
     } catch (error) {
-      console.error('Error processing due notifications:', error);
+      console.error("Error processing due notifications:", error);
       return 0;
     }
   }

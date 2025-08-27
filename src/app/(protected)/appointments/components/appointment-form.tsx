@@ -33,13 +33,11 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { z } from "zod";
 import {
-  AppointmentCreateSchema,
   appointmentTypeOptions,
   appointmentStatusOptions,
   durationOptions,
   AppointmentStatusEnum,
   AppointmentTypeEnum,
-  type AppointmentCreate,
 } from "@/lib/schemas/appointment";
 
 // Form schema that matches our form exactly
@@ -63,7 +61,6 @@ interface AppointmentFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
 }
-
 
 export function AppointmentForm({ onSuccess, onCancel }: AppointmentFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,7 +89,7 @@ export function AppointmentForm({ onSuccess, onCancel }: AppointmentFormProps) {
       // Create a Date object from user's local date and time input
       const dateString = format(selectedDate, "yyyy-MM-dd");
       const localDateTime = new Date(`${dateString}T${selectedTime}:00`);
-      
+
       // Convert to UTC ISO string for storage
       const utcDateTime = localDateTime.toISOString();
       form.setValue("datetime", utcDateTime);
@@ -104,26 +101,27 @@ export function AppointmentForm({ onSuccess, onCancel }: AppointmentFormProps) {
   // Update datetime when date or time changes
   useEffect(() => {
     updateDateTime();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, selectedTime]);
 
   const onSubmit = async (data: AppointmentFormData) => {
     setIsSubmitting(true);
     try {
       const result = await createAppointment(data);
-      
+
       if (result.success) {
         toast.success("Appointment created successfully");
         form.reset();
         onSuccess?.();
       } else {
         toast.error(result.error || "Failed to create appointment");
-        
+
         // Handle validation errors by setting them on the form
         if (result.details) {
           Object.entries(result.details).forEach(([field, messages]) => {
             form.setError(field as keyof AppointmentFormData, {
               type: "server",
-              message: messages.join(", ")
+              message: messages.join(", "),
             });
           });
         }
@@ -135,7 +133,6 @@ export function AppointmentForm({ onSuccess, onCancel }: AppointmentFormProps) {
       setIsSubmitting(false);
     }
   };
-
 
   return (
     <Form {...form}>
@@ -255,8 +252,8 @@ export function AppointmentForm({ onSuccess, onCancel }: AppointmentFormProps) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Duration *</FormLabel>
-                <Select 
-                  onValueChange={(value) => field.onChange(parseInt(value))} 
+                <Select
+                  onValueChange={(value) => field.onChange(parseInt(value))}
                   value={field.value?.toString()}
                 >
                   <FormControl>
@@ -266,7 +263,10 @@ export function AppointmentForm({ onSuccess, onCancel }: AppointmentFormProps) {
                   </FormControl>
                   <SelectContent>
                     {durationOptions.map((duration) => (
-                      <SelectItem key={duration.value} value={duration.value.toString()}>
+                      <SelectItem
+                        key={duration.value}
+                        value={duration.value.toString()}
+                      >
                         {duration.label}
                       </SelectItem>
                     ))}
