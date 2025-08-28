@@ -13,14 +13,15 @@ interface AppointmentsTableToolbarProps {
   canSearch?: boolean;
 }
 
-export function AppointmentsTableToolbar({ 
-  table, 
-  canDelete = true, 
-  canSearch = true 
+export function AppointmentsTableToolbar({
+  table,
+  canDelete = true,
+  canSearch = true,
 }: AppointmentsTableToolbarProps) {
-  const isFiltered = table.getState().columnFilters.length > 0 || table.getState().globalFilter;
+  const isFiltered =
+    table.getState().columnFilters.length > 0 || table.getState().globalFilter;
   const selectedRows = table.getFilteredSelectedRowModel().rows;
-  const selectedAppointments = selectedRows.map(row => row.original);
+  const selectedAppointments = selectedRows.map((row) => row.original);
 
   const handleBulkDeleteSuccess = () => {
     // Reset row selection after successful deletion
@@ -36,7 +37,7 @@ export function AppointmentsTableToolbar({
               placeholder="Search appointments (patient, type, reason)..."
               value={table.getState().globalFilter ?? ""}
               onChange={(event) => table.setGlobalFilter(event.target.value)}
-              className="h-8 w-[150px] lg:w-[350px]"
+              className="w-full lg:w-[350px]"
             />
             {isFiltered && (
               <Button
@@ -45,7 +46,7 @@ export function AppointmentsTableToolbar({
                   table.resetColumnFilters();
                   table.setGlobalFilter("");
                 }}
-                className="h-8 px-2 lg:px-3"
+                className="px-2 lg:px-3"
               >
                 Reset
                 <X className="ml-2 h-4 w-4" />
@@ -56,7 +57,7 @@ export function AppointmentsTableToolbar({
       </div>
       <div className="flex items-center space-x-2">
         {canDelete && selectedRows.length > 0 && (
-          <BulkDeleteAppointmentsModal 
+          <BulkDeleteAppointmentsModal
             appointments={selectedAppointments}
             onSuccess={handleBulkDeleteSuccess}
           >

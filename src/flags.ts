@@ -52,7 +52,7 @@ export const enableDeleteAppointmentFlag = flag<boolean>({
 export const enableSearchAppointmentFlag = flag<boolean>({
   key: "search-appointments",
   options: [true, false],
-  decide: () => false,
+  decide: () => true,
 });
 
 export const enableAppointmentNotificationFlag = flag<boolean>({

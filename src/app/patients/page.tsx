@@ -1,10 +1,3 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { createClient } from "@/lib/db/server";
 import { Patient } from "@/lib/schemas/patient";
 import { PatientsTable } from "./components/patients-table";
@@ -13,12 +6,15 @@ export default async function PatientsPage() {
   const supabase = await createClient();
 
   // Check authentication
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
   if (authError || !user) {
     return <div>Please sign in to view patients.</div>;
   }
 
-  const { data: patients, error, count } = await supabase
+  const { data: patients, error } = await supabase
     .from("patients")
     .select("*", { count: "exact" })
     .eq("user_id", user.id)
@@ -31,17 +27,7 @@ export default async function PatientsPage() {
 
   return (
     <section>
-      <Card>
-        <CardHeader>
-          <CardTitle>Patients</CardTitle>
-          <CardDescription>
-            {count === 0 ? "No patients found" : `${count ?? 0} patients`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PatientsTable data={patients as Patient[] || []} />
-        </CardContent>
-      </Card>
+      <PatientsTable data={(patients as Patient[]) || []} />
     </section>
   );
 }

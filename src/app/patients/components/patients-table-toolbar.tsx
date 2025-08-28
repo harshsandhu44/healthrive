@@ -13,7 +13,8 @@ interface PatientsTableToolbarProps {
 }
 
 export function PatientsTableToolbar({ table }: PatientsTableToolbarProps) {
-  const isFiltered = table.getState().columnFilters.length > 0 || table.getState().globalFilter;
+  const isFiltered =
+    table.getState().columnFilters.length > 0 || table.getState().globalFilter;
 
   return (
     <div className="flex items-center justify-between">
@@ -22,7 +23,7 @@ export function PatientsTableToolbar({ table }: PatientsTableToolbarProps) {
           placeholder="Search patients (ID, name, phone)..."
           value={table.getState().globalFilter ?? ""}
           onChange={(event) => table.setGlobalFilter(event.target.value)}
-          className="h-8 w-[150px] lg:w-[300px]"
+          className="w-full lg:w-[300px]"
         />
         {isFiltered && (
           <Button
@@ -31,7 +32,7 @@ export function PatientsTableToolbar({ table }: PatientsTableToolbarProps) {
               table.resetColumnFilters();
               table.setGlobalFilter("");
             }}
-            className="h-8 px-2 lg:px-3"
+            className="px-2 lg:px-3"
           >
             Reset
             <X className="ml-2 h-4 w-4" />
