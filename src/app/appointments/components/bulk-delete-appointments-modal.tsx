@@ -45,15 +45,18 @@ export function BulkDeleteAppointmentsModal({
   const [isPending, startTransition] = useTransition();
 
   const appointmentCount = appointments.length;
-  const appointmentIds = appointments.map(apt => apt.id);
+  const appointmentIds = appointments.map((apt) => apt.id);
 
   const handleDelete = () => {
     startTransition(async () => {
       try {
         const result = await bulkDeleteAppointments(appointmentIds);
-        
+
         if (result.success) {
-          toast.success(result.message || `Successfully deleted ${appointmentCount} appointments`);
+          toast.success(
+            result.message ||
+              `Successfully deleted ${appointmentCount} appointments`,
+          );
           setOpen(false);
           onSuccess?.();
         } else {
@@ -88,23 +91,31 @@ export function BulkDeleteAppointmentsModal({
               <Alert variant="destructive">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  You are about to permanently delete <strong>{appointmentCount}</strong> appointment{appointmentCount > 1 ? 's' : ''}. 
-                  This action cannot be undone.
+                  You are about to permanently delete {appointmentCount}{" "}
+                  appointment{appointmentCount > 1 ? "s" : ""}. This action
+                  cannot be undone.
                 </AlertDescription>
               </Alert>
-              
+
               <div className="space-y-3">
                 <p className="text-sm font-medium">Selected appointments:</p>
                 <div className="rounded-lg border p-3 bg-muted/50 max-h-48 overflow-y-auto">
                   <div className="space-y-3">
                     {previewAppointments.map((appointment) => (
-                      <div key={appointment.id} className="flex justify-between items-start text-sm">
+                      <div
+                        key={appointment.id}
+                        className="flex justify-between items-start text-sm"
+                      >
                         <div className="space-y-1">
                           <div className="font-medium">
-                            {appointment.patients.first_name} {appointment.patients.last_name}
+                            {appointment.patients.first_name}{" "}
+                            {appointment.patients.last_name}
                           </div>
                           <div className="text-muted-foreground">
-                            {format(new Date(appointment.datetime), "MMM dd, yyyy 'at' h:mm a")}
+                            {format(
+                              new Date(appointment.datetime),
+                              "MMM dd, yyyy 'at' h:mm a",
+                            )}
                           </div>
                         </div>
                         {appointment.appointment_type && (
@@ -116,7 +127,8 @@ export function BulkDeleteAppointmentsModal({
                     ))}
                     {hasMore && (
                       <div className="text-xs text-muted-foreground text-center py-2">
-                        ... and {appointments.length - 3} more appointment{appointments.length - 3 > 1 ? 's' : ''}
+                        ... and {appointments.length - 3} more appointment
+                        {appointments.length - 3 > 1 ? "s" : ""}
                       </div>
                     )}
                   </div>
@@ -133,7 +145,8 @@ export function BulkDeleteAppointmentsModal({
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete {appointmentCount} Appointment{appointmentCount > 1 ? 's' : ''}
+            Delete {appointmentCount} Appointment
+            {appointmentCount > 1 ? "s" : ""}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
