@@ -4,6 +4,7 @@ import { SignOut } from "@/app/components/sign-out";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
+import { Logo } from "@/components/ui/logo";
 import { buttonVariants } from "@/components/ui/button";
 import { getUserWithProfile } from "@/lib/db/auth";
 
@@ -28,6 +29,7 @@ export async function ProtectedHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
+        <Logo variant="secondary" className="mr-2" />
         <span className="text-base font-medium line-clamp-1">{title}</span>
         <Badge variant="secondary" className="capitalize">
           {account_type.split("_").join(" ")}
