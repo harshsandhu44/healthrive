@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { UpdateAppointmentModal } from "./update-appointment-modal";
 import { DeleteAppointmentModal } from "./delete-appointment-modal";
+// Note: Feature flags will be passed as props to avoid client-side async issues
 
 interface AppointmentWithPatient {
   id: string;
@@ -48,7 +49,12 @@ interface AppointmentWithPatient {
   };
 }
 
-export const appointmentsColumns: ColumnDef<AppointmentWithPatient>[] = [
+interface FeatureFlags {
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
+export const createAppointmentsColumns = ({ canEdit, canDelete }: FeatureFlags): ColumnDef<AppointmentWithPatient>[] => [
   {
     id: "select",
     header: ({ table }) => (
@@ -212,21 +218,25 @@ export const appointmentsColumns: ColumnDef<AppointmentWithPatient>[] = [
               <Eye className="mr-2 h-4 w-4" />
               View appointment
             </DropdownMenuItem>
-            <UpdateAppointmentModal appointment={appointment}>
-              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit appointment
-              </DropdownMenuItem>
-            </UpdateAppointmentModal>
-            <DeleteAppointmentModal appointment={appointment}>
-              <DropdownMenuItem 
-                className="text-destructive"
-                onSelect={(e) => e.preventDefault()}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete appointment
-              </DropdownMenuItem>
-            </DeleteAppointmentModal>
+            {canEdit && (
+              <UpdateAppointmentModal appointment={appointment}>
+                <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit appointment
+                </DropdownMenuItem>
+              </UpdateAppointmentModal>
+            )}
+            {canDelete && (
+              <DeleteAppointmentModal appointment={appointment}>
+                <DropdownMenuItem 
+                  className="text-destructive"
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete appointment
+                </DropdownMenuItem>
+              </DeleteAppointmentModal>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       );

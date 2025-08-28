@@ -11,6 +11,7 @@ import {
   generateAppointmentId 
 } from "@/lib/schemas/appointment";
 import { smsService } from "@/services/sms-service";
+import { enableAppointmentNotificationFlag } from "@/flags";
 
 interface ActionResult {
   success: boolean;
@@ -78,8 +79,11 @@ export async function createAppointment(data: AppointmentCreate): Promise<Action
     let smsStatus: 'sent' | 'failed' | 'skipped' = 'skipped';
     let smsError: string | undefined;
 
-    // Send SMS notification if patient has a phone number
-    if (!patientError && patient?.phone_number) {
+    // Check if SMS notifications are enabled
+    const smsNotificationsEnabled = await enableAppointmentNotificationFlag();
+
+    // Send SMS notification if enabled and patient has a phone number
+    if (smsNotificationsEnabled && !patientError && patient?.phone_number) {
       try {
         const smsResult = await smsService.sendAppointmentConfirmation({
           patientName: `${patient.first_name} ${patient.last_name}`,
@@ -104,9 +108,11 @@ export async function createAppointment(data: AppointmentCreate): Promise<Action
         console.error("SMS service error:", error);
       }
     } else {
-      if (patientError) {
+      if (!smsNotificationsEnabled) {
+        console.log("SMS notifications are disabled, skipping SMS");
+      } else if (patientError) {
         console.warn("Could not fetch patient for SMS:", patientError);
-      } else {
+      } else if (!patient?.phone_number) {
         console.log("Patient has no phone number, skipping SMS");
       }
     }

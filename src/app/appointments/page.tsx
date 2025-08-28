@@ -1,12 +1,18 @@
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { createClient } from "@/lib/db/server";
 import { AppointmentsTable } from "./components/appointments-table";
+import { CreateAppointmentModal } from "./components/create-appointment-modal";
+import { 
+  enableCreateAppointmentFlag, 
+  enableEditAppointmentFlag, 
+  enableDeleteAppointmentFlag, 
+  enableSearchAppointmentFlag 
+} from "@/flags";
 
 export default async function AppointmentsPage() {
   const supabase = await createClient();
@@ -16,6 +22,12 @@ export default async function AppointmentsPage() {
   if (authError || !user) {
     return <div>Please sign in to view appointments.</div>;
   }
+
+  // Get feature flag values
+  const canCreateAppointment = await enableCreateAppointmentFlag();
+  const canEditAppointment = await enableEditAppointmentFlag();
+  const canDeleteAppointment = await enableDeleteAppointmentFlag();
+  const canSearchAppointment = await enableSearchAppointmentFlag();
 
   const { data: appointments, error, count } = await supabase
     .from("appointments")
@@ -32,16 +44,31 @@ export default async function AppointmentsPage() {
   }
 
   return (
-    <section>
-      <Card>
-        <CardHeader>
-          <CardTitle>Appointments</CardTitle>
-          <CardDescription>
+    <section className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Appointments</h1>
+          <p className="text-muted-foreground">
             {count === 0 ? "No appointments found" : `${count ?? 0} appointments`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <AppointmentsTable data={appointments || []} />
+          </p>
+        </div>
+        {canCreateAppointment && (
+          <CreateAppointmentModal>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Appointment
+            </Button>
+          </CreateAppointmentModal>
+        )}
+      </div>
+      <Card>
+        <CardContent className="p-0">
+          <AppointmentsTable 
+            data={appointments || []} 
+            canEdit={canEditAppointment}
+            canDelete={canDeleteAppointment}
+            canSearch={canSearchAppointment}
+          />
         </CardContent>
       </Card>
     </section>
