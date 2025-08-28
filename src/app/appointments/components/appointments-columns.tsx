@@ -17,6 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { UpdateAppointmentModal } from "./update-appointment-modal";
+import { DeleteAppointmentModal } from "./delete-appointment-modal";
 
 interface AppointmentWithPatient {
   id: string;
@@ -217,10 +218,15 @@ export const appointmentsColumns: ColumnDef<AppointmentWithPatient>[] = [
                 Edit appointment
               </DropdownMenuItem>
             </UpdateAppointmentModal>
-            <DropdownMenuItem className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Cancel appointment
-            </DropdownMenuItem>
+            <DeleteAppointmentModal appointment={appointment}>
+              <DropdownMenuItem 
+                className="text-destructive"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete appointment
+              </DropdownMenuItem>
+            </DeleteAppointmentModal>
           </DropdownMenuContent>
         </DropdownMenu>
       );

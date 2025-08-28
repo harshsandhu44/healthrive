@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { DataTableColumnHeader } from "@/components/ui/data-table/data-table-column-header";
 import { Patient } from "@/lib/schemas/patient";
 import { UpdatePatientModal } from "./update-patient-modal";
+import { DeletePatientModal } from "./delete-patient-modal";
 
 export const patientsColumns: ColumnDef<Patient>[] = [
   {
@@ -188,10 +189,15 @@ export const patientsColumns: ColumnDef<Patient>[] = [
                 Edit patient
               </DropdownMenuItem>
             </UpdatePatientModal>
-            <DropdownMenuItem className="text-destructive">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete patient
-            </DropdownMenuItem>
+            <DeletePatientModal patient={patient}>
+              <DropdownMenuItem 
+                className="text-destructive"
+                onSelect={(e) => e.preventDefault()}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete patient
+              </DropdownMenuItem>
+            </DeletePatientModal>
           </DropdownMenuContent>
         </DropdownMenu>
       );
