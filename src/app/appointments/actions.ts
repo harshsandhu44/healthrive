@@ -10,12 +10,15 @@ import {
   type Appointment,
   generateAppointmentId 
 } from "@/lib/schemas/appointment";
+import { smsService } from "@/services/sms-service";
 
 interface ActionResult {
   success: boolean;
   data?: Appointment;
   error?: string;
   details?: Record<string, string[]>;
+  smsStatus?: 'sent' | 'failed' | 'skipped';
+  smsError?: string;
 }
 
 export async function createAppointment(data: AppointmentCreate): Promise<ActionResult> {
@@ -64,12 +67,58 @@ export async function createAppointment(data: AppointmentCreate): Promise<Action
       };
     }
 
+    // Get patient details for SMS notification
+    const { data: patient, error: patientError } = await supabase
+      .from("patients")
+      .select("first_name, last_name, phone_number")
+      .eq("id", appointmentData.patient_id)
+      .eq("user_id", user.id)
+      .single();
+
+    let smsStatus: 'sent' | 'failed' | 'skipped' = 'skipped';
+    let smsError: string | undefined;
+
+    // Send SMS notification if patient has a phone number
+    if (!patientError && patient?.phone_number) {
+      try {
+        const smsResult = await smsService.sendAppointmentConfirmation({
+          patientName: `${patient.first_name} ${patient.last_name}`,
+          patientPhone: patient.phone_number,
+          appointmentDate: insertedAppointment.datetime,
+          appointmentType: insertedAppointment.appointment_type || undefined,
+          location: insertedAppointment.location || undefined,
+          reason: insertedAppointment.reason || undefined,
+        });
+
+        if (smsResult.success) {
+          smsStatus = 'sent';
+          console.log(`SMS sent successfully to ${patient.phone_number}. SID: ${smsResult.messageSid}`);
+        } else {
+          smsStatus = 'failed';
+          smsError = smsResult.error;
+          console.warn(`Failed to send SMS to ${patient.phone_number}: ${smsResult.error}`);
+        }
+      } catch (error) {
+        smsStatus = 'failed';
+        smsError = error instanceof Error ? error.message : 'Unknown SMS error';
+        console.error("SMS service error:", error);
+      }
+    } else {
+      if (patientError) {
+        console.warn("Could not fetch patient for SMS:", patientError);
+      } else {
+        console.log("Patient has no phone number, skipping SMS");
+      }
+    }
+
     // Revalidate the appointments page to show the new appointment
     revalidatePath("/appointments");
 
     return {
       success: true,
-      data: insertedAppointment as Appointment
+      data: insertedAppointment as Appointment,
+      smsStatus,
+      smsError,
     };
   } catch (error) {
     console.error("Server action error:", error);

@@ -110,7 +110,22 @@ export function AppointmentForm({ onSuccess, onCancel }: AppointmentFormProps) {
       const result = await createAppointment(data);
 
       if (result.success) {
-        toast.success("Appointment created successfully");
+        // Show success message with SMS status
+        let successMessage = "Appointment created successfully";
+        
+        if (result.smsStatus === 'sent') {
+          successMessage += " and SMS confirmation sent to patient";
+        } else if (result.smsStatus === 'failed') {
+          successMessage += " (SMS notification failed to send)";
+        }
+        
+        toast.success(successMessage);
+        
+        // Show additional warning if SMS failed
+        if (result.smsStatus === 'failed' && result.smsError) {
+          toast.warning(`SMS Error: ${result.smsError}`);
+        }
+        
         form.reset();
         onSuccess?.();
       } else {
