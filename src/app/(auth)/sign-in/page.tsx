@@ -28,7 +28,7 @@ export default function SignInPage() {
   };
 
   const handleProfileComplete = () => {
-    router.push("/dashboard");
+    router.push("/");
   };
 
   return (

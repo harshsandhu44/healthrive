@@ -81,7 +81,7 @@ export default function SetupProfile({ onComplete }: SetupProfileProps) {
 
       // Navigate to dashboard after a brief delay
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/");
         onComplete?.();
       }, 1000);
     } catch {

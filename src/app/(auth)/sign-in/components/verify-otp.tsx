@@ -79,7 +79,7 @@ export default function VerifyOtp({
       if (hasExistingProfile) {
         // User already has profile data, redirect to dashboard
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/");
         }, 1000);
       } else {
         // New user, proceed to profile setup

@@ -19,8 +19,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Settings } from "@/app/(protected)/components/settings";
-import { UserProfile } from "@/app/(protected)/components/user-profile";
+import { Settings } from "@/app/components/settings";
+import { UserProfile } from "@/app/components/user-profile";
 
 export async function ProtectedSidebar({
   ...props
@@ -29,7 +29,7 @@ export async function ProtectedSidebar({
     {
       icon: LayoutDashboardIcon,
       label: "Dashboard",
-      href: { pathname: "/dashboard" },
+      href: { pathname: "/" },
     },
     { icon: UsersIcon, label: "Patients", href: { pathname: "/patients" } },
     {

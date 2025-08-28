@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { SignOut } from "@/app/(protected)/components/sign-out";
+import { SignOut } from "@/app/components/sign-out";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
