@@ -1,0 +1,26 @@
+{
+  "name": "Vylune - Healthcare Platform",
+  "short_name": "Vylune",
+  "description": "Vylune is a healthcare platform that provides a comprehensive solution for healthcare providers and patients.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4F46E5",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/logo-primary.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/logo-primary.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical", "productivity"],
+  "screenshots": []
+}
