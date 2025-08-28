@@ -3,31 +3,42 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  const pathname = request.nextUrl.pathname
+  
+  // Enhanced logging for production debugging
+  console.log(`[MIDDLEWARE] Processing: ${pathname} - URL: ${request.url}`)
+  
   try {
+    // Double-check: Skip sign-in route completely (safety net)
+    if (pathname === '/sign-in') {
+      console.log(`[MIDDLEWARE] Skipping sign-in route: ${pathname}`)
+      return NextResponse.next()
+    }
+    
     // Update session and get user data
     const { response, user, error } = await updateSession(request)
     
     // Check if user is authenticated (has valid user session)
     const isAuthenticated = !error && user && user.aud === 'authenticated'
     
-    // Get current pathname
-    const pathname = request.nextUrl.pathname
-    
-    // Skip authentication check for sign-in page (should not happen due to matcher, but safety net)
-    if (pathname === '/sign-in') {
-      return response
-    }
+    console.log(`[MIDDLEWARE] Auth check for ${pathname}:`, {
+      hasUser: !!user,
+      userAud: user?.aud,
+      hasError: !!error,
+      isAuthenticated
+    })
     
     // If user is not authenticated, redirect to sign-in
     if (!isAuthenticated) {
-      console.log('User not authenticated, redirecting to sign-in')
+      console.log(`[MIDDLEWARE] Redirecting unauthenticated user from ${pathname} to /sign-in`)
       const signInUrl = new URL('/sign-in', request.url)
       return NextResponse.redirect(signInUrl)
     }
     
+    console.log(`[MIDDLEWARE] Authenticated user accessing ${pathname}`)
     return response
   } catch (err) {
-    console.error('Middleware error:', err)
+    console.error(`[MIDDLEWARE] Error processing ${pathname}:`, err)
     // On error, redirect to sign-in to be safe
     const signInUrl = new URL('/sign-in', request.url)
     return NextResponse.redirect(signInUrl)
@@ -36,6 +47,15 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sign-in|api/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    /*
+     * Include only specific protected routes:
+     * - Root path /
+     * - /patients
+     * - /appointments
+     * This completely excludes /sign-in, /api, and static files
+     */
+    '/',
+    '/patients/:path*',
+    '/appointments/:path*',
   ],
 }
