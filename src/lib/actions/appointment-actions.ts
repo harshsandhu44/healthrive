@@ -38,6 +38,58 @@ export async function deleteAppointment(appointmentId: string) {
   }
 }
 
+export async function bulkDeleteAppointments(appointmentIds: string[]) {
+  try {
+    const supabase = await createClient()
+
+    // Check authentication
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    if (authError || !user) {
+      throw new Error('Unauthorized')
+    }
+
+    if (!appointmentIds || appointmentIds.length === 0) {
+      return { 
+        success: false, 
+        error: 'No appointments selected for deletion' 
+      }
+    }
+
+    // Delete multiple appointments in a single query
+    const { error, count } = await supabase
+      .from('appointments')
+      .delete({ count: 'exact' })
+      .in('id', appointmentIds)
+      .eq('user_id', user.id) // Ensure user can only delete their own appointments
+
+    if (error) {
+      console.error('Bulk delete appointments error:', error)
+      throw new Error('Failed to delete appointments')
+    }
+
+    // Revalidate the appointments page
+    revalidatePath('/appointments')
+
+    const deletedCount = count || 0
+    const expectedCount = appointmentIds.length
+
+    return { 
+      success: true, 
+      deletedCount,
+      expectedCount,
+      message: deletedCount === expectedCount 
+        ? `Successfully deleted ${deletedCount} appointment${deletedCount > 1 ? 's' : ''}`
+        : `Deleted ${deletedCount} of ${expectedCount} appointments (some may not exist or belong to you)`
+    }
+  } catch (error) {
+    console.error('Bulk delete appointments action error:', error)
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to delete appointments' 
+    }
+  }
+}
+
 export async function getAppointmentDetails(appointmentId: string) {
   try {
     const supabase = await createClient()

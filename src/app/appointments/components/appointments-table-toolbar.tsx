@@ -6,6 +6,7 @@ import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "@/components/ui/data-table/data-table-view-options";
+import { BulkDeleteAppointmentsModal } from "./bulk-delete-appointments-modal";
 
 interface AppointmentsTableToolbarProps {
   table: Table<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -13,6 +14,13 @@ interface AppointmentsTableToolbarProps {
 
 export function AppointmentsTableToolbar({ table }: AppointmentsTableToolbarProps) {
   const isFiltered = table.getState().columnFilters.length > 0 || table.getState().globalFilter;
+  const selectedRows = table.getFilteredSelectedRowModel().rows;
+  const selectedAppointments = selectedRows.map(row => row.original);
+
+  const handleBulkDeleteSuccess = () => {
+    // Reset row selection after successful deletion
+    table.resetRowSelection();
+  };
 
   return (
     <div className="flex items-center justify-between">
@@ -38,10 +46,15 @@ export function AppointmentsTableToolbar({ table }: AppointmentsTableToolbarProp
         )}
       </div>
       <div className="flex items-center space-x-2">
-        {table.getFilteredSelectedRowModel().rows.length > 0 && (
-          <Button variant="outline" size="sm">
-            Delete ({table.getFilteredSelectedRowModel().rows.length})
-          </Button>
+        {selectedRows.length > 0 && (
+          <BulkDeleteAppointmentsModal 
+            appointments={selectedAppointments}
+            onSuccess={handleBulkDeleteSuccess}
+          >
+            <Button variant="outline" size="sm">
+              Delete ({selectedRows.length})
+            </Button>
+          </BulkDeleteAppointmentsModal>
         )}
         <DataTableViewOptions table={table} />
       </div>
