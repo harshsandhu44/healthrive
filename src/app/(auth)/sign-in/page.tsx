@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SendOtp } from "./components/send-otp";
 import VerifyOtp from "./components/verify-otp";
 import SetupProfile from "./components/setup-profile";
@@ -10,6 +10,15 @@ type AuthStep = "send-otp" | "verify-otp" | "setup-profile";
 
 export default function SignInPage() {
   const router = useRouter();
+
+  // Add debugging for sign-in page
+  useEffect(() => {
+    console.log('[SIGN-IN] Page loaded');
+    
+    return () => {
+      console.log('[SIGN-IN] Page cleanup');
+    };
+  }, []);
 
   const [currentStep, setCurrentStep] = useState<AuthStep>("send-otp");
   const [email, setEmail] = useState("");
@@ -28,6 +37,7 @@ export default function SignInPage() {
   };
 
   const handleProfileComplete = () => {
+    console.log('[SIGN-IN] Profile completed, navigating to home');
     router.push("/");
   };
 
