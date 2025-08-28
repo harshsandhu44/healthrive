@@ -24,13 +24,6 @@ export const enableSearchPatientFlag = flag<boolean>({
   decide: () => false,
 });
 
-export const enableCronJobsFlag = flag<boolean>({
-  key: "cron-jobs",
-  options: [true, false],
-  decide: () => false,
-});
-
-
 export const patientsFlag = [
   enableCreatePatientFlag,
   enableEditPatientFlag,
@@ -38,7 +31,40 @@ export const patientsFlag = [
   enableSearchPatientFlag,
 ];
 
-export const cronFlags = [
-  enableCronJobsFlag,
-];
+export const enableCreateAppointmentFlag = flag<boolean>({
+  key: "create-appointment",
+  options: [true, false],
+  decide: () => true,
+});
 
+export const enableEditAppointmentFlag = flag<boolean>({
+  key: "edit-appointment",
+  options: [true, false],
+  decide: () => true,
+});
+
+export const enableDeleteAppointmentFlag = flag<boolean>({
+  key: "delete-appointment",
+  options: [true, false],
+  decide: () => true,
+});
+
+export const enableSearchAppointmentFlag = flag<boolean>({
+  key: "search-appointments",
+  options: [true, false],
+  decide: () => false,
+});
+
+export const enableAppointmentNotificationFlag = flag<boolean>({
+  key: "appointment-notification",
+  options: [true, false],
+  decide: () => false,
+});
+
+export const appointmentFlag = [
+  enableCreateAppointmentFlag,
+  enableEditAppointmentFlag,
+  enableDeleteAppointmentFlag,
+  enableSearchAppointmentFlag,
+  enableAppointmentNotificationFlag,
+];
